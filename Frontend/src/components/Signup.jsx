@@ -8,11 +8,32 @@ import {
   IconBrandGoogle,
   IconBrandOnlyfans,
 } from "@tabler/icons-react";
+import { Form, Formik } from "formik"
+import * as Yup from "yup"
+import { useState } from "react";
 
 export default function SignupFormDemo() {
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("Form submitted");
+
+  const [visibility, setVisibility] = useState(false)
+
+  const visibilityHandle = ()=>{
+    setVisibility(!visibility)
+  }
+
+  const initialStates = {
+    name: '',
+    email: '',
+    password: ''
+  }
+
+  const validationSchema = Yup.object({
+    name: Yup.string().required('name is required'),
+    email: Yup.string().email('invalid email').required('email is required'),
+    password: Yup.string().required('password is required')
+  })
+
+  const handleSubmit = (values) => {
+    console.log(values);
   };
   return (
     <div
@@ -24,60 +45,95 @@ export default function SignupFormDemo() {
         Login to aceternity if you can because we don&apos;t have a login flow
         yet
       </p>
-      <form className="my-8" onSubmit={handleSubmit}>
-        <div
-          className="mb-4 flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
-          <LabelInputContainer>
-            <Label htmlFor="firstname">First name</Label>
-            <Input id="firstname" placeholder=" " type="text" />
-          </LabelInputContainer>
-          <LabelInputContainer>
-            <Label htmlFor="lastname">Last name</Label>
-            <Input id="lastname" placeholder=" " type="text" />
-          </LabelInputContainer>
-        </div>
-        <LabelInputContainer className="mb-4">
-          <Label htmlFor="email">Email Address</Label>
-          <Input id="email" placeholder=" " type="email" />
-        </LabelInputContainer>
-        <LabelInputContainer className="mb-4">
-          <Label htmlFor="password">Password</Label>
-          <Input id="password" placeholder=" " type="password" />
-        </LabelInputContainer>
-        
 
-        <button
-          className="group/btn relative block h-10 w-full rounded-md bg-gradient-to-br from-black to-neutral-600 font-medium text-white shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:bg-zinc-800 dark:from-zinc-900 dark:to-zinc-900 dark:shadow-[0px_1px_0px_0px_#27272a_inset,0px_-1px_0px_0px_#27272a_inset]"
-          type="submit">
-          Sign up &rarr;
-          <BottomGradient />
-        </button>
+      <Formik onSubmit={handleSubmit} initialValues={initialStates} validationSchema={validationSchema}>
 
-        <div
-          className="my-8 h-[1px] w-full bg-gradient-to-r from-transparent via-neutral-300 to-transparent dark:via-neutral-700" />
+        {({ handleBlur, handleChange, touched, errors }) =>
 
-        <div className="flex flex-col space-y-4">
-          <button
-            className="group/btn shadow-input relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626]"
-            type="submit">
-            <IconBrandGithub className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
-            <span className="text-sm text-neutral-700 dark:text-neutral-300">
-              GitHub
-            </span>
-            <BottomGradient />
-          </button>
-          <button
-            className="group/btn shadow-input relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626]"
-            type="submit">
-            <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
-            <span className="text-sm text-neutral-700 dark:text-neutral-300">
-              Google
-            </span>
-            <BottomGradient />
-          </button>
-         
-        </div>
-      </form>
+          <Form className="my-8">
+            <div
+              className="mb-4 flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
+              <LabelInputContainer>
+                <Label htmlFor="firstname">First name</Label>
+                <Input id="name"
+                  placeholder=" "
+                  type="text"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                />
+                {touched.name && errors.name &&(
+                  <p className="text-red-500 text-sm mt-1">{errors.name} </p>
+                )}
+
+              </LabelInputContainer>
+
+              <LabelInputContainer>
+                <Label htmlFor="lastname">Last name</Label>
+                <Input id="lastname" placeholder=" " type="text" />
+              </LabelInputContainer>
+            </div>
+
+            <LabelInputContainer className="mb-4">
+              <Label htmlFor="email">Email Address</Label>
+              <Input id="email" 
+              placeholder=" "
+               type="text"
+              onChange={handleChange}
+              onBlur={handleBlur}
+              />
+
+              {touched.email && errors.email &&(
+                <p className="text-red-500 text-sm mt-1">{errors.email} </p>
+              )}
+            </LabelInputContainer>
+
+            <LabelInputContainer className="mb-4 relative">
+              <Label htmlFor="password">Password</Label>
+              <Input id="password" 
+              placeholder=" " 
+              type={visibility? "text" : "password"}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              />
+              
+              <button type="button"
+              className="text-white absolute right-3 top-7.5 hover:cursor-pointer"
+              onClick={visibilityHandle}>
+                {visibility? <i className="ri-eye-off-line"></i> : <i className="ri-eye-line"></i>}
+              </button>
+
+              {touched.password && errors.password &&(
+                <p className="text-red-500 text-sm mt-1">{errors.password} </p>
+              )}
+            </LabelInputContainer>
+
+
+            <button
+              className="group/btn relative block h-10 w-full rounded-md bg-gradient-to-br from-black to-neutral-600 font-medium text-white shadow-[0px_1px_0px_0px_#ffffff40_inset,0px_-1px_0px_0px_#ffffff40_inset] dark:bg-zinc-800 dark:from-zinc-900 dark:to-zinc-900 dark:shadow-[0px_1px_0px_0px_#27272a_inset,0px_-1px_0px_0px_#27272a_inset]"
+              type="submit">
+              Sign up &rarr;
+              <BottomGradient />
+            </button>
+
+            <div
+              className="my-8 h-[1px] w-full bg-gradient-to-r from-transparent via-neutral-300 to-transparent dark:via-neutral-700" />
+
+            <div className="flex flex-col space-y-4">
+              
+              <button
+                className="group/btn shadow-input relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626]"
+                type="button">
+                <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
+                <span className="text-sm text-neutral-700 dark:text-neutral-300">
+                  Google
+                </span>
+                <BottomGradient />
+              </button>
+
+            </div>
+          </Form>
+        }
+      </Formik>
     </div>
   );
 }
