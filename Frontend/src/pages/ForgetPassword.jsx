@@ -50,7 +50,7 @@ const ForgetPassword = () => {
                             <LabelInputContainer className="mb-4">
                                 <Label htmlFor="email">Email Address</Label>
                                 <Input
-
+                                    
                                     name='email'
                                     onChange={handleChange}
                                     onBlur={handleBlur}
@@ -76,7 +76,7 @@ const ForgetPassword = () => {
                             <div className="flex flex-col space-y-4">
                                 <button
                                     className="group/btn shadow-input relative h-10 w-full space-x-2 rounded-md bg-gray-50 px-4 font-medium text-white dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626] hover:cursor-pointer"
-                                    type="submit"
+                                    type="button"
                                     onClick={()=> navigate('/Login')}>
                                         Back to Sign in
                                     <BottomGradient />
