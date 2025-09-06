@@ -1,5 +1,7 @@
 "use client";
 import React from "react";
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom'
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -16,7 +18,9 @@ export default function SignupFormDemo() {
 
   const [visibility, setVisibility] = useState(false)
 
-  const visibilityHandle = ()=>{
+  const navigate = useNavigate();
+
+  const visibilityHandle = () => {
     setVisibility(!visibility)
   }
 
@@ -32,8 +36,22 @@ export default function SignupFormDemo() {
     password: Yup.string().required('password is required')
   })
 
-  const handleSubmit = (values) => {
-    console.log(values);
+  const handleSubmit = async (values) => {
+
+    const userData = {
+      name: values.name,
+      email: values.email,
+      password: values.password
+    }
+    const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/register`, userData, { withCredentials: true })
+
+    if (response.status === 201) {
+      const data = response.data
+      navigate('/dashboard');
+      console.log(data);
+
+    }
+
   };
   return (
     <div
@@ -61,7 +79,7 @@ export default function SignupFormDemo() {
                   onChange={handleChange}
                   onBlur={handleBlur}
                 />
-                {touched.name && errors.name &&(
+                {touched.name && errors.name && (
                   <p className="text-red-500 text-sm mt-1">{errors.name} </p>
                 )}
 
@@ -75,34 +93,34 @@ export default function SignupFormDemo() {
 
             <LabelInputContainer className="mb-4">
               <Label htmlFor="email">Email Address</Label>
-              <Input id="email" 
-              placeholder=" "
-               type="text"
-              onChange={handleChange}
-              onBlur={handleBlur}
+              <Input id="email"
+                placeholder=" "
+                type="text"
+                onChange={handleChange}
+                onBlur={handleBlur}
               />
 
-              {touched.email && errors.email &&(
+              {touched.email && errors.email && (
                 <p className="text-red-500 text-sm mt-1">{errors.email} </p>
               )}
             </LabelInputContainer>
 
             <LabelInputContainer className="mb-4 relative">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" 
-              placeholder=" " 
-              type={visibility? "text" : "password"}
-              onChange={handleChange}
-              onBlur={handleBlur}
+              <Input id="password"
+                placeholder=" "
+                type={visibility ? "text" : "password"}
+                onChange={handleChange}
+                onBlur={handleBlur}
               />
-              
+
               <button type="button"
-              className="text-white absolute right-3 top-7.5 hover:cursor-pointer"
-              onClick={visibilityHandle}>
-                {visibility? <i className="ri-eye-off-line"></i> : <i className="ri-eye-line"></i>}
+                className="text-white absolute right-3 top-7.5 hover:cursor-pointer"
+                onClick={visibilityHandle}>
+                {visibility ? <i className="ri-eye-off-line"></i> : <i className="ri-eye-line"></i>}
               </button>
 
-              {touched.password && errors.password &&(
+              {touched.password && errors.password && (
                 <p className="text-red-500 text-sm mt-1">{errors.password} </p>
               )}
             </LabelInputContainer>
@@ -119,7 +137,7 @@ export default function SignupFormDemo() {
               className="my-8 h-[1px] w-full bg-gradient-to-r from-transparent via-neutral-300 to-transparent dark:via-neutral-700" />
 
             <div className="flex flex-col space-y-4">
-              
+
               <button
                 className="group/btn shadow-input relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626]"
                 type="button">
