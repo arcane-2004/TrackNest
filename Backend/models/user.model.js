@@ -1,4 +1,6 @@
 const mongoose = require('mongoose')
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
 
 const userSchema = new mongoose.Schema({
 
@@ -16,7 +18,6 @@ const userSchema = new mongoose.Schema({
     },
     imageUrl :{
         type: String,
-        required: true,
     },
     googleId: {
         type: String,
@@ -44,6 +45,21 @@ const userSchema = new mongoose.Schema({
         
     }
 },{timestamps: true })
+
+userSchema.methods.generateAuthToken = function(){
+    const accessToken = jwt.sign({email: this.email}, process.env.JWT_SECRET, {expiresIn: '10d'})
+    return accessToken;
+}
+
+userSchema.statics.hashPassword = async function(password){
+    return await bcrypt.hash(password, 10)
+}
+
+userSchema.methods.comparePassword =async function(password){
+    return await bcrypt.compare(password, this.password)
+}
+
+
 
 
 module.exports = mongoose.model('User', userSchema)

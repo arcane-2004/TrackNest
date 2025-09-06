@@ -4,6 +4,8 @@ const passport = require("passport")
 const { body } = require('express-validator')
 const googleAuth = require('../middlewares/googleAuth.middleware')
 
+const userController = require('../controllers/user.controller')
+
 router.get('/auth/google', passport.authenticate('google', {
     scope: ['email', 'profile'],
     prompt: 'select_account'
@@ -11,10 +13,21 @@ router.get('/auth/google', passport.authenticate('google', {
 
 router.get('/auth/google/callback', passport.authenticate('google', {
     failureRedirect: `${process.env.FRONTEND_URL}/login`
-}), googleAuth,
-    (req, res, next) => {
-        res.redirect(`${process.env.FRONTEND_URL}/dashboard`)
-    })
+}),
+googleAuth,
+(req, res, next) => {
+    res.redirect(`${process.env.FRONTEND_URL}/dashboard`)
+});
+
+
+router.post('/register',[
+    body('email').isEmail().withMessage('Invalid email'),
+    body('password').isLength({min:6}).withMessage('Password should be minimum 6 characters'),
+], userController.registerUser )
+
+
+
+
 
 
 
