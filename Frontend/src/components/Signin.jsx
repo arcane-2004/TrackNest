@@ -56,7 +56,14 @@ export default function SignupFormDemo() {
         navigate("/dashboard");
       }
     } catch (errors) {
-      setErrorMsg(errors.response?.data?.message || "Login failed");
+      if (errors.response?.status === 401) {
+        setErrorMsg(errors.response?.data?.errors?.[0]?.msg || "Invalid credentials")
+      }
+      else {
+        setErrorMsg(errors.response?.data?.message || "Login failed");
+      }
+      console.log(errors);
+      
     }
 
 
