@@ -17,6 +17,8 @@ import { useState } from "react";
 export default function SignupFormDemo() {
 
   const [visibility, setVisibility] = useState(false)
+  const [errorMsg, setErrorMsg] = useState('');
+
 
   const navigate = useNavigate();
 
@@ -43,14 +45,22 @@ export default function SignupFormDemo() {
       email: values.email,
       password: values.password
     }
-    const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/register`, userData, { withCredentials: true })
 
-    if (response.status === 201) {
-      const data = response.data
-      navigate('/dashboard');
-      console.log(data);
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/register`, userData, { withCredentials: true })
 
+      if (response.status === 201) {
+        const data = response.data
+        navigate('/dashboard');
+        console.log(data);
+
+      }
+
+    } catch (errors) {
+      setErrorMsg(errors.response?.data?.message || "Login failed");
     }
+
+
   };
 
 
@@ -139,6 +149,10 @@ export default function SignupFormDemo() {
               Sign up &rarr;
               <BottomGradient />
             </button>
+
+            {errorMsg && (
+              <p className="text-red-500 text-sm mb-2">{errorMsg}</p>
+            )}
 
             <div
               className="my-8 h-[1px] w-full bg-gradient-to-r from-transparent via-neutral-300 to-transparent dark:via-neutral-700" />

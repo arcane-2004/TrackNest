@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import axios from "axios";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -19,6 +20,7 @@ export default function SignupFormDemo() {
   const navigate = useNavigate();
 
   const [visibility, setVisibility] = useState(false);
+  const [errorMsg, setErrorMsg] = useState('');
 
   const visibilityHandle = () => {
     setVisibility(!visibility)
@@ -36,8 +38,28 @@ export default function SignupFormDemo() {
 
 
 
-  const handleSubmit = (values) => {
-    console.log(values);
+  const handleSubmit = async (values) => {
+
+    const userData = {
+      email: values.email,
+      password: values.password
+    }
+
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/login`, userData, {
+        withCredentials: true
+      })
+      if (response.status === 201) {
+        const { accessToken, user } = response.data;
+        console.log("Login successful:", user, accessToken);
+
+        navigate("/dashboard");
+      }
+    } catch (errors) {
+      setErrorMsg(errors.response?.data?.message || "Login failed");
+    }
+
+
   };
 
   const handleGoogleSignIn = () => {
@@ -73,6 +95,7 @@ export default function SignupFormDemo() {
               {touched.email && errors.email && (
                 <p className="text-red-500 text-sm mt-1">{errors.email}</p>
               )}
+
             </LabelInputContainer>
 
             <LabelInputContainer className="mb-4 relative">
@@ -94,6 +117,7 @@ export default function SignupFormDemo() {
               {touched.password && errors.password && (
                 <p className="text-red-500 text-sm mt-1">{errors.password}</p>
               )}
+
             </LabelInputContainer>
 
 
@@ -103,10 +127,13 @@ export default function SignupFormDemo() {
               Sign in &rarr;
               <BottomGradient />
             </button>
+            {errorMsg && (
+              <p className="text-red-500 text-sm mb-2">{errorMsg}</p>
+            )}
 
-            <button className="text-gray-800 font-medium text-sm mt-1.5 hover:cursor-pointer" 
-            onClick={() => navigate('/forget/password')}
-            type="text" >
+            <button className="text-gray-800 font-medium text-sm mt-1.5 hover:cursor-pointer"
+              onClick={() => navigate('/forget/password')}
+              type="text" >
               Forget password
             </button>
 
@@ -118,7 +145,7 @@ export default function SignupFormDemo() {
                 className="group/btn shadow-input relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626] hover:cursor-pointer"
                 type="submit"
                 onClick={handleGoogleSignIn}>
-                  
+
                 <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
                 <span className="text-sm text-neutral-700 dark:text-neutral-300">
                   Google
