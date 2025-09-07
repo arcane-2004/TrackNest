@@ -8,6 +8,7 @@ import * as Yup from "yup"
 import { Form, Formik } from "formik"
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 import {
   IconBrandGithub,
@@ -20,7 +21,6 @@ export default function SignupFormDemo() {
   const navigate = useNavigate();
 
   const [visibility, setVisibility] = useState(false);
-  const [errorMsg, setErrorMsg] = useState('');
 
   const visibilityHandle = () => {
     setVisibility(!visibility)
@@ -57,10 +57,10 @@ export default function SignupFormDemo() {
       }
     } catch (errors) {
       if (errors.response?.status === 401) {
-        setErrorMsg(errors.response?.data?.errors?.[0]?.msg || "Invalid credentials")
+        toast.error(errors.response?.data?.errors?.[0]?.msg || "Invalid credentials")
       }
       else {
-        setErrorMsg(errors.response?.data?.message || "Login failed");
+        toast.error(errors.response?.data?.message || "Login failed");
       }
       console.log(errors);
       
@@ -134,9 +134,7 @@ export default function SignupFormDemo() {
               Sign in &rarr;
               <BottomGradient />
             </button>
-            {errorMsg && (
-              <p className="text-red-500 text-sm mb-2">{errorMsg}</p>
-            )}
+            
 
             <button className="text-gray-800 font-medium text-sm mt-1.5 hover:cursor-pointer"
               onClick={() => navigate('/forget/password')}

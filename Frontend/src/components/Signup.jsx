@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import axios from 'axios';
+import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom'
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -17,7 +18,7 @@ import { useState } from "react";
 export default function SignupFormDemo() {
 
   const [visibility, setVisibility] = useState(false)
-  const [errorMsg, setErrorMsg] = useState('');
+
 
 
   const navigate = useNavigate();
@@ -59,10 +60,10 @@ export default function SignupFormDemo() {
     } catch (errors) {
 
       if (errors.response?.status === 401) {
-        setErrorMsg(errors.response?.data?.errors?.[0]?.msg || "Invalid credentials")
+        toast.error(errors.response?.data?.errors?.[0]?.msg || "Invalid credentials")
       }
       else {
-        setErrorMsg(errors.response?.data?.message || "Login failed");
+        toast.error(errors.response?.data?.message || "Login failed");
       }
 
     }
@@ -98,6 +99,7 @@ export default function SignupFormDemo() {
               <LabelInputContainer>
                 <Label htmlFor="firstname">First name</Label>
                 <Input id="name"
+                  name="name"
                   placeholder=" "
                   type="text"
                   onChange={handleChange}
@@ -118,6 +120,7 @@ export default function SignupFormDemo() {
             <LabelInputContainer className="mb-4">
               <Label htmlFor="email">Email Address</Label>
               <Input id="email"
+                name="email"
                 placeholder=" "
                 type="text"
                 onChange={handleChange}
@@ -132,6 +135,7 @@ export default function SignupFormDemo() {
             <LabelInputContainer className="mb-4 relative">
               <Label htmlFor="password">Password</Label>
               <Input id="password"
+                name="password"
                 placeholder=" "
                 type={visibility ? "text" : "password"}
                 onChange={handleChange}
@@ -157,9 +161,6 @@ export default function SignupFormDemo() {
               <BottomGradient />
             </button>
 
-            {errorMsg && (
-              <p className="text-red-500 text-sm mb-2">{errorMsg}</p>
-            )}
 
             <div
               className="my-8 h-[1px] w-full bg-gradient-to-r from-transparent via-neutral-300 to-transparent dark:via-neutral-700" />
