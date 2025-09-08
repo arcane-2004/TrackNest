@@ -7,7 +7,7 @@ module.exports.registerUser = async (req, res, next) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        res.status(401).json({errors: errors.array() })
+        res.status(401).json({ errors: errors.array() })
     }
 
     try {
@@ -27,7 +27,7 @@ module.exports.registerUser = async (req, res, next) => {
             })
 
             const accessToken = newUser.generateAuthToken();
-            res.cookie('accessToken', accessToken,{
+            res.cookie('accessToken', accessToken, {
                 httpOnly: true,
                 secure: true,
                 sameSite: 'none'
@@ -41,25 +41,25 @@ module.exports.registerUser = async (req, res, next) => {
     }
 }
 
-module.exports.loginUser = async (req, res, next) =>{
+module.exports.loginUser = async (req, res, next) => {
 
     const errors = validationResult(req);
-    if(!errors.isEmpty()){
-        return res.status(401).json({errors: errors.array()})
+    if (!errors.isEmpty()) {
+        return res.status(401).json({ errors: errors.array() })
     }
 
-    try{
+    try {
 
-        const {email, password} = req.body;
-        const user = await userModel.findOne({email:email});
+        const { email, password } = req.body;
+        const user = await userModel.findOne({ email: email });
 
-        if(!user){
-            return res.status(400).json({message: 'Invalid email or password'});
+        if (!user) {
+            return res.status(400).json({ message: 'Invalid email or password' });
         }
 
         const isMatch = await user.comparePassword(password);
-        if(!isMatch){
-            return res.status(400).json({message: 'Invalid email or password'});
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Invalid email or password' });
         }
 
         const accessToken = user.generateAuthToken();
@@ -68,26 +68,68 @@ module.exports.loginUser = async (req, res, next) =>{
             secure: true,
             sameSite: 'none'
         });
-        res.status(201).json({accessToken, user});
+        res.status(201).json({ accessToken, user });
 
-    }catch(error){
-        next(error);    
+    } catch (error) {
+        next(error);
     }
 }
 
-module.exports.getUserProfile = async (req, res, next) =>{
-    
-    return res.status(200).json({user:req.user});
+module.exports.getUserProfile = async (req, res, next) => {
+
+    return res.status(200).json({ user: req.user });
 }
 
-module.exports.logoutUser = async( req, res, next) => {
+module.exports.logoutUser = async (req, res, next) => {
 
     const accessToken = req.cookies.accessToken || req.header.authorization?.split(' ')[1];
     // const sessionId = req.cookies.connect.sid
     res.clearCookie('accessToken');
     res.clearCookie('connect.sid');
 
-    await blackListTokenModel.create({token: accessToken});
+    await blackListTokenModel.create({ token: accessToken });
 
-    return res.status(200).json({message: 'Logged out successfully'})
+    return res.status(200).json({ message: 'Logged out successfully' })
+}
+
+module.exports.forgetPassword = async (req, res, next) => {
+
+    const { email } = req.body;
+
+    const user = await userModel.findOne({ email: email });
+    if (!user) {
+        return res.status(400).json({ message: "Incorrect email" })
+    }
+
+    try {
+        const userOtp = user.password_otp?.otp;
+        if (userOtp) {
+            const timeDiff = new Date().getTime() - new Date(user.password_otp.last_attempt).getTime() <= 24 * 60 * 60 * 1000;
+
+            if (!timeDiff) {
+                user.password_otp.limit = 5;
+                await user.save();
+            }
+
+            const remainingLimit = user.password_otp.limit === 0
+            if (timeDiff && remainingLimit) {
+                return res.status(429).json({ message: "daily limit exceeded" })
+            }
+        }
+
+        const otp = Math.floor(100000 + Math.random() * 900000);
+        user.password_otp.otp = otp;
+        user.password_otp.limit--;
+        user.password_otp.last_attempt = new Date();
+        user.password_otp.sendTime = new Date().getTime() + 2*60*1000
+
+        await user.save();
+
+        res.status(200).json({message : 'otp sent to given email', otp: user.password_otp.otp})
+    }
+    catch(error){
+        next(error)
+    }
+
+   
 }

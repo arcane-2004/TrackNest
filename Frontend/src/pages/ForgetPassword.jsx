@@ -4,8 +4,9 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import * as Yup from "yup"
 import { Form, Formik } from "formik"
-import { useState } from "react";
+// import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from 'axios';  
 
 import {
     IconBrandGithub,
@@ -27,8 +28,25 @@ const ForgetPassword = () => {
 
 
 
-    const handleSubmit = (values) => {
-        console.log(values);
+    const handleSubmit = async (values) => {
+        const data = {
+            email: values.email
+        }
+        try{
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/forget/password`, data, {
+                withCredentials: true
+            });
+            if(response.status === 200){
+                navigate('/verify/otp')
+            }
+
+        }
+        catch(error){
+            console.log(error);
+        }
+
+        
+        
     };
 
     return (

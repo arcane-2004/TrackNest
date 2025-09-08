@@ -37,6 +37,7 @@ router.get('/logout', authMiddleware.authUser, userController.logoutUser)
 
 router.get('/get/access', authMiddleware.authUser, getAccessMiddleware.getAccess)
 
+router.post('/forget/password', userController.forgetPassword)
 
 module.exports = router
 
