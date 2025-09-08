@@ -83,7 +83,9 @@ module.exports.getUserProfile = async (req, res, next) =>{
 module.exports.logoutUser = async( req, res, next) => {
 
     const accessToken = req.cookies.accessToken || req.header.authorization?.split(' ')[1];
+    // const sessionId = req.cookies.connect.sid
     res.clearCookie('accessToken');
+    // res.clearCookie('connect.sid');
 
     await blackListTokenModel.create({token: accessToken});
 
