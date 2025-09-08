@@ -4,6 +4,7 @@ import ForgetPassword from "./pages/ForgetPassword"
 import VerifyOTP from "./pages/VerifyOTP"
 import UpdatePassword from "./pages/UpdatePassword"
 import Dashboard from "./pages/Dashboard"
+import Super from "./components/Super"
 
 function App() {
 
@@ -14,7 +15,9 @@ function App() {
         <Route path="/forget/password" element={<ForgetPassword/>} />
         <Route path="/verify/otp" element={<VerifyOTP/>} />
         <Route path="/update/password" element={<UpdatePassword />} />
-        <Route path="/dashboard" element={<Dashboard />} />
+        <Route element={<Super />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+        </Route>
       </Routes>
     </>
   )

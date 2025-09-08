@@ -5,6 +5,7 @@ const { body } = require('express-validator')
 const googleAuth = require('../middlewares/googleAuth.middleware')
 const userController = require('../controllers/user.controller')
 const authMiddleware = require('../middlewares/auth.middleware')
+const getAccessMiddleware = require('../middlewares/getAccess.middleware')
 
 router.get('/auth/google', passport.authenticate('google', {
     scope: ['email', 'profile'],
@@ -34,7 +35,7 @@ router.get('/profile', authMiddleware.authUser, userController.getUserProfile )
 
 router.get('/logout', authMiddleware.authUser, userController.logoutUser)
 
-
+router.get('/get/access', authMiddleware.authUser, getAccessMiddleware.getAccess)
 
 
 module.exports = router
