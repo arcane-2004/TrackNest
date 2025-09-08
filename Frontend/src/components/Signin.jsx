@@ -44,14 +44,14 @@ export default function SignupFormDemo() {
       email: values.email,
       password: values.password
     }
-
+    
     try {
       const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/login`, userData, {
         withCredentials: true
       })
       if (response.status === 201) {
-        const { accessToken, user } = response.data;
-        console.log("Login successful:", user, accessToken);
+        // const { accessToken, user } = response.data;
+        
 
         navigate("/dashboard");
       }
