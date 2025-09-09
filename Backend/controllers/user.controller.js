@@ -2,6 +2,7 @@ const userModel = require('../models/user.model');
 const blackListTokenModel = require('../models/blackListToken.model')
 const userService = require('../services/user.service');
 const { validationResult } = require('express-validator')
+const sendEmail = require('../utils/sendMail.utils')
 
 module.exports.registerUser = async (req, res, next) => {
 
@@ -107,23 +108,30 @@ module.exports.forgetPassword = async (req, res, next) => {
             const timeDiff = new Date().getTime() - new Date(user.password_otp.last_attempt).getTime() <= 24 * 60 * 60 * 1000;
 
             if (!timeDiff) {
-                user.password_otp.limit = 5;
+                user.password_otp.limit = 100;
                 await user.save();
             }
 
-            const remainingLimit = user.password_otp.limit === 0
+            const remainingLimit = user.password_otp.limit === 100
             if (timeDiff && remainingLimit) {
                 return res.status(429).json({ message: "daily limit exceeded" })
             }
         }
 
-        const otp = Math.floor(100000 + Math.random() * 900000);
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
         user.password_otp.otp = otp;
         user.password_otp.limit--;
         user.password_otp.last_attempt = new Date();
         user.password_otp.sendTime = new Date().getTime() + 2*60*1000
 
         await user.save();
+
+        const data = {
+            email: email,
+            otp:otp,
+        }
+        const result = await sendEmail(data);
+        console.log(result);
 
         res.status(200).json({message : 'otp sent to given email', otp: user.password_otp.otp})
     }

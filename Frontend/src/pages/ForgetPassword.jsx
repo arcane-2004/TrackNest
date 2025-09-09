@@ -7,6 +7,7 @@ import { Form, Formik } from "formik"
 // import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';  
+import toast from 'react-hot-toast';
 
 import {
     IconBrandGithub,
@@ -38,11 +39,14 @@ const ForgetPassword = () => {
             });
             if(response.status === 200){
                 navigate('/verify/otp')
+                console.log(response.data);
+                toast.success(response.data.message)
+
             }
 
         }
         catch(error){
-            console.log(error);
+            toast.error(error.response?.data?.message || "Something went wrong")
         }
 
         

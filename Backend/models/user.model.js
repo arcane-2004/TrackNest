@@ -40,7 +40,7 @@ const userSchema = new mongoose.Schema({
         },
         limit: {
             type: Number,
-            default: 5
+            default: 100
         },
         last_attempt: {
             type: Object
