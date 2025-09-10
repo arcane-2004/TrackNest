@@ -3,6 +3,7 @@ const blackListTokenModel = require('../models/blackListToken.model')
 const userService = require('../services/user.service');
 const { validationResult } = require('express-validator')
 const sendEmail = require('../utils/sendMail.utils')
+const jwt = require('jsonwebtoken')
 
 module.exports.registerUser = async (req, res, next) => {
 
@@ -95,7 +96,22 @@ module.exports.logoutUser = async (req, res, next) => {
 
 module.exports.forgetPassword = async (req, res, next) => {
 
-    const { email } = req.body;
+    let email = req.body.email;
+    
+    if (!email) {
+        const pass_key_id = req.cookies.pass_key_id || req.headers.authorization?.split(' ')[1];
+        if (!pass_key_id) {
+            return res.status(440).json({ message: 'Session expired. Please request a new OTP.' });
+        }
+        try {
+            email = jwt.verify(pass_key_id, process.env.EMAIL_JWT_SECRET).email;
+        } catch (error) {
+            if (error.name === 'TokenExpiredError') {
+                return res.status(440).json({ message: 'Session expired. Please request a new OTP.' });
+            }
+            return next(error);
+        }
+    }
 
     const user = await userModel.findOne({ email: email });
     if (!user) {
@@ -108,11 +124,11 @@ module.exports.forgetPassword = async (req, res, next) => {
             const timeDiff = new Date().getTime() - new Date(user.password_otp.last_attempt).getTime() <= 24 * 60 * 60 * 1000;
 
             if (!timeDiff) {
-                user.password_otp.limit = 100;
+                user.password_otp.limit = 5;
                 await user.save();
             }
 
-            const remainingLimit = user.password_otp.limit === 100
+            const remainingLimit = user.password_otp.limit === 5
             if (timeDiff && remainingLimit) {
                 return res.status(429).json({ message: "daily limit exceeded" })
             }
@@ -122,22 +138,73 @@ module.exports.forgetPassword = async (req, res, next) => {
         user.password_otp.otp = otp;
         user.password_otp.limit--;
         user.password_otp.last_attempt = new Date();
-        user.password_otp.sendTime = new Date().getTime() + 2*60*1000
+        user.password_otp.sendTime = new Date().getTime() + 2 * 60 * 1000
 
         await user.save();
 
         const data = {
             email: email,
-            otp:otp,
+            otp: otp,
         }
-        const result = await sendEmail(data);
-        console.log(result);
+        await sendEmail(data);
 
-        res.status(200).json({message : 'otp sent to given email', otp: user.password_otp.otp})
+
+        const pass_key_id = jwt.sign({ email: email }, process.env.EMAIL_JWT_SECRET, { expiresIn: '10m' })
+        res.cookie('pass_key_id', pass_key_id, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none'
+        });
+
+        res.status(200).json({ message: 'otp sent to given email', otp: user.password_otp.otp })
+
     }
-    catch(error){
+    catch (error) {
+        if (error.name === 'TokenExpiredError') {
+            return res.status(440).json({ message: 'Session expired. Please request a new OTP.' });
+        }
         next(error)
     }
 
-   
+
+}
+
+module.exports.verifyOtp = async (req, res, next) => {
+
+    const { otp } = req.body;
+    const pass_key_id = req.cookies.pass_key_id || Headers.authorization?.split(' ')[1];
+    if (!pass_key_id) {
+        return res.status(440).json({ message: 'Session expired. Please request a new OTP.' });
+    }
+
+    try {
+        const email = jwt.verify(pass_key_id, process.env.EMAIL_JWT_SECRET).email
+        const user = await userModel.findOne({ email: email });
+        if (!user) {
+            return res.status(404).json({ message: 'user not found' });
+        }
+
+        const isExpire = user.password_otp.sendTime < new Date().getTime();
+        
+        if (isExpire) {
+            return res.status(400).json({ message: 'invalid OTP' })
+        }
+
+        if (user.password_otp.otp !== otp) {
+            return res.status(400).json({ message: 'invalid OTP' });
+        }
+
+        user.password_otp.otp = null;
+        user.password_otp.sendTime = null;
+        await user.save();
+
+        return res.status(200).json({ message: 'OTP verified successfully' });
+    }
+    catch (error) {
+        if (error.name === 'TokenExpiredError') {
+            return res.status(440).json({ message: 'Session expired. Please request a new OTP.' });
+        }
+        next(error);
+    }
+
 }

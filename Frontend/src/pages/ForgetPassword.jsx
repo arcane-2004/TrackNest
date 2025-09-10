@@ -39,7 +39,6 @@ const ForgetPassword = () => {
             });
             if(response.status === 200){
                 navigate('/verify/otp')
-                console.log(response.data);
                 toast.success(response.data.message)
 
             }

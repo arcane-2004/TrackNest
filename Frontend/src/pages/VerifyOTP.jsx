@@ -5,10 +5,17 @@ import { Form, Formik } from 'formik'
 import * as Yup from 'yup'
 import { useNavigate } from 'react-router-dom';
 import Countdown from 'react-countdown'
+import axios from 'axios';
+import toast from 'react-hot-toast';
+import { useState } from 'react';
+
 
 const VerifyOTP = () => {
 
     const navigate = useNavigate();
+
+    const [timerEnd, setTimerEnd] = useState(Date.now() + 2 * 60 * 1000);
+    const [isResending, setIsResending] = useState(false);
 
     const initialStates = {
         otp1: '',
@@ -28,13 +35,38 @@ const VerifyOTP = () => {
         otp6: Yup.number().required(''),
     })
 
-    const handleSubmit = (values) => {
-        console.log(values);
+    const handleSubmit = async (values) => {
+        const otp = { otp: values.otp1 + values.otp2 + values.otp3 + values.otp4 + values.otp5 + values.otp6 };
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/verify/otp`, otp, { withCredentials: true });
 
+            if (response.status === 200) {
+                toast.success(response.data.message || "OTP verified successfully");
+                navigate('/update/password');
+            }
+        }
+        catch (errors) {
+            toast.error(errors.response?.data?.message || "OTP verification failed");
+        }
+
+
+    }
+
+    const handleResend = async () => {
+        setIsResending(true);
+        try {
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/forget/password`, {}, { withCredentials: true });
+            if (response.status === 200) {
+                toast.success(response.data.message || "OTP resent successfully");
+                setTimerEnd(Date.now() + 2 * 60 * 1000);
+            }
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Something went wrong");
+        }
+        setIsResending(false);
     }
     // function for managing the input of otp
     const inputChange = (value, setFieldValue, index, item) => {
-        console.log(index)
         setFieldValue(item, value);
         if (index >= 0 && index < 6) {
             const element = document.getElementById(`otp${index + 2}`);
@@ -60,12 +92,12 @@ const VerifyOTP = () => {
                     Enter the 6-digit OTP sent to your registered Email
                 </p>
                 <Formik onSubmit={handleSubmit} initialValues={initialStates} validationSchema={validationSchema}>
-                    {({ handleBlur, handleChange, touched, errors, values, setFieldValue }) =>
+                    {({ handleBlur, touched, errors, values, setFieldValue }) =>
                         <Form>
                             <LabelInputContainer className="mb-4 flex flex-row gap-1 justify-center ">
 
                                 {optArrray.map((item, index) =>
-                                    <div>
+                                    <div key={item}>
                                         <Input
                                             className="text-center"
                                             type="text"
@@ -110,19 +142,25 @@ const VerifyOTP = () => {
 
                             <div className='text-white my-2'>
                                 <Countdown
+                                    key={timerEnd}
                                     renderer={({ minutes, seconds, completed }) => {
                                         if (completed) {
-                                            return <button className='hover:cursor-pointer'>resend</button>
+                                            return <button className='hover:cursor-pointer'
+                                                onClick={handleResend}
+                                                disabled={isResending}
+                                            >
+                                                {isResending ? "Resending..." : "Resend"}
+                                            </button>
                                         }
                                         else {
                                             return (
                                                 <span>
-                                                    {minutes}:{seconds < 10 ? `0${seconds}` : seconds}
+                                                    {`${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`}
                                                 </span>
                                             )
                                         }
                                     }}
-                                    date={new Date().getTime() + 0.05 * 60 * 1000} />
+                                    date={timerEnd} />
                             </div>
 
                         </Form>}

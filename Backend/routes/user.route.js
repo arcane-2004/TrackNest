@@ -39,5 +39,7 @@ router.get('/get/access', authMiddleware.authUser, getAccessMiddleware.getAccess
 
 router.post('/forget/password', userController.forgetPassword)
 
+router.post('/verify/otp', userController.verifyOtp)
+
 module.exports = router
 
