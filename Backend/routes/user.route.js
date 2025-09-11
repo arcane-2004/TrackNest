@@ -41,5 +41,7 @@ router.post('/forget/password', userController.forgetPassword)
 
 router.post('/verify/otp', userController.verifyOtp)
 
+router.post('/update/password', authMiddleware.authUser, userController.updatePassword)
+
 module.exports = router
 

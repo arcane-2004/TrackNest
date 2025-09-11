@@ -198,6 +198,13 @@ module.exports.verifyOtp = async (req, res, next) => {
         user.password_otp.sendTime = null;
         await user.save();
 
+        res.clearCookie('pass_key_id');
+        const accessToken = user.generateAuthToken();
+        res.cookie('accessToken', accessToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none'
+        });
         return res.status(200).json({ message: 'OTP verified successfully' });
     }
     catch (error) {
@@ -207,4 +214,24 @@ module.exports.verifyOtp = async (req, res, next) => {
         next(error);
     }
 
+}
+
+module.exports.updatePassword = async (req, res, next) => {
+    
+    const {password} = req.body;
+    const user = req.user;
+
+    try{
+        const hashedPassword = await userModel.hashPassword(password);
+        user.password = hashedPassword;
+        user.save();
+        res.clearCookie('accessToken');
+        res.clearCookie('connect.sid');
+
+        return res.status(200).json({message: 'Password updated successfully'});
+    }catch(error){
+        
+        return res.status(500).json({message: 'Internal server error'});
+        next(error);
+    }
 }

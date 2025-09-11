@@ -14,6 +14,7 @@ const UserSigninSignup = () => {
 
     const [toggle, setToggle] = useState(false)
     const [firstRender, setFirstRender ] = useState(true)
+    const [isRegister, setIsRegister] = useState(true)
 
     const togglePanelRef = useRef(null);
 
@@ -67,17 +68,17 @@ const UserSigninSignup = () => {
 
 
     return (
-        <div className='flex justify-center items-center h-screen bg-gradient-to-br from-[#000000] via-[#17aecc] to-[#000000] '>
+        <div className='flex justify-center items-center h-screen bg-gradient-to-br from-[#000000] via-[#323e51] to-[#000000] '>
 
-            <div className='h-[80vh] w-[80vw] rounded-[100px] bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl'>
+            <div className='h-[80vh] w-[80vw] rounded-[100px] bg-white/5 backdrop-blur-xl shadow-2xl shadow-cyan-400/80 border-2 border-[#03B8FF]'>
                 <div
                     ref={togglePanelRef}
-                    className='flex items-center justify-center bg-gradient-to-br from-[#00d9ff] to-[#000000]  shadow-lg h-[80vh] w-[40vw] rounded-l-[100px] rounded-r-[50%] absolute z-10'>
+                    className='flex items-center justify-center bg-gradient-to-br from-[#788db0] to-[#010101]  shadow-lg h-[80vh] w-[40vw] rounded-l-[100px] rounded-r-[50%] absolute z-10'>
 
                     <button
                         onClick={() => setToggle(prev => !prev)}
                         className='bg-gray-400 px-8 py-4 rounded-4xl cursor-pointer'>
-                        toggle
+                        {toggle ? 'Sign In' : 'Create Account'}
 
                     </button>
                 </div>

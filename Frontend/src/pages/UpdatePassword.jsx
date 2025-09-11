@@ -1,9 +1,11 @@
 import React from 'react'
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { Form, Formik} from 'formik'
+import { Form, Formik } from 'formik'
 import * as Yup from 'yup'
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const UpdatePassword = () => {
 
@@ -17,8 +19,24 @@ const UpdatePassword = () => {
         password: Yup.string().required('password is required')
     })
 
-    const handleSubmit = (value) => {
-        console.log(value);
+    const handleSubmit = async (value) => {
+
+        const data = {
+            password: value.password
+        }
+
+        try{
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/user/update/password`, data, {withCredentials: true})
+
+            if(response.status === 200){
+                toast.success(response.data.message);
+                navigate('/Login')
+            }
+
+        }
+        catch(error){
+            toast.error(error.response?.data?.message);
+        }
 
     }
 
