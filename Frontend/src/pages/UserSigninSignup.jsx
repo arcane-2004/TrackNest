@@ -13,8 +13,8 @@ import Signin from '../components/Signin'
 const UserSigninSignup = () => {
 
     const [toggle, setToggle] = useState(false)
-    const [firstRender, setFirstRender ] = useState(true)
-    const [isRegister, setIsRegister] = useState(true)
+    const [firstRender, setFirstRender] = useState(true)
+
 
     const togglePanelRef = useRef(null);
 
@@ -36,7 +36,7 @@ const UserSigninSignup = () => {
                 ease: 'power2.out',
             }).to(togglePanelRef.current, {
                 width: '40vw',
-                left: '50%', 
+                left: '50%',
                 borderTopRightRadius: "100px",
                 borderBottomRightRadius: "100px",
                 borderTopLeftRadius: "50%",
@@ -70,26 +70,37 @@ const UserSigninSignup = () => {
     return (
         <div className='flex justify-center items-center h-screen bg-gradient-to-br from-[#000000] via-[#323e51] to-[#000000] '>
 
-            <div className='h-[80vh] w-[80vw] rounded-[100px] bg-white/5 backdrop-blur-xl shadow-2xl shadow-cyan-400/80 border-2 border-[#03B8FF]'>
-                <div
-                    ref={togglePanelRef}
-                    className='flex items-center justify-center bg-gradient-to-br from-[#788db0] to-[#010101]  shadow-lg h-[80vh] w-[40vw] rounded-l-[100px] rounded-r-[50%] absolute z-10'>
+            <div className='relative flex h-[80vh] w-[80vw] overflow-hidden rounded-[100px] p-[2px] shadow-2xl  '>
 
-                    <button
-                        onClick={() => setToggle(prev => !prev)}
-                        className='bg-gray-400 px-8 py-4 rounded-4xl cursor-pointer'>
-                        {toggle ? 'Sign In' : 'Create Account'}
+                <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#CBF7FF_0%,#0073FF_50%,#CBF7FF_100%)] p-[2px]" />
+                <span className="relative inline-flex h-full w-full cursor-pointer items-center justify-center rounded-[100px] bg-slate-950 px-3 py-1 text-sm font-medium text-white backdrop-blur-3xl ">
 
-                    </button>
-                </div>
-                <div className='h-[80vh] w-[80vw] flex items-center'>
-                    <Signup />
-                    <Signin />
-                </div>
+
+                    <div
+                        ref={togglePanelRef}
+                        className='flex items-center justify-center bg-gradient-to-br from-[#788db0] to-[#010101]  shadow-lg h-[80vh] w-[40vw] rounded-l-[100px] rounded-r-[50%] absolute z-10 left-0'>
+
+
+                        <button
+                            onClick={() => setToggle(prev => !prev)}
+                            className="relative inline-flex h-12 overflow-hidden rounded-full p-[1px] ">
+                            <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#CBF7FF_0%,#0073FF_50%,#CBF7FF_100%)]" />
+                            <span className="inline-flex h-full w-full cursor-pointer items-center justify-center rounded-full bg-slate-950 px-3 py-1 text-sm font-medium text-white backdrop-blur-3xl">
+                                {toggle ? 'Sign In' : 'Create Account'}
+                            </span>
+                        </button>
+                    </div>
+                    <div className='flex items-center justify-between gap-36'>
+                        <Signup />
+                        <Signin />
+                    </div>
+                </span>
+
+
             </div>
 
 
-        </div>
+        </div >
     )
 }
 

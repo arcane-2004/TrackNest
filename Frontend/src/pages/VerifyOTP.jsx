@@ -80,91 +80,98 @@ const VerifyOTP = () => {
     const optArrray = ['otp1', 'otp2', 'otp3', 'otp4', 'otp5', 'otp6'];
 
     return (
-        <div className='flex justify-center items-center bg-black h-screen'>
+        <div className='flex justify-center items-center bg-gradient-to-br from-[#000000] via-[#323e51] to-[#000000] h-screen'>
+
+            <div className='relative flex overflow-hidden rounded-4xl p-[2px] shadow-2xl  '>
+
+                <span className="absolute inset-[-1000%] animate-[spin_2s_linear_infinite] bg-[conic-gradient(from_90deg_at_50%_50%,#CBF7FF_0%,#0073FF_50%,#CBF7FF_100%)] p-[2px]" />
+                <span className="relative inline-flex h-full w-full cursor-pointer rounded-4xl items-center justify-center bg-slate-950 px-3 py-1 text-sm font-medium text-white backdrop-blur-3xl ">
 
 
-            <div
-                className="bg-[#242424] mx-auto w-full max-w-md rounded-none p-4 md:rounded-2xl md:p-8">
-                <h2 className="text-xl font-bold text-neutral-800 dark:text-neutral-200 text-center">
-                    Verify OTP
-                </h2>
-                <p className="mt-2 max-w-sm text-sm text-neutral-600 dark:text-neutral-300 mb-2">
-                    Enter the 6-digit OTP sent to your registered Email
-                </p>
-                <Formik onSubmit={handleSubmit} initialValues={initialStates} validationSchema={validationSchema}>
-                    {({ handleBlur, touched, errors, values, setFieldValue }) =>
-                        <Form>
-                            <LabelInputContainer className="mb-4 flex flex-row gap-1 justify-center ">
+                    <div
+                        className="bg-gray-950 mx-auto w-full max-w-md rounded-none p-4 md:rounded-2xl md:p-8">
+                        <h2 className="text-xl font-bold text-neutral-800 dark:text-neutral-200 text-center">
+                            Verify OTP
+                        </h2>
+                        <p className="mt-2 max-w-sm text-sm text-neutral-600 dark:text-neutral-300 mb-2">
+                            Enter the 6-digit OTP sent to your registered Email
+                        </p>
+                        <Formik onSubmit={handleSubmit} initialValues={initialStates} validationSchema={validationSchema}>
+                            {({ handleBlur, touched, errors, values, setFieldValue }) =>
+                                <Form>
+                                    <LabelInputContainer className="mb-4 flex flex-row gap-1 justify-center ">
 
-                                {optArrray.map((item, index) =>
-                                    <div key={item}>
-                                        <Input
-                                            className="text-center"
-                                            type="text"
-                                            name={item}
-                                            value={values[item] ?? ""}
-                                            id={item}
-                                            onBlur={handleBlur}
-                                            maxLength={1}
-                                            pattern="[0-9]+"
-                                            onChange={(e) => {
-                                                const value = e.target.value.replace(/[^0-9]/g, "")
-                                                inputChange(value, setFieldValue, index, item)
-                                            }}
-                                            inputMode="numeric" />
+                                        {optArrray.map((item, index) =>
+                                            <div key={item}>
+                                                <Input
+                                                    className="text-center"
+                                                    type="text"
+                                                    name={item}
+                                                    value={values[item] ?? ""}
+                                                    id={item}
+                                                    onBlur={handleBlur}
+                                                    maxLength={1}
+                                                    pattern="[0-9]+"
+                                                    onChange={(e) => {
+                                                        const value = e.target.value.replace(/[^0-9]/g, "")
+                                                        inputChange(value, setFieldValue, index, item)
+                                                    }}
+                                                    inputMode="numeric" />
 
-                                        {touched[item] && errors[item] && (
-                                            <p>errors[item]</p>
+                                                {touched[item] && errors[item] && (
+                                                    <p>errors[item]</p>
+                                                )}
+                                            </div>
                                         )}
+                                    </LabelInputContainer>
+                                    <button
+                                        className="group/btn shadow-input relative h-10 w-full space-x-2 rounded-md bg-gray-50 px-4 font-medium text-white dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626] hover:cursor-pointer"
+                                        type="submit"
+                                        disabled={Object.values(values).some((value) => value === "")}>
+                                        Verify OTP
+                                        <BottomGradient />
+                                    </button>
+
+                                    <div
+                                        className="my-8 h-[1px] w-full bg-gradient-to-r from-transparent via-neutral-300 to-transparent dark:via-neutral-700" />
+
+                                    <div className="flex flex-col space-y-4">
+                                        <button
+                                            className="group/btn shadow-input relative h-10 w-full space-x-2 rounded-md bg-gray-50 px-4 font-medium text-white dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626] hover:cursor-pointer"
+                                            type="button"
+                                            onClick={() => navigate('/Login')}>
+                                            Back to Sign in
+                                            <BottomGradient />
+                                        </button>
                                     </div>
-                                )}
-                            </LabelInputContainer>
-                            <button
-                                className="group/btn shadow-input relative h-10 w-full space-x-2 rounded-md bg-gray-50 px-4 font-medium text-white dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626] hover:cursor-pointer"
-                                type="submit"
-                                disabled={Object.values(values).some((value) => value === "")}>
-                                Verify OTP
-                                <BottomGradient />
-                            </button>
 
-                            <div
-                                className="my-8 h-[1px] w-full bg-gradient-to-r from-transparent via-neutral-300 to-transparent dark:via-neutral-700" />
+                                    <div className='text-white my-2'>
+                                        <Countdown
+                                            key={timerEnd}
+                                            renderer={({ minutes, seconds, completed }) => {
+                                                if (completed) {
+                                                    return <button className='hover:cursor-pointer'
+                                                        onClick={handleResend}
+                                                        disabled={isResending}
+                                                    >
+                                                        {isResending ? "Resending..." : "Resend"}
+                                                    </button>
+                                                }
+                                                else {
+                                                    return (
+                                                        <span>
+                                                            {`${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`}
+                                                        </span>
+                                                    )
+                                                }
+                                            }}
+                                            date={timerEnd} />
+                                    </div>
 
-                            <div className="flex flex-col space-y-4">
-                                <button
-                                    className="group/btn shadow-input relative h-10 w-full space-x-2 rounded-md bg-gray-50 px-4 font-medium text-white dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626] hover:cursor-pointer"
-                                    type="button"
-                                    onClick={() => navigate('/Login')}>
-                                    Back to Sign in
-                                    <BottomGradient />
-                                </button>
-                            </div>
-
-                            <div className='text-white my-2'>
-                                <Countdown
-                                    key={timerEnd}
-                                    renderer={({ minutes, seconds, completed }) => {
-                                        if (completed) {
-                                            return <button className='hover:cursor-pointer'
-                                                onClick={handleResend}
-                                                disabled={isResending}
-                                            >
-                                                {isResending ? "Resending..." : "Resend"}
-                                            </button>
-                                        }
-                                        else {
-                                            return (
-                                                <span>
-                                                    {`${minutes}:${seconds < 10 ? `0${seconds}` : seconds}`}
-                                                </span>
-                                            )
-                                        }
-                                    }}
-                                    date={timerEnd} />
-                            </div>
-
-                        </Form>}
-                </Formik>
+                                </Form>}
+                        </Formik>
+                    </div>
+                </span>
             </div>
         </div>
     )

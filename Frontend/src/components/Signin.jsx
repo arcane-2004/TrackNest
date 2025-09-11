@@ -78,10 +78,10 @@ export default function SignupFormDemo() {
     <div
       className=" mx-auto w-full max-w-md rounded-none p-4 md:rounded-2xl md:p-8">
       <h2 className="text-xl font-bold text-neutral-800 dark:text-neutral-200">
-        Welcome to Aceternity
+        Welcome to TrackNest
       </h2>
       <p className="mt-2 max-w-sm text-sm text-neutral-600 dark:text-neutral-300">
-        Login to aceternity if you can because we don&apos;t have a login flow
+        Login to TrackNest if you can because we don&apos;t have a login flow
         yet
       </p>
 
@@ -136,10 +136,10 @@ export default function SignupFormDemo() {
             </button>
             
 
-            <button className="text-gray-800 font-medium text-sm mt-1.5 hover:cursor-pointer"
+            <button className="text-[#A7ACB4] font-medium text-sm mt-1.5 hover:cursor-pointer"
               onClick={() => navigate('/forget/password')}
               type="text" >
-              Forget password
+              Forget password?
             </button>
 
             <div
