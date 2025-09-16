@@ -32,7 +32,7 @@ export const SidebarProvider = ({
   );
 };
 
-export const Sidebar = ({
+export const  Sidebar = ({
   children,
   open,
   setOpen,
