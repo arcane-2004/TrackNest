@@ -10,12 +10,28 @@ const userSchema = new mongoose.Schema({
     },
     email :{
         type: String,
-        required: true,
+        required: true,     
     },
     password:{
         type: String,
         
     },
+
+    transcations: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Transaction'
+    }],
+
+    accounts: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Account'
+    }],
+
+    budgets:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Budget'
+    }],
+
     imageUrl :{
         type: String,
     },
