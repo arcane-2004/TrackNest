@@ -8,7 +8,8 @@ const accountSchema = new mongoose.Schema({
     },
 
     name:{
-        type: String
+        type: String,
+        require: true
     },
     
     type:{

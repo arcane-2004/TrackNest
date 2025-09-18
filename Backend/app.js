@@ -8,6 +8,9 @@ const session = require("express-session")
 const passport = require("passport")
 const googleStrategy = require('passport-google-oauth20').Strategy;
 const userRoute = require('./routes/user.route');
+const accountRoute = require('./routes/account.route');
+const transctionRoute = require('./routes/transaction.route');
+const budgetRoute = require('./routes/budget.route')
 
 const app = express();
 
@@ -58,6 +61,14 @@ app.get('/', (req, res) => {
 
 
 app.use('/user', userRoute);
+
+app.use('/account', accountRoute);
+
+app.use('/transaction', transctionRoute);
+
+app.use('/budget', budgetRoute);
+
+
 
 
 
