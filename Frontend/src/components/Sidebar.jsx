@@ -83,7 +83,8 @@ const Sidebar = () => {
 
     const menuItems = [
         { id: "dashboard", icon: House, lable: "Dashboard", path: "/dashboard" },
-        { id: "user", icon: User, lable: "User", path: "/profile" }
+        { id: "user", icon: User, lable: "Userdafdadsaf", path: "/profile" },
+       
     ]
 
     const isActiveRoute = (itemPath) => {
@@ -96,9 +97,9 @@ const Sidebar = () => {
     }
 
     return (
-        <div className='h-full '>
+        <div className='h-full'>
             <motion.div
-                className='h-full bg-[#00131A] shadow-lg relative z-10'
+                className='h-full bg-transparent shadow-lg relative z-10 border-r-1 border-[#454545]'
                 initial='collapsed'
                 animate={isHovered ? "expanded" : "collapsed"}
                 variants={sideBarVarient}
@@ -127,24 +128,26 @@ const Sidebar = () => {
                                 const isActive = isActiveRoute(item.path);
                                 return (
                                     <motion.li
-                                        className='text-[#fff] '
+                                        className='text-[#454545] '
                                         key={item.id}
                                         variants={itemVariants}
                                     >
                                         <button
                                             onClick={() => handleNavigation(item.path)}
-                                            className={`w-full relative group rounded-2xl  p-2 mt-5 flex gap-4 hover:cursor-pointer ${isActive
-                                                ? 'bg-none border-r-4 border-[#03E6FF]  text-[#03E6FF] '
-                                                : 'bg-none text-slate-300 hover:bg-slate-800/60 hover:text-slate-100 hover:shadow-md'
+                                            className={`w-full relative group rounded-full p-2 mt-5 flex gap-4 hover:cursor-pointer ${isActive
+                                                ? 'bg-gradient-to-r from-[#343434] via-[#212121] to-transparent backdrop-blur-lg shadow-inner border-r-3 border-r-[#505050] text-[#fff] '
+
+                                                : 'bg-none text-[#454545] hover:bg-[#232222] hover:text-slate-100 hover:shadow-md'
                                                 }`}
                                         >
+                                            
                                             <div>
                                                 {<item.icon />}
                                             </div>
                                             <motion.div
                                                 className='overflow-hidden'
                                                 variants={textVarient}
-                                            >   
+                                            >
                                                 {item.lable}
                                             </motion.div>
 
