@@ -17,21 +17,6 @@ const userSchema = new mongoose.Schema({
         
     },
 
-    transcations: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Transaction'
-    }],
-
-    accounts: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Account'
-    }],
-
-    budgets:[{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Budget'
-    }],
-
     imageUrl :{
         type: String,
     },

@@ -39,9 +39,21 @@ module.exports.addTransaction = async (req, res, next) => {
 
         })
 
+        balanceUpdate(currentAccount, amount, type)
+
         return res.status(201).json({message: 'Transaction added successfully', transaction: newTransaction});
 
     } catch (error) {
         return res.status(500).json({ message: 'Internal server error' });
+    }
+}
+
+const balanceUpdate = async (account, amount, type) => {
+
+    try {
+        account.balance += type === 'income' ? amount : -amount;
+        await account.save();
+    } catch (error) {
+        console.error('Error updating balance:', error);
     }
 }
