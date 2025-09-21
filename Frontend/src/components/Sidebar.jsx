@@ -1,13 +1,16 @@
 import React from 'react'
 import { motion } from 'motion/react'
 import { useState } from 'react';
-import { User, House } from 'lucide-react';
+import { User, House, NotebookTabs, Wallet  } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
 
 const Sidebar = () => {
 
     const [isHovered, setIsHovered] = useState(false);
-    const [currentPath, setCurrentPath] = useState('/dashboard');
+    const [currentPath, setCurrentPath] = useState(window.location.pathname);
 
+    const navigate = useNavigate();
 
     const sideBarVarient = {
         collapsed: {
@@ -84,6 +87,8 @@ const Sidebar = () => {
     const menuItems = [
         { id: "dashboard", icon: House, lable: "Dashboard", path: "/dashboard" },
         { id: "user", icon: User, lable: "Userdafdadsaf", path: "/profile" },
+        {id: "transactions", icon: NotebookTabs , lable: "Transactions", path: "/transactions"},
+        {id: "accounts", icon: Wallet , lable: "Accounts", path: "/accounts"}
        
     ]
 
@@ -93,9 +98,10 @@ const Sidebar = () => {
 
     const handleNavigation = (path) => {
         setCurrentPath(path);
-        console.log(path)
+        navigate(path)
     }
 
+    
     return (
         <div className='h-full'>
             <motion.div
@@ -135,11 +141,12 @@ const Sidebar = () => {
                                         <button
                                             onClick={() => handleNavigation(item.path)}
                                             className={`w-full relative group rounded-full p-2 mt-5 flex gap-4 hover:cursor-pointer ${isActive
-                                                ? 'bg-gradient-to-r from-[#343434] via-[#212121] to-transparent backdrop-blur-lg shadow-inner border-r-3 border-r-[#505050] text-[#fff] '
+                                                ? 'bg-gradient-to-r from-[#363636] via-transparent to-transparent backdrop-blur-lg shadow-inner border-r-3 border-r-[#505050] text-[#fff] '
 
                                                 : 'bg-none text-[#454545] hover:bg-[#232222] hover:text-slate-100 hover:shadow-md'
                                                 }`}
                                         >
+                                           
                                             
                                             <div>
                                                 {<item.icon />}
@@ -164,6 +171,7 @@ const Sidebar = () => {
                                             )} */}
 
                                         </button>
+        
                                     </motion.li>
                                 )
                             })}

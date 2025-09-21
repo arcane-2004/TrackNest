@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap');
 @import "tailwindcss";
 
 @theme inline {
@@ -5,6 +6,10 @@
     0px 2px 3px -1px rgba(0, 0, 0, 0.1),
     0px 1px 0px 0px rgba(25, 28, 33, 0.02),
     0px 0px 0px 1px rgba(25, 28, 33, 0.08);
+}
+
+@theme {
+  --font-figtree : "Figtree", sans-serif;
 }
 
 html, body, #root {

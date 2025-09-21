@@ -13,6 +13,10 @@ const transactionSchema = new mongoose.Schema({
         required: true
     },
 
+    name: {
+        type: String,
+    },
+
     type: {
         type: String,
         enum: ['income', 'expanse', 'transfer'] 
