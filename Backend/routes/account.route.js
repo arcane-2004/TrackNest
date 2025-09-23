@@ -6,4 +6,7 @@ const authMiddleware = require('../middlewares/auth.middleware')
 
 router.post('/add', authMiddleware.authUser, accountController.addAccount)
 
+router.get('/get-accounts', authMiddleware.authUser, accountController.getAccounts)
+
+
 module.exports = router;

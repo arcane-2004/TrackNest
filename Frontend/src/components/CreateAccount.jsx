@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from 'axios'
 import {
     Drawer,
     DrawerContent,
@@ -15,27 +16,46 @@ import { Switch } from "./ui/switch";
 
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import { toast } from 'react-hot-toast'
+import { Loader2 } from "lucide-react";
 
 
-const CreateAccount = ({ children }) => {
+
+const CreateAccount = ({ children, onSuccess }) => {
     const [open, setOpen] = useState(false);
+    const [isCreating, setIsCreating] = useState(null);
 
     const validationSchema = Yup.object({
         name: Yup.string().required("Name is required"),
-        type: Yup.string().oneOf(['savings', 'checking', 'credit', 'loan', 'investment', 'other'], "Invalid type").required("Account type is required"),
+        type: Yup.string().oneOf(['Savings', 'Current', 'Credit', 'Loan', 'Investment', 'Other'], "Invalid type").required("Account type is required"),
         isDefault: Yup.boolean(),
     });
 
     const initialValues = {
         name: "",
-        type: "", initialBalance: "",
+        type: "",
+        initialBalance: "",
         isDefault: false
     }
 
-    const handleSubmit = (values, { resetForm }) => {
+    const handleSubmit = async (values, { resetForm }) => {
         console.log("Form Submitted:", values);
-        resetForm();
-        setOpen(false); // close drawer on submit
+        try {
+            setIsCreating(true);
+            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/account/add`, values, { withCredentials: true });
+            resetForm();
+            if (response.status === 201) {
+                toast.success(response.data.message)
+
+                onSuccess(); // 👈 flip refresh
+
+            }
+        } catch (err) {
+            toast.error(err.response?.data.error || "Something went wrong");
+        } finally {
+            setIsCreating(false);
+            setOpen(false);
+        }
     };
 
     return (
@@ -77,12 +97,12 @@ const CreateAccount = ({ children }) => {
                                         <SelectValue placeholder="Select type" />
                                     </SelectTrigger>
                                     <SelectContent className={'bg-[#27272a] text-[#a4a4a4]'}>
-                                        <SelectItem value="current">Current</SelectItem>
-                                        <SelectItem value="savings">Savings</SelectItem>
-                                        <SelectItem value="investment">Investment</SelectItem>
-                                        <SelectItem value="credit">Credit</SelectItem>
-                                        <SelectItem value="loan">Loan</SelectItem>
-                                        <SelectItem value="other">Other</SelectItem>
+                                        <SelectItem value="Current">Current</SelectItem>
+                                        <SelectItem value="Savings">Savings</SelectItem>
+                                        <SelectItem value="Investment">Investment</SelectItem>
+                                        <SelectItem value="Credit">Credit</SelectItem>
+                                        <SelectItem value="Loan">Loan</SelectItem>
+                                        <SelectItem value="Other">Other</SelectItem>
                                     </SelectContent>
                                 </Select>
                                 <ErrorMessage name="type" component="p" className="text-red-500 text-sm" />
@@ -117,14 +137,25 @@ const CreateAccount = ({ children }) => {
                             </div>
 
                             {/* Submit */}
-                            <DrawerClose className="flex gap-4 justify-center items-center w-full">
-                                <Button type='button' variant='outline' className=" bg-gray-600" onClick={() => setOpen(false)}>
+                            <DrawerClose asChild className="flex gap-4 justify-center items-center w-full">
+                                <button type='button' variant='outline' className=" bg-gray-600" onClick={() => setOpen(false)}>
                                     Cancle
-                                </Button>
-                                <Button type="submit" className=" bg-gray-600">
-                                    Create Account
-                                </Button>
+                                </button>
                             </DrawerClose>
+                            <button type="submit" className=" bg-gray-600 flex-1 w-full"
+                            disabled={isCreating}
+                            >
+                                {
+                                    isCreating ?
+                                        (<>
+                                            <Loader2 className="animate-spin" />
+                                            Creating...
+                                        </>) :
+                                        (
+                                            "Create Account"
+                                        )
+                                }
+                            </button>
 
                         </Form>
                     )}
