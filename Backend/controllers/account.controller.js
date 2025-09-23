@@ -9,12 +9,20 @@ module.exports.addAccount = async (req, res, next) => {
     }
 
     try {
-        const { name, type, initialBalance, isDefault } = req.body;
+        const { name, type, initialBalance} = req.body;
+        let { isDefault } = req.body;
 
         if (type !== 'Savings' && type !== 'Current' && type !== 'Credit' && type !== 'Loan' && type !== 'Investment' && type !== 'Other') {
             return res.status(400).json({ message: 'Invalid account type' })
         }
 
+        //  First account should always be default
+        const count = await accountModel.countDocuments({ userId: user._id });
+        if (count === 0) {
+            isDefault = true;
+        }
+
+        //  If new account is set to default → reset others
         if (isDefault) {
             await accountModel.updateMany({ userId: user._id }, { isDefault: false });
         }
@@ -41,9 +49,9 @@ module.exports.getAccounts = async (req, res, next) => {
     }
 
     try {
-        const accounts = await accountModel.find({ userId: user._id }).sort({ date: -1 });
+        const accounts = await accountModel.find({ userId: user._id }).sort({ createdAt: -1 });
 
-        return res.status(200).json({ accounts});
+        return res.status(200).json({ accounts });
     }
     catch (error) {
         return res.status(500).json({ message: 'Internal server error' });
