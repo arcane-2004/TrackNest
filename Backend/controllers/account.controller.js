@@ -9,7 +9,7 @@ module.exports.addAccount = async (req, res, next) => {
     }
 
     try {
-        const { name, type, initialBalance} = req.body;
+        const { name, type, initialBalance } = req.body;
         let { isDefault } = req.body;
 
         if (type !== 'Savings' && type !== 'Current' && type !== 'Credit' && type !== 'Loan' && type !== 'Investment' && type !== 'Other') {
@@ -57,4 +57,34 @@ module.exports.getAccounts = async (req, res, next) => {
         return res.status(500).json({ message: 'Internal server error' });
     }
 
+}
+
+module.exports.updateDefault = async (req, res, next) => {
+
+    const user = req.user;
+    if (!user) {
+        return res.status(401).json({ message: 'Unauthorized' })
+    }
+
+    try {
+        const { accountId } = req.body;
+
+        const account = await accountModel.findOne({ _id: accountId, userId: user._id });
+        if (!account) {
+            return res.status(404).json({ message: "Account not found" });
+        }
+
+        if (account.isDefault === true){
+            return res.status(400).json({message: "Need atleast 1 default account"});
+        }
+
+        await accountModel.updateOne({ userId: user._id, isDefault: true }, { isDefault: false })
+
+        account.isDefault = true;
+        await account.save();
+
+        return res.status(200).json({ message: 'Default account updated successfully' , account: account})
+    } catch (error) {
+        return res.status(500).json({ message: 'Internal server error' })
+    }
 }

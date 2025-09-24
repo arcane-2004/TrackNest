@@ -8,5 +8,6 @@ router.post('/add', authMiddleware.authUser, accountController.addAccount)
 
 router.get('/get-accounts', authMiddleware.authUser, accountController.getAccounts)
 
+router.post('/update-default', authMiddleware.authUser, accountController.updateDefault)
 
 module.exports = router;

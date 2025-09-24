@@ -18,10 +18,11 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { toast } from 'react-hot-toast'
 import { Loader2 } from "lucide-react";
+import HoverBorderGradient from "./ui/hover-border-gradient";
 
 
 
-const CreateAccount = ({ children, onSuccess }) => {
+const CreateAccount = ({ children, onAccountAdded }) => {
     const [open, setOpen] = useState(false);
     const [isCreating, setIsCreating] = useState(null);
 
@@ -46,8 +47,7 @@ const CreateAccount = ({ children, onSuccess }) => {
             resetForm();
             if (response.status === 201) {
                 toast.success(response.data.message)
-
-                onSuccess(); // 👈 flip refresh
+                onAccountAdded()
 
             }
         } catch (err) {
@@ -137,26 +137,31 @@ const CreateAccount = ({ children, onSuccess }) => {
                             </div>
 
                             {/* Submit */}
-                            <DrawerClose asChild className="flex gap-4 justify-center items-center w-full">
-                                <button type='button' variant='outline' className=" bg-gray-600" onClick={() => setOpen(false)}>
-                                    Cancle
-                                </button>
-                            </DrawerClose>
-                            <button type="submit" className=" bg-gray-600 flex-1 w-full"
-                            disabled={isCreating}
-                            >
-                                {
-                                    isCreating ?
-                                        (<>
-                                            <Loader2 className="animate-spin" />
-                                            Creating...
-                                        </>) :
-                                        (
-                                            "Create Account"
-                                        )
-                                }
-                            </button>
-
+                            <div className="flex justify-center items-center gap-3 text-lg font-medium ">
+                                <DrawerClose asChild>
+                                    <button type='button' variant='outline'
+                                        className=" bg-[#fff] rounded-full p-3 "
+                                        onClick={() => setOpen(false)}>
+                                        Cancle
+                                    </button>
+                                </DrawerClose>
+                                {/* <HoverBorderGradient> */}
+                                    <button type="submit" className=" bg-[#e9700e] rounded-full p-3 text-[#f6ece3] "
+                                        disabled={isCreating}
+                                    >
+                                        {
+                                            isCreating ?
+                                                (<>
+                                                    <Loader2 className="animate-spin" />
+                                                    Creating...
+                                                </>) :
+                                                (
+                                                    "Create Account"
+                                                )
+                                        }
+                                    </button>
+                                {/* </HoverBorderGradient> */}
+                            </div>
                         </Form>
                     )}
                 </Formik>
