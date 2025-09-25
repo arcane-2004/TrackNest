@@ -37,7 +37,6 @@ module.exports.addTransaction = async (req, res, next) => {
             recurringInterval,
             nextRecurringDate,
             lastProcessed
-
         })
 
         await balanceUpdate(currentAccount, amount, type)
