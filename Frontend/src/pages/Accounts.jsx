@@ -91,7 +91,7 @@ const Accounts = () => {
                     <h2 className='absolute text-2xl font-bold right-20'>Accounts</h2>
                     <span className='absolute right-5 text-[#ae5921] hover:cursor-pointer'
                         onClick={handleLogout}
-                        
+
                     ><LogOut /></span>
                 </div>
 
@@ -108,7 +108,6 @@ const Accounts = () => {
                             </div>
                         </CreateAccount>
 
-
                         {isLoading ? <Loader2 className="animate-spin mx-auto" /> :
                             accounts.map(account => (
                                 <AccountCard
@@ -118,7 +117,6 @@ const Accounts = () => {
                                     isLoading={isLoading}
                                 />
                             ))}
-
                     </div>
                 </ScrollArea>
             </div>

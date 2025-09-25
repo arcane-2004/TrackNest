@@ -1,0 +1,16 @@
+import React from 'react'
+import { useParams } from 'react-router-dom'
+
+const AccountViewPage = () => {
+
+    const {id }= useParams() 
+
+  return (
+    <div>
+      {id}
+
+    </div>
+  )
+}
+
+export default AccountViewPage
