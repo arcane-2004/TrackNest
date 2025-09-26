@@ -64,6 +64,31 @@ module.exports.getTransactions = async(req, res, next) => {
     }
 }
 
+module.exports.getAccountTransactions = async(req, res, next) => {
+    console.log('hello');
+    
+    const user = req.user;
+    const {id} = req.params;
+    console.log(id)
+    if(!user || !id){
+        return res.status(401).json({message: "Unautho"})
+    }
+    
+    try{
+
+        const transactions = await transactionModel.find({userId: user._id, accountId: id});
+        
+        if(transactions.length > 0){
+            return res.status(200).json({message: 'get transactions successfull', transactions: transactions})
+        }
+
+        return res.status(500).json({message: 'did not find any transaction'})
+
+    }catch(error){
+        return res.status(500).json({message: 'Internal server error', error: error})
+    }
+
+}
 
 
 const balanceUpdate = async (account, amount, type) => {

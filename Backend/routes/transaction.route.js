@@ -8,4 +8,6 @@ router.post('/add', authMiddleware.authUser, transactionController.addTransactio
 
 router.get('/get-transactions', authMiddleware.authUser, transactionController.getTransactions);
 
+router.get('/get/account-transaction/:id', authMiddleware.authUser, transactionController.getAccountTransactions);
+
 module.exports = router;
