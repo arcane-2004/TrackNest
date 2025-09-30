@@ -137,29 +137,29 @@ const CreateAccount = ({ children, onAccountAdded }) => {
                             </div>
 
                             {/* Submit */}
-                            <div className="flex justify-center items-center gap-3 text-lg font-medium ">
+                            <div className="flex justify-center items-center gap-3 text-lg font-medium">
                                 <DrawerClose asChild>
                                     <button type='button' variant='outline'
-                                        className=" bg-[#fff] rounded-full p-3 "
+                                        className=" bg-[#fff] rounded-full p-3 hover:cursor-pointer"
                                         onClick={() => setOpen(false)}>
                                         Cancle
                                     </button>
                                 </DrawerClose>
                                 {/* <HoverBorderGradient> */}
-                                    <button type="submit" className=" bg-[#e9700e] rounded-full p-3 text-[#f6ece3] "
-                                        disabled={isCreating}
-                                    >
-                                        {
-                                            isCreating ?
-                                                (<>
-                                                    <Loader2 className="animate-spin" />
-                                                    Creating...
-                                                </>) :
-                                                (
-                                                    "Create Account"
-                                                )
-                                        }
-                                    </button>
+                                <button type="submit" className=" bg-[#e9700e] rounded-full p-3 text-[#f6ece3] flex gap-1.5 items-center justify-center hover:cursor-pointer"
+                                    disabled={isCreating}
+                                >
+                                    {
+                                        isCreating ?
+                                            (<>
+                                                <Loader2 className="animate-spin" />
+                                                Creating...
+                                            </>) :
+                                            (
+                                                "Create Account"
+                                            )
+                                    }
+                                </button>
                                 {/* </HoverBorderGradient> */}
                             </div>
                         </Form>

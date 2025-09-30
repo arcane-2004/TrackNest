@@ -9,6 +9,7 @@ import GettingStarted from "./pages/GettingStarted"
 import Transactions from "./pages/Transactions"
 import Accounts from "./pages/Accounts"
 import AccountViewPage from "./pages/AccountViewPage"
+import PageNotFound from "./pages/PageNotFound"
 
 function App() {
 
@@ -16,6 +17,7 @@ function App() {
     <>
       <Routes>
         <Route path="/" element={<GettingStarted/>} />
+        <Route path="/*" element={<PageNotFound/>} />
         <Route path="/login" element={<Login />} />
         <Route path="/forget/password" element={<ForgetPassword />} />
         <Route path="/verify/otp" element={<VerifyOTP />} />
