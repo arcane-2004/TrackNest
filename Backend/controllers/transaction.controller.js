@@ -15,13 +15,14 @@ module.exports.addTransaction = async (req, res, next) => {
         
         const { name, amount, type, category, date, description, paymentMethod, receiptUrl, isRecurring, recurringInterval, nextRecurringDate, lastProcessed, accountType } = req.body;
         let currentAccount;
+        console.log(accountType)
         if(!accountType) {
             currentAccount =  accounts.find(account => account.isDefault === true);
         }
         else{
             currentAccount = accounts.find(account => account.type === accountType);;
         }
-        
+        console.log( currentAccount)
         const newTransaction = await transactionService.createTransaction({
             userId: user._id,
             accountId: currentAccount._id,
@@ -64,31 +65,40 @@ module.exports.getTransactions = async(req, res, next) => {
     }
 }
 
-module.exports.getAccountTransactions = async(req, res, next) => {
-    console.log('hello');
-    
+module.exports.getAccountTransactions = async (req, res, next) => {
+  try {
     const user = req.user;
-    const {id} = req.params;
-    console.log(id)
-    if(!user || !id){
-        return res.status(401).json({message: "Unautho"})
-    }
-    
-    try{
+    const { id } = req.params;
 
-        const transactions = await transactionModel.find({userId: user._id, accountId: id});
-        
-        if(transactions.length > 0){
-            return res.status(200).json({message: 'get transactions successfull', transactions: transactions})
-        }
-
-        return res.status(500).json({message: 'did not find any transaction'})
-
-    }catch(error){
-        return res.status(500).json({message: 'Internal server error', error: error})
+    if (!user || !id) {
+      return res.status(401).json({ message: "Unauthorized access" });
     }
 
-}
+    const account = await accountModel.findOne({ _id: id, userId: user._id });
+    if (!account) {
+      return res.status(404).json({ message: "Account not found" });
+    }
+
+    const transactions = await transactionModel
+      .find({ userId: user._id, accountId: id })
+      .sort({ createdAt: -1 }); // latest first
+
+    return res.status(200).json({
+      message:
+        transactions.length > 0
+          ? "Transactions fetched successfully"
+          : "No transactions found for this account",
+      account,
+      transactions,
+    });
+  } catch (error) {
+    console.error("Error fetching transactions:", error);
+    return res.status(500).json({
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
 
 
 const balanceUpdate = async (account, amount, type) => {
