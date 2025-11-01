@@ -1,11 +1,35 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import Sidebar from "../components/Sidebar";
 import { LogOut } from "lucide-react";
 import { useHandleLogout } from "../utils/user.hooks";
 import axios from "axios";
+import { Button } from "@/components/ui/button"
+import { Ellipsis, Pencil, Trash2 } from 'lucide-react';
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@/components/ui/table";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 const Transactions = () => {
 	const [transactions, setTransactions] = useState([]);
+	const [sortConfig, setSortConfig] = useState({
+		
+	})
+
 	const handleLogout = useHandleLogout();
 
 	useEffect(() => {
@@ -33,7 +57,7 @@ const Transactions = () => {
 				{/* Header */}
 				<div className="relative mb-10 flex items-center justify-between">
 					<h2 className="text-3xl font-bold bg-gradient-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent">
-						Dashboard
+						Transactions
 					</h2>
 
 					<div className="flex items-center gap-6">
@@ -82,73 +106,90 @@ const Transactions = () => {
 							No transactions found.
 						</p>
 					) : (
-						<div className="overflow-x-auto rounded-lg border border-zinc-800/50">
-							<table className="min-w-full text-sm text-left text-zinc-300">
-								<thead className="bg-[#1a1a1a] border-b border-zinc-800 text-zinc-400 uppercase text-xs tracking-wider">
-									<tr>
-										<th scope="col" className="py-3 px-4">
-											Name
-										</th>
-										<th scope="col" className="py-3 px-4">
-											Date
-										</th>
-										<th scope="col" className="py-3 px-4">
-											Category
-										</th>
-										<th scope="col" className="py-3 px-4">
-											Account
-										</th>
-										<th scope="col" className="py-3 px-4">
-											Payment Method
-										</th>
-										<th
-											scope="col"
-											className="py-3 px-4 text-right"
-										>
-											Amount
-										</th>
-									</tr>
-								</thead>
+						<Table>
 
-								<tbody>
-									{transactions.map((t, i) => (
-										<tr
-											key={i}
-											className="border-b border-zinc-800 hover:bg-[#1b1b1b] transition-colors duration-150"
-										>
-											<td className="py-3 px-4 font-medium text-white">
-												{t.name || "Untitled"}
-											</td>
-											<td className="py-3 px-4 text-zinc-400">
-												{t.date
-													? new Date(
-															t.date
-													  ).toLocaleDateString()
-													: "N/A"}
-											</td>
-											<td className="py-3 px-4 text-zinc-300">
-												{t.category || "—"}
-											</td>
-											<td className="py-3 px-4 text-zinc-300">
-												{t.name || "—"}
-											</td>
-											<td className="py-3 px-4 text-zinc-300">
-												{t.paymentMethod || "—"}
-											</td>
-											<td
-												className={`py-3 px-4 text-right font-semibold ${
-													t.amount > 0
-														? "text-emerald-400"
-														: "text-red-400"
+
+							<TableHeader>
+								<TableRow>
+									<TableHead className="w-[180px]">Name</TableHead>
+									<TableHead
+										className="cursor-pointer"
+									// onClick={() => handleSort("date")}
+									>
+										Date
+									</TableHead>
+									<TableHead>Category</TableHead>
+									<TableHead>Account</TableHead>
+									<TableHead>Payment Method</TableHead>
+									<TableHead className="text-right">Amount</TableHead>
+								</TableRow>
+							</TableHeader>
+
+							<TableBody>
+								{transactions.map((t, i) => (
+									<TableRow key={i} className="hover:bg-zinc-800/50 transition-colors">
+										<TableCell className="font-medium text-white">
+											{t.name || "Untitled"}
+										</TableCell>
+										<TableCell className="text-zinc-400">
+											{t.date
+												? new Date(t.date).toLocaleDateString()
+												: "N/A"}
+										</TableCell>
+										<TableCell className="text-zinc-300">
+											{t.category || "—"}
+										</TableCell>
+										<TableCell className="text-zinc-300">
+											{t.accountName || "—"}
+										</TableCell>
+										<TableCell className="text-zinc-300">
+											{t.paymentMethod || "—"}
+										</TableCell>
+										<TableCell
+											className={`text-right font-semibold ${t.amount > 0
+												? "text-emerald-400"
+												: "text-red-400"
 												}`}
-											>
-												₹{t.amount}
-											</td>
-										</tr>
-									))}
-								</tbody>
-							</table>
-						</div>
+										>
+											₹{t.amount}
+										</TableCell>
+										<TableCell align="right">
+											<DropdownMenu  >
+												<DropdownMenuTrigger asChild>
+
+													<Button variant="ghost" className="h-8 w-8 p-0 cursor-pointer">
+														<Ellipsis className="h-4 w-4" />
+													</Button>
+												</DropdownMenuTrigger>
+												<DropdownMenuContent
+													align="end"
+													className="w-40 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xl shadow-lg p-1"
+												>
+													<DropdownMenuLabel className="text-xs uppercase tracking-wider text-zinc-500 px-2 py-1">
+														Actions
+													</DropdownMenuLabel>
+
+													<DropdownMenuItem
+														className="flex items-center gap-2 px-3 py-2.5 rounded-md hover:bg-zinc-800 hover:text-orange-400 cursor-pointer transition-colors"
+													>
+														<Pencil className="h-4 w-4 text-zinc-400 group-hover:text-orange-400" />
+														<span>Edit</span>
+													</DropdownMenuItem>
+
+													<DropdownMenuItem
+														className="flex items-center gap-2 px-3 py-2.5 rounded-md hover:bg-red-600/10 hover:text-red-400 cursor-pointer transition-colors"
+													>
+														<Trash2 className="h-4 w-4 text-zinc-400 group-hover:text-red-400" />
+														<span>Delete</span>
+													</DropdownMenuItem>
+												</DropdownMenuContent>
+
+											</DropdownMenu>
+										</TableCell>
+									</TableRow>
+								))}
+							</TableBody>
+						</Table>
 					)}
 				</div>
 			</div>

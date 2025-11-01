@@ -7,7 +7,6 @@ import axios from 'axios';
 import { useState, useEffect } from 'react';
 import { toast } from 'react-hot-toast'
 import { ScrollArea } from '../components/ui/scroll-area'
-import { Switch } from '../components/ui/switch'
 import { Link } from 'react-router-dom';
 import AccountCard from '../components/AccountCard';
 
