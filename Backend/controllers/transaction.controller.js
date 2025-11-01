@@ -13,14 +13,14 @@ module.exports.addTransaction = async (req, res, next) => {
     try {
         const accounts = await accountModel.find({ userId: user._id });
         
-        const { name, amount, type, category, date, description, paymentMethod, receiptUrl, isRecurring, recurringInterval, nextRecurringDate, lastProcessed, accountType } = req.body;
+        const { name, amount, type, category, date, description, paymentMethod, receiptUrl, isRecurring, recurringInterval, nextRecurringDate, lastProcessed, accountName } = req.body;
         let currentAccount;
-        console.log(accountType)
-        if(!accountType) {
+        console.log(accountName)
+        if(!accountName) {
             currentAccount =  accounts.find(account => account.isDefault === true);
         }
         else{
-            currentAccount = accounts.find(account => account.type === accountType);;
+            currentAccount = accounts.find(account => account.name === accountName);;
         }
         console.log( currentAccount)
         const newTransaction = await transactionService.createTransaction({
@@ -33,6 +33,7 @@ module.exports.addTransaction = async (req, res, next) => {
             date,
             description,
             paymentMethod,
+            accountName: currentAccount.name,
             receiptUrl,
             isRecurring,
             recurringInterval,

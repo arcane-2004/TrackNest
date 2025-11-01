@@ -46,6 +46,11 @@ const transactionSchema = new mongoose.Schema({
         type: String,
     },
 
+    accountName: {
+        type: String,
+        required:true
+    },
+    
     receiptUrl: {
         type: String,
     },
