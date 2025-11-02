@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Sidebar from "../components/Sidebar";
 import { LogOut } from "lucide-react";
 import { useHandleLogout } from "../utils/user.hooks";
 import axios from "axios";
 import { Button } from "@/components/ui/button"
-import { Ellipsis, Pencil, Trash2 } from 'lucide-react';
+import { Ellipsis, Pencil, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
 import {
 	Table,
 	TableBody,
@@ -27,7 +27,8 @@ import {
 const Transactions = () => {
 	const [transactions, setTransactions] = useState([]);
 	const [sortConfig, setSortConfig] = useState({
-		
+		field: "date",
+		direction: "desc"
 	})
 
 	const handleLogout = useHandleLogout();
@@ -46,6 +47,28 @@ const Transactions = () => {
 		};
 		fetchTransactions();
 	}, []);
+
+	// sorting the transactions
+	const sortedTransactions = useMemo(() => {
+		const sorted = [...transactions];
+		sorted.sort((a, b) => {
+			const field = sortConfig.field;
+			const direction = sortConfig.direction === "asc" ? 1 : -1;
+
+
+			if (a[field] < b[field]) return -1 * direction;
+			if (a[field] > b[field]) return 1 * direction;
+			return 0;
+		});
+		return sorted;
+	}, [transactions, sortConfig]);
+
+	const handleSort = (field) => {
+		setSortConfig((current) => ({
+			field,
+			direction: current.field == field && current.direction === "asc" ? "desc" : "asc"
+		}))
+	}
 
 	return (
 		<div className="h-full w-full bg-[#0f0f0f] text-white flex">
@@ -101,7 +124,7 @@ const Transactions = () => {
 						Recent Transactions
 					</h3>
 
-					{transactions.length === 0 ? (
+					{sortedTransactions.length === 0 ? (
 						<p className="text-zinc-400 text-sm italic">
 							No transactions found.
 						</p>
@@ -114,9 +137,13 @@ const Transactions = () => {
 									<TableHead className="w-[180px]">Name</TableHead>
 									<TableHead
 										className="cursor-pointer"
-									// onClick={() => handleSort("date")}
+										onClick={() => handleSort("date")}
 									>
-										Date
+										<div className="flex items-center">
+											Date {sortConfig.field === "date" && sortConfig.direction === "asc" ? 
+											<ChevronUp className="text-zinc-400 font-light text-sm h-5" /> 
+											: <ChevronDown className="text-zinc-400 font-light text-sm h-5" />}
+										</div>
 									</TableHead>
 									<TableHead>Category</TableHead>
 									<TableHead>Account</TableHead>
@@ -126,7 +153,7 @@ const Transactions = () => {
 							</TableHeader>
 
 							<TableBody>
-								{transactions.map((t, i) => (
+								{sortedTransactions.map((t, i) => (
 									<TableRow key={i} className="hover:bg-zinc-800/50 transition-colors">
 										<TableCell className="font-medium text-white">
 											{t.name || "Untitled"}
@@ -146,7 +173,7 @@ const Transactions = () => {
 											{t.paymentMethod || "—"}
 										</TableCell>
 										<TableCell
-											className={`text-right font-semibold ${t.amount > 0
+											className={`text-right font-semibold ${t.type === "income"
 												? "text-emerald-400"
 												: "text-red-400"
 												}`}
