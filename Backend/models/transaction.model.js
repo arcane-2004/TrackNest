@@ -13,6 +13,12 @@ const transactionSchema = new mongoose.Schema({
         required: true
     },
 
+    categoryId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category',
+        required: true
+    },
+
     name: {
         type: String,
     },
@@ -40,10 +46,6 @@ const transactionSchema = new mongoose.Schema({
     date: {
         type: Date,
         default: Date.now,
-    },
-
-    category: {
-        type: String,
     },
 
     accountName: {
