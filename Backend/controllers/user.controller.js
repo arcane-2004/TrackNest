@@ -1,4 +1,5 @@
 const userModel = require('../models/user.model');
+const categoryModel = require('../models/category.model');
 const blackListTokenModel = require('../models/blackListToken.model')
 const userService = require('../services/user.service');
 const { validationResult } = require('express-validator')
@@ -27,6 +28,20 @@ module.exports.registerUser = async (req, res, next) => {
                 email,
                 password: hashedPassword
             })
+
+            // clone default categories
+            const defaults = await categoryModel.find({ isDefault: true });
+            const userCats = defaults.map(d => ({
+                name: d.name,
+                icon: d.icon,
+                color: d.color,
+                type: d.type,
+                userId: newUser._id,
+                isDefault: false,
+            }));
+            await categoryModel.insertMany(userCats);
+
+            
 
             const accessToken = newUser.generateAuthToken();
             res.cookie('accessToken', accessToken, {
@@ -97,7 +112,7 @@ module.exports.logoutUser = async (req, res, next) => {
 module.exports.forgetPassword = async (req, res, next) => {
 
     let email = req.body.email;
-    
+
     if (!email) {
         const pass_key_id = req.cookies.pass_key_id || req.headers.authorization?.split(' ')[1];
         if (!pass_key_id) {
@@ -185,7 +200,7 @@ module.exports.verifyOtp = async (req, res, next) => {
         }
 
         const isExpire = user.password_otp.sendTime < new Date().getTime();
-        
+
         if (isExpire) {
             return res.status(400).json({ message: 'invalid OTP' })
         }
@@ -217,21 +232,21 @@ module.exports.verifyOtp = async (req, res, next) => {
 }
 
 module.exports.updatePassword = async (req, res, next) => {
-    
-    const {password} = req.body;
+
+    const { password } = req.body;
     const user = req.user;
 
-    try{
+    try {
         const hashedPassword = await userModel.hashPassword(password);
         user.password = hashedPassword;
         user.save();
         res.clearCookie('accessToken');
         res.clearCookie('connect.sid');
 
-        return res.status(200).json({message: 'Password updated successfully'});
-    }catch(error){
-        
-        return res.status(500).json({message: 'Internal server error'});
+        return res.status(200).json({ message: 'Password updated successfully' });
+    } catch (error) {
+
+        return res.status(500).json({ message: 'Internal server error' });
         next(error);
     }
 }

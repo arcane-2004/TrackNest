@@ -4,7 +4,7 @@ const categorySchema = new mongoose.Schema({
     userId : {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        required: trusted,
+        default: null
     },
 
     name : {
@@ -22,9 +22,15 @@ const categorySchema = new mongoose.Schema({
 
     type: {
         type: String,
-        enum: ['INCOME', 'EXPANSE'],
+        enum: ['income', 'expense'],
         required: true,
     },
+
+    isDefault: { 
+        type: Boolean, 
+        default: false 
+    },
+
 },{timestamps: true })
 
 module.exports = mongoose.model('Category', categorySchema);

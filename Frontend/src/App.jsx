@@ -8,6 +8,7 @@ import Super from "./components/Super"
 import GettingStarted from "./pages/GettingStarted"
 import Transactions from "./pages/Transactions"
 import Accounts from "./pages/Accounts"
+import Category from "./pages/Category"
 import AccountViewPage from "./pages/AccountViewPage"
 import PageNotFound from "./pages/PageNotFound"
 
@@ -23,6 +24,7 @@ function App() {
         <Route path="/verify/otp" element={<VerifyOTP />} />
         <Route path="/transactions" element={<Transactions/>}/>
         <Route path="/accounts" element={<Accounts/>}/>
+        <Route path="/category" element={<Category/>}/>
         <Route path="/account/:id" element={<AccountViewPage/>} />
         <Route element={<Super />}>
           <Route path="/dashboard" element={<Dashboard />} />

@@ -1,7 +1,7 @@
 import React from 'react'
 import { motion } from 'motion/react'
 import { useState } from 'react';
-import { User, House, NotebookTabs, Wallet  } from 'lucide-react';
+import { User, House, NotebookTabs, Wallet, Logs  } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 
@@ -88,7 +88,8 @@ const Sidebar = () => {
         { id: "dashboard", icon: House, lable: "Dashboard", path: "/dashboard" },
         { id: "user", icon: User, lable: "Userdafdadsaf", path: "/profile" },
         {id: "transactions", icon: NotebookTabs , lable: "Transactions", path: "/transactions"},
-        {id: "accounts", icon: Wallet , lable: "Accounts", path: "/accounts"}
+        {id: "accounts", icon: Wallet , lable: "Accounts", path: "/accounts"},
+        {id: "category", icon: Logs , lable: "Category", path: "/category"}
        
     ]
 

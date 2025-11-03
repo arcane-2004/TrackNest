@@ -1,11 +1,12 @@
 const userModel = require('../models/user.model')
+const categoryModel = require('../models/category.model')
 const googleAuth = async (req, res, next) => {
 
-    try{
+    try {
 
-        const findedUser = await userModel.findOne({email: req.user?._json?.email})
+        const findedUser = await userModel.findOne({ email: req.user?._json?.email })
         let savedUser;
-        if(!findedUser){
+        if (!findedUser) {
             const newUser = new userModel({
                 name: req.user?._json?.name,
                 email: req.user?._json?.email,
@@ -15,16 +16,28 @@ const googleAuth = async (req, res, next) => {
             savedUser = await newUser.save();
         }
 
+        // clone default categories
+        const defaults = await categoryModel.find({ isDefault: true });
+        const userCats = defaults.map(d => ({
+            name: d.name,
+            icon: d.icon,
+            color: d.color,
+            type: d.type,
+            userId: (findedUser || savedUser)._id,
+            isDefault: false,
+        }));
+        await categoryModel.insertMany(userCats);
+
         const accessToken = (findedUser || savedUser).generateAuthToken();
         res.cookie('accessToken', accessToken, {
             httpOnly: true,
             secure: true,
             sameSite: 'none'
         })
-        
+
         next();
 
-    }catch(error){
+    } catch (error) {
         next(error)
     }
 
