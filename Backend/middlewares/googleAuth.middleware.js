@@ -14,19 +14,21 @@ const googleAuth = async (req, res, next) => {
                 googleId: req.user?._json?.sub
             })
             savedUser = await newUser.save();
+
+            // clone default categories
+            const defaults = await categoryModel.find({ isDefault: true });
+            const userCats = defaults.map(d => ({
+                name: d.name,
+                icon: d.icon,
+                color: d.color,
+                type: d.type,
+                userId: savedUser._id,
+                isDefault: false,
+            }));
+            await categoryModel.insertMany(userCats);
         }
 
-        // clone default categories
-        const defaults = await categoryModel.find({ isDefault: true });
-        const userCats = defaults.map(d => ({
-            name: d.name,
-            icon: d.icon,
-            color: d.color,
-            type: d.type,
-            userId: (findedUser || savedUser)._id,
-            isDefault: false,
-        }));
-        await categoryModel.insertMany(userCats);
+
 
         const accessToken = (findedUser || savedUser).generateAuthToken();
         res.cookie('accessToken', accessToken, {

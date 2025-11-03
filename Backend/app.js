@@ -10,6 +10,7 @@ const userRoute = require('./routes/user.route');
 const accountRoute = require('./routes/account.route');
 const transctionRoute = require('./routes/transaction.route');
 const budgetRoute = require('./routes/budget.route')
+const categoryRoute = require('./routes/category.route');
 
 const app = express();
 
