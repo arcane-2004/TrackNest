@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect, useMemo } from "react";
 import Sidebar from "../components/Sidebar";
 import { LogOut } from "lucide-react";
@@ -7,6 +6,7 @@ import { useHandleLogout } from "../utils/user.hooks";
 import axios from "axios";
 import { Button } from "@/components/ui/button"
 import { Ellipsis, Pencil, Trash2, ChevronUp, ChevronDown } from 'lucide-react';
+import CreateTransaction from "../components/createTransaction";
 import {
 	Table,
 	TableBody,
@@ -33,6 +33,7 @@ const Transactions = () => {
 
 	const handleLogout = useHandleLogout();
 
+	// fetching transactions
 	useEffect(() => {
 		const fetchTransactions = async () => {
 			try {
@@ -63,6 +64,7 @@ const Transactions = () => {
 		return sorted;
 	}, [transactions, sortConfig]);
 
+
 	const handleSort = (field) => {
 		setSortConfig((current) => ({
 			field,
@@ -85,27 +87,29 @@ const Transactions = () => {
 
 					<div className="flex items-center gap-6">
 						{/* Add Transaction Button */}
-						<button className="group px-6 py-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-400 text-sm font-semibold text-white hover:scale-[1.03] transition-transform duration-300 shadow-md shadow-orange-500/10 hover:cursor-pointer">
-							<span className="relative z-10 flex items-center gap-2">
-								Add Transaction
-								<svg
-									fill="none"
-									height="16"
-									viewBox="0 0 24 24"
-									width="16"
-									xmlns="http://www.w3.org/2000/svg"
-									className="group-hover:rotate-90 transition-transform duration-300"
-								>
-									<path
-										d="M10.75 8.75L14.25 12L10.75 15.25"
-										stroke="currentColor"
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth="1.5"
-									/>
-								</svg>
-							</span>
-						</button>
+						<CreateTransaction>
+							<button className="group px-6 py-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-400 text-sm font-semibold text-white hover:scale-[1.03] transition-transform duration-300 shadow-md shadow-orange-500/10 hover:cursor-pointer">
+								<span className="relative z-10 flex items-center gap-2">
+									Add Transaction
+									<svg
+										fill="none"
+										height="16"
+										viewBox="0 0 24 24"
+										width="16"
+										xmlns="http://www.w3.org/2000/svg"
+										className="group-hover:rotate-90 transition-transform duration-300"
+									>
+										<path
+											d="M10.75 8.75L14.25 12L10.75 15.25"
+											stroke="currentColor"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											strokeWidth="1.5"
+										/>
+									</svg>
+								</span>
+							</button>
+						</CreateTransaction>
 
 						{/* Logout */}
 						<span
@@ -140,9 +144,9 @@ const Transactions = () => {
 										onClick={() => handleSort("date")}
 									>
 										<div className="flex items-center">
-											Date {sortConfig.field === "date" && sortConfig.direction === "asc" ? 
-											<ChevronUp className="text-zinc-400 font-light text-sm h-5" /> 
-											: <ChevronDown className="text-zinc-400 font-light text-sm h-5" />}
+											Date {sortConfig.field === "date" && sortConfig.direction === "asc" ?
+												<ChevronUp className="text-zinc-400 font-light text-sm h-5" />
+												: <ChevronDown className="text-zinc-400 font-light text-sm h-5" />}
 										</div>
 									</TableHead>
 									<TableHead>Category</TableHead>

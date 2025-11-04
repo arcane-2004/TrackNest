@@ -6,7 +6,7 @@ module.exports.getCategories = async (req, res, next) => {
     const user = req.user;
 
     if(!user){
-        return res.status(401).json({message: "unauthorized"});
+        return res.status(401).json({message: "user not defined"});
     }
     try{
         const categories = await categoryModel.find({userId: user._id})
