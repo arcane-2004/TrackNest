@@ -23,9 +23,9 @@ const transactionSchema = new mongoose.Schema({
         type: String,
     },
 
-    type: {
-        type: String,
-        enum: ['income', 'expense', 'transfer'] 
+    isExpense: {
+        type: Boolean,
+        default: true
     },
 
     amount: {

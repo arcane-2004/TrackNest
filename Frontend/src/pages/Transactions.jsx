@@ -248,11 +248,11 @@ const Transactions = () => {
 												{t.paymentMethod || "—"}
 											</TableCell>
 											<TableCell
-												className={`text-right font-semibold ${t.type === "income"
+												className={`text-right font-semibold ${!t.isExpense 
 													? "text-emerald-400"
 													: "text-red-400"
 													}`}
-											>{console.log(t.type)}
+											>
 												₹{t.amount}
 											</TableCell>
 											<TableCell align="right">

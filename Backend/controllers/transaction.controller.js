@@ -13,7 +13,7 @@ module.exports.addTransaction = async (req, res, next) => {
 	try {
 		const accounts = await accountModel.find({ userId: user._id });
 
-		const { name, amount, type, category, account, date, time, description, paymentMethod, receiptUrl, isRecurring, recurringInterval, nextRecurringDate, lastProcessed } = req.body;
+		const { name, amount, isExpense, category, account, date, time, description, paymentMethod, receiptUrl, isRecurring, recurringInterval, nextRecurringDate, lastProcessed } = req.body;
 
 		// Combine date + time if provided, else use current timestamp
 		let dateTime;
@@ -41,11 +41,7 @@ module.exports.addTransaction = async (req, res, next) => {
 			dateTime = new Date();
 		}
 
-		// Check for account id
-		// if(!account){
-		// 	const accountObj = accounts.find(acc => acc.isDefault);
-		// 	account = accountObj._id;
-		// }
+		//Get current account
 		let currentAccount
 		if (account) {
 			currentAccount = accounts.find(acc => acc._id.toString() === account);
@@ -62,7 +58,7 @@ module.exports.addTransaction = async (req, res, next) => {
 			categoryId: category,
 			name,
 			amount,
-			type,
+			isExpense,
 			dateTime,
 			description,
 			paymentMethod,
@@ -73,7 +69,7 @@ module.exports.addTransaction = async (req, res, next) => {
 			lastProcessed
 		})
 
-		await balanceUpdate(currentAccount, amount, type)
+		await balanceUpdate(currentAccount, amount)
 
 		return res.status(201).json({ message: 'Transaction added successfully', transaction: newTransaction });
 
