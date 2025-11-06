@@ -56,11 +56,9 @@ const Transactions = () => {
 		fetchTransactions();
 	}, []);
 
-	// const onSuccess = () => {
-	// 	// fetchTransactions();
-	// 	// ✅ Optimistically update UI
-	// 	setTransactions((prev) => [newTransaction, ...prev]);
-	// }
+	const onSuccess = () => {
+		fetchTransactions();
+	}
 
 	const handelDelete = async (id) => {
 
@@ -120,7 +118,7 @@ const Transactions = () => {
 
 					<div className="flex items-center gap-6">
 						{/* Add Transaction Button */}
-						<CreateTransaction setTransactions={setTransactions}>
+						<CreateTransaction onSuccess={onSuccess}>
 							<div className="group px-6 py-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-400 text-sm font-semibold text-white hover:scale-[1.03] transition-transform duration-300 shadow-md shadow-orange-500/10 hover:cursor-pointer">
 								<span className="relative z-10 flex items-center gap-2">
 									Add Transaction
@@ -175,10 +173,10 @@ const Transactions = () => {
 										<TableHead className="w-[180px]">Name</TableHead>
 										<TableHead
 											className="cursor-pointer"
-											onClick={() => handleSort("date")}
+											onClick={() => handleSort("dateTime")}
 										>
 											<div className="flex items-center">
-												Date {sortConfig.field === "date" && sortConfig.direction === "asc" ?
+												Date {sortConfig.field === "dateTime" && sortConfig.direction === "asc" ?
 													<ChevronUp className="text-zinc-400 font-light text-sm h-5" />
 													: <ChevronDown className="text-zinc-400 font-light text-sm h-5" />}
 											</div>

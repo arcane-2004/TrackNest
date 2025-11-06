@@ -28,7 +28,7 @@ import { toast } from "react-hot-toast"
 import { Loader2 } from "lucide-react"
 import axios from "axios"
 
-const CreateTransaction = ({ onSuccess, children, setTransactions }) => {
+const CreateTransaction = ({ onSuccess, children }) => {
     const [categories, setCategories] = useState([])
     const [accounts, setAccounts] = useState([])
 
@@ -78,10 +78,13 @@ const CreateTransaction = ({ onSuccess, children, setTransactions }) => {
         description: "",
         category: "",
         account: "",
+        paymentMethod: "",
         date: "",
         time: "",
         isExpense: true,
     }
+
+    const paymentMethods = ['cash', 'credit card', 'debit card', 'bank transfer', 'upi', 'auto debit' ,'other']
 
     const handleSubmit = async (values, { setSubmitting, resetForm }) => {
         try {
@@ -90,14 +93,9 @@ const CreateTransaction = ({ onSuccess, children, setTransactions }) => {
                 amount: values.isExpense ? -Math.abs(values.amount) : Math.abs(values.amount),
             }
 
-            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/transaction/add`, data, {
+            await axios.post(`${import.meta.env.VITE_BASE_URL}/transaction/add`, data, {
                 withCredentials: true,
             })
-
-            const newTransaction = response.data.transaction; // returned from backend
-
-            // ✅ Optimistically update UI
-            setTransactions((prev) => [ ...prev, newTransaction]);
 
             toast.success("Transaction added successfully!")
             resetForm()
@@ -187,58 +185,85 @@ const CreateTransaction = ({ onSuccess, children, setTransactions }) => {
                                         <Field as={Input} name="description" placeholder="Optional details" />
                                     </div>
 
-                                    {/* Category */}
-                                    <div>
-                                        <Label>Category</Label>
-                                        <Select
-                                            onValueChange={(val) => setFieldValue("category", val)}
-                                            value={values.category}
-                                        >
-                                            <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
-                                                <SelectValue placeholder="Select Category" />
-                                            </SelectTrigger>
-                                            <SelectContent className="bg-zinc-800 text-white border-zinc-700">
-                                                {filteredCategories.length === 0 ? (
-                                                    <p className="text-zinc-400 text-sm p-2">
-                                                        No categories found for this type.
-                                                    </p>
-                                                ) : (
-                                                    filteredCategories.map((cat) => (
-                                                        <SelectItem key={cat._id} value={cat._id}>
-                                                            <div className="flex items-center gap-2">
-                                                                <span
-                                                                    className="w-3 h-3 rounded-full"
-                                                                    style={{ backgroundColor: cat.color }}
-                                                                ></span>
-                                                                {cat.name}
-                                                            </div>
+                                    <div className="flex justify-around">
+                                        {/* Category */}
+                                        <div>
+                                            <Label>Category</Label>
+                                            <Select
+                                                onValueChange={(val) => setFieldValue("category", val)}
+                                                value={values.category}
+                                            >
+                                                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                                                    <SelectValue placeholder="Select Category" />
+                                                </SelectTrigger>
+                                                <SelectContent className="bg-zinc-800 text-white border-zinc-700">
+                                                    {filteredCategories.length === 0 ? (
+                                                        <p className="text-zinc-400 text-sm p-2">
+                                                            No categories found for this type.
+                                                        </p>
+                                                    ) : (
+                                                        filteredCategories.map((cat) => (
+                                                            <SelectItem key={cat._id} value={cat._id}>
+                                                                <div className="flex items-center gap-2">
+                                                                    <span
+                                                                        className="w-3 h-3 rounded-full"
+                                                                        style={{ backgroundColor: cat.color }}
+                                                                    ></span>
+                                                                    {cat.name}
+                                                                </div>
+                                                            </SelectItem>
+                                                        ))
+                                                    )}
+                                                </SelectContent>
+                                            </Select>
+                                            <ErrorMessage
+                                                name="category"
+                                                component="p"
+                                                className="text-red-400 text-sm mt-1"
+                                            />
+                                        </div>
+
+                                        {/* Account */}
+                                        <div>
+                                            <Label>Account</Label>
+                                            <Select
+                                                onValueChange={(val) => setFieldValue("account", val)}
+                                                value={values.account}
+
+                                            >
+                                                <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
+                                                    <SelectValue placeholder="Select Account" />
+                                                </SelectTrigger>
+                                                <SelectContent className="bg-zinc-800 text-white border-zinc-700">
+                                                    {accounts.map((acc) => (
+                                                        <SelectItem key={acc._id} value={acc._id}>
+                                                            {acc.name}
                                                         </SelectItem>
-                                                    ))
-                                                )}
-                                            </SelectContent>
-                                        </Select>
-                                        <ErrorMessage
-                                            name="category"
-                                            component="p"
-                                            className="text-red-400 text-sm mt-1"
-                                        />
+                                                    ))}
+                                                </SelectContent>
+                                            </Select>
+                                            <ErrorMessage
+                                                name="account"
+                                                component="p"
+                                                className="text-red-400 text-sm mt-1"
+                                            />
+                                        </div>
                                     </div>
 
-                                    {/* Account */}
+                                    {/* paymentMethod */}
                                     <div>
-                                        <Label>Account</Label>
+                                        <Label>Payment Method</Label>
                                         <Select
-                                            onValueChange={(val) => setFieldValue("account", val)}
-                                            value={values.account}
-
+                                            onValueChange={(val) => setFieldValue("paymentMethod", val)}
+                                            value={values.paymentMethod}
                                         >
                                             <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
-                                                <SelectValue placeholder="Select Account" />
+                                                <SelectValue placeholder="Select Payment Method" />
                                             </SelectTrigger>
                                             <SelectContent className="bg-zinc-800 text-white border-zinc-700">
-                                                {accounts.map((acc) => (
-                                                    <SelectItem key={acc._id} value={acc._id}>
-                                                        {acc.name}
+                                                {paymentMethods.map((py) => (
+                                                    <SelectItem key={py} value={py}>
+                                                        {py}
                                                     </SelectItem>
                                                 ))}
                                             </SelectContent>

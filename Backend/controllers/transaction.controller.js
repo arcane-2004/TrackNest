@@ -85,7 +85,7 @@ module.exports.getTransactions = async (req, res, next) => {
 	}
 
 	try {
-		const transactions = await transactionModel.find({ userId: user._id }).sort({ date: -1 }).populate('categoryId').populate('accountId');
+		const transactions = await transactionModel.find({ userId: user._id }).sort({ dateTime: -1 }).populate('categoryId').populate('accountId');
 
 		return res.status(200).json({ transactions });
 	}
