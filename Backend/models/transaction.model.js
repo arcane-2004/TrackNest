@@ -43,14 +43,9 @@ const transactionSchema = new mongoose.Schema({
         default: 'upi'
     },
 
-    date: {
+    dateTime: {
         type: Date,
-        default: Date.now,
-    },
-
-    accountName: {
-        type: String,
-        required:true
+        required: true,
     },
     
     receiptUrl: {

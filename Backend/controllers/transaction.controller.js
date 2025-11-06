@@ -13,7 +13,7 @@ module.exports.addTransaction = async (req, res, next) => {
 	try {
 		const accounts = await accountModel.find({ userId: user._id });
 
-		const { name, amount, type, category, date, time, description, paymentMethod, receiptUrl, isRecurring, recurringInterval, nextRecurringDate, lastProcessed, accountName } = req.body;
+		const { name, amount, type, category, account, date, time, description, paymentMethod, receiptUrl, isRecurring, recurringInterval, nextRecurringDate, lastProcessed } = req.body;
 
 		// Combine date + time if provided, else use current timestamp
 		let dateTime;
@@ -41,27 +41,31 @@ module.exports.addTransaction = async (req, res, next) => {
 			dateTime = new Date();
 		}
 
-		// find the current selected account
-		let currentAccount;
-		console.log(accountName)
-		if (!accountName) {
-			currentAccount = accounts.find(account => account.isDefault === true);
+		// Check for account id
+		// if(!account){
+		// 	const accountObj = accounts.find(acc => acc.isDefault);
+		// 	account = accountObj._id;
+		// }
+		let currentAccount
+		if (account) {
+			currentAccount = accounts.find(acc => acc._id.toString() === account);
+			if (!currentAccount) {
+				return res.status(400).json({ message: "Account not found" });
+			}
+		} else {
+			currentAccount = accounts.find(acc => acc.isDefault === true);
 		}
-		else {
-			currentAccount = accounts.find(account => account.name === accountName);;
-		}
-		console.log(currentAccount)
+
 		const newTransaction = await transactionService.createTransaction({
 			userId: user._id,
 			accountId: currentAccount._id,
+			categoryId: category,
 			name,
 			amount,
 			type,
-			category,
 			dateTime,
 			description,
 			paymentMethod,
-			accountName: currentAccount.name,
 			receiptUrl,
 			isRecurring,
 			recurringInterval,
@@ -85,11 +89,12 @@ module.exports.getTransactions = async (req, res, next) => {
 	}
 
 	try {
-		const transactions = (await transactionModel.find({ userId: user._id }).sort({ date: -1 })).populate('categoryId');
+		const transactions = await transactionModel.find({ userId: user._id }).sort({ date: -1 }).populate('categoryId').populate('accountId');
 
 		return res.status(200).json({ transactions });
 	}
 	catch (error) {
+		console.log(error)
 		return res.status(500).json({ message: 'Internal server error' });
 	}
 }
@@ -129,11 +134,35 @@ module.exports.getAccountTransactions = async (req, res, next) => {
 	}
 };
 
+module.exports.deleteTransaction = async (req, res, next) => {
+	const { id } = req.body; // ✅ use req.body, not req.data
 
-const balanceUpdate = async (account, amount, type) => {
+	if (!id) {
+		return res.status(400).json({ message: "There was a error in deleting transaction" });
+	}
 
 	try {
-		account.balance += type === 'income' ? amount : -amount;
+
+		const deleted = await transactionModel.findByIdAndDelete(id).populate('accountId');
+
+		if (!deleted) {
+			return res.status(404).json({ message: "Unable to delete Transaction" });
+		}
+
+		await balanceUpdate(deleted.accountId, deleted.amount * (-1));
+
+		return res.status(200).json({ message: "Transaction deleted successfully" });
+	} catch (error) {
+		
+		return res.status(500).json({message: "Internal server error"});
+	}
+}
+
+
+const balanceUpdate = async (account, amount) => {
+
+	try {
+		account.balance += amount;
 		await account.save();
 	} catch (error) {
 		console.error('Error updating balance:', error);

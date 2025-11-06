@@ -10,4 +10,6 @@ router.get('/get-transactions', authMiddleware.authUser, transactionController.g
 
 router.get('/get/account-transaction/:id', authMiddleware.authUser, transactionController.getAccountTransactions);
 
+router.post('/delete', authMiddleware.authUser, transactionController.deleteTransaction);
+
 module.exports = router;
