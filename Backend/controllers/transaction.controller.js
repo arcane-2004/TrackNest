@@ -182,10 +182,8 @@ module.exports.updateTransaction = async (req, res, next) => {
 			{ new: true })
 
 		// Apply new balance effect
-		console.log("data", data)
-		console.log("updatedTransaction", updatedTransaction)
 		const newAccount = await accountModel.findById(updatedTransaction.accountId);
-		console.log("newAccount", newAccount)
+		
 		if (newAccount) {
 			balanceUpdate(newAccount, data.amount)
 		}
