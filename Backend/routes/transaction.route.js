@@ -12,4 +12,6 @@ router.get('/get/account-transaction/:id', authMiddleware.authUser, transactionC
 
 router.post('/delete', authMiddleware.authUser, transactionController.deleteTransaction);
 
+router.put('/update/:id', authMiddleware.authUser, transactionController.updateTransaction);
+
 module.exports = router;

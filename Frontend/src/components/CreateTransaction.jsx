@@ -28,7 +28,7 @@ import { toast } from "react-hot-toast"
 import { Loader2 } from "lucide-react"
 import axios from "axios"
 
-const CreateTransaction = ({ onSuccess, children }) => {
+const CreateTransaction = ({ onSuccess, children, transaction }) => {
     const [categories, setCategories] = useState([])
     const [accounts, setAccounts] = useState([])
 
@@ -67,24 +67,55 @@ const CreateTransaction = ({ onSuccess, children }) => {
         amount: Yup.number().required("Amount is required").positive("Must be positive"),
         description: Yup.string().max(200, "Max 200 characters"),
         category: Yup.string().required("Select a category"),
-        account: Yup.string(),
+        accountId: Yup.string(),
         date: Yup.date(),
         time: Yup.string(),
     })
 
-    const initialValues = {
+    // safe helpers — preserves local timezone
+    function formatDateForInput(dateLike) {
+        if (!dateLike) return "";
+        const d = new Date(dateLike);
+        const pad = (n) => String(n).padStart(2, "0");
+        const year = d.getFullYear();
+        const month = pad(d.getMonth() + 1);
+        const day = pad(d.getDate());
+        return `${year}-${month}-${day}`; // YYYY-MM-DD for <input type="date">
+    }
+
+    function formatTimeForInput(dateLike) {
+        if (!dateLike) return "";
+        const d = new Date(dateLike);
+        const pad = (n) => String(n).padStart(2, "0");
+        const hours = pad(d.getHours());
+        const minutes = pad(d.getMinutes());
+        return `${hours}:${minutes}`; // HH:MM for <input type="time">
+    }
+
+
+    const initialValues = transaction ? {
+        name: transaction.name,
+        amount: Math.abs(transaction.amount),
+        description: transaction.description || "",
+        category: String(transaction.categoryId?._id || ""),
+        accountId: String(transaction.accountId?._id || ""),
+        paymentMethod: transaction.paymentMethod || "",
+        date: formatDateForInput(transaction.dateTime),
+        time: formatTimeForInput(transaction.dateTime),
+        isExpense: transaction.amount < 0,
+    } : {
         name: "",
-        amount: "",
+        amountId: "",
         description: "",
         category: "",
-        account: "",
-        paymentMethod: "",
+        accountId: "",
+        paymentMethod: "upi",
         date: "",
         time: "",
         isExpense: true,
     }
 
-    const paymentMethods = ['cash', 'credit card', 'debit card', 'bank transfer', 'upi', 'auto debit' ,'other']
+    const paymentMethods = ['cash', 'credit card', 'debit card', 'bank transfer', 'upi', 'auto debit', 'other']
 
     const handleSubmit = async (values, { setSubmitting, resetForm }) => {
         try {
@@ -93,13 +124,31 @@ const CreateTransaction = ({ onSuccess, children }) => {
                 amount: values.isExpense ? -Math.abs(values.amount) : Math.abs(values.amount),
             }
 
-            await axios.post(`${import.meta.env.VITE_BASE_URL}/transaction/add`, data, {
-                withCredentials: true,
-            })
+            let response;
 
-            toast.success("Transaction added successfully!")
-            resetForm()
-            onSuccess()
+            if (transaction) {
+                //  Edit existing transaction
+                console.log("data", data)
+                response = await axios.put(
+                    `${import.meta.env.VITE_BASE_URL}/transaction/update/${transaction._id}`,
+                    {data},
+                    { withCredentials: true }
+                );
+                toast.success(response.data.message);
+                resetForm()
+                onSuccess()
+            } else {
+                // Create new transaction
+                response = await axios.post(
+                    `${import.meta.env.VITE_BASE_URL}/transaction/add`,
+                    data,
+                    { withCredentials: true }
+                );
+
+                toast.success(response.data.message)
+                resetForm()
+                onSuccess()
+            }
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to create transaction")
         } finally {
@@ -107,9 +156,11 @@ const CreateTransaction = ({ onSuccess, children }) => {
         }
     }
 
+    
+
     return (
         <Sheet>
-            <SheetTrigger>{children}</SheetTrigger>
+            <SheetTrigger asChild>{children}</SheetTrigger>
 
             <SheetContent
                 side="right"
@@ -117,7 +168,7 @@ const CreateTransaction = ({ onSuccess, children }) => {
             >
                 <SheetHeader>
                     <SheetTitle className="text-xl font-semibold text-emerald-400">
-                        Add Transaction
+                        {transaction ? "Edit Transaction" : "Add Transaction"}
                     </SheetTitle>
                     <SheetDescription className="text-zinc-400">
                         Fill in the transaction details below.
@@ -227,8 +278,8 @@ const CreateTransaction = ({ onSuccess, children }) => {
                                         <div>
                                             <Label>Account</Label>
                                             <Select
-                                                onValueChange={(val) => setFieldValue("account", val)}
-                                                value={values.account}
+                                                onValueChange={(val) => setFieldValue("accountId", val)}
+                                                value={values.accountId}
 
                                             >
                                                 <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
@@ -256,7 +307,7 @@ const CreateTransaction = ({ onSuccess, children }) => {
                                         <Select
                                             onValueChange={(val) => setFieldValue("paymentMethod", val)}
                                             value={values.paymentMethod}
-                                        >
+                                        >   
                                             <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                                                 <SelectValue placeholder="Select Payment Method" />
                                             </SelectTrigger>
@@ -309,7 +360,7 @@ const CreateTransaction = ({ onSuccess, children }) => {
                                         {isSubmitting ? (
                                             <Loader2 className="animate-spin" />
                                         ) : (
-                                            "Create Transaction"
+                                            transaction ? "Update Transaction" : "Create Transaction"
                                         )}
                                     </Button>
                                 </Form>

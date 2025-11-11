@@ -42,8 +42,7 @@ const Transactions = () => {
 			const response = await axios.get(
 				`${import.meta.env.VITE_BASE_URL}/transaction/get-transactions`,
 				{ withCredentials: true }
-			);
-			console.log('response', response.data)
+			);	
 			setTransactions(response.data.transactions || []);
 		} catch (error) {
 			console.error(error.response?.data.message || "Something went wrong");
@@ -246,7 +245,7 @@ const Transactions = () => {
 												{t.paymentMethod || "—"}
 											</TableCell>
 											<TableCell
-												className={`text-right font-semibold ${!t.isExpense 
+												className={`text-right font-semibold ${!t.isExpense
 													? "text-emerald-400"
 													: "text-red-400"
 													}`}
@@ -268,14 +267,17 @@ const Transactions = () => {
 														<DropdownMenuLabel className="text-xs uppercase tracking-wider text-zinc-500 px-2 py-1">
 															Actions
 														</DropdownMenuLabel>
-
-														<DropdownMenuItem
-															className="flex items-center gap-2 px-3 py-2.5 rounded-md hover:bg-zinc-800 hover:text-orange-400 cursor-pointer transition-colors"
-														>
-															<Pencil className="h-4 w-4 text-zinc-400 group-hover:text-orange-400" />
-															<span>Edit</span>
-														</DropdownMenuItem>
-
+														{/* Edit transaction button */}
+														<CreateTransaction transaction={t} onSuccess={onSuccess}>
+															<DropdownMenuItem
+																onSelect={(e) => e.preventDefault()}
+																className="flex items-center gap-2 px-3 py-2.5 rounded-md hover:bg-zinc-800 hover:text-orange-400 cursor-pointer transition-colors"
+															>
+																
+																<Pencil className="h-4 w-4 text-zinc-400 group-hover:text-orange-400" />
+																<span>Edit</span>
+															</DropdownMenuItem>
+														</CreateTransaction>
 														<DropdownMenuItem
 															className="flex items-center gap-2 px-3 py-2.5 rounded-md hover:bg-red-600/10 hover:text-red-400 cursor-pointer transition-colors"
 															onClick={() => {

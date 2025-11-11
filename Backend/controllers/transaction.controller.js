@@ -71,7 +71,7 @@ module.exports.addTransaction = async (req, res, next) => {
 
 		await balanceUpdate(currentAccount, amount)
 
-		return res.status(201).json({ message: 'Transaction added successfully', transaction: newTransaction });
+		return res.status(201).json({ message: 'Transaction added successfully!', transaction: newTransaction });
 
 	} catch (error) {
 		return res.status(500).json({ message: error.message });
@@ -149,9 +149,53 @@ module.exports.deleteTransaction = async (req, res, next) => {
 
 		return res.status(200).json({ message: "Transaction deleted successfully" });
 	} catch (error) {
-		
-		return res.status(500).json({message: "Internal server error"});
+
+		return res.status(500).json({ message: "Internal server error" });
 	}
+}
+
+module.exports.updateTransaction = async (req, res, next) => {
+
+	const { id } = req.params;
+	const { data } = req.body;
+
+	if (!id) {
+		return res.status(401).json({ message: "Transaction id is required" });
+	}
+	try {
+		// Find existing transaction
+		const oldTransaction = await transactionModel.findById(id);
+		if (!oldTransaction) {
+			return res.status(404).json({ message: "Transaction not found" });
+		}
+
+		// Revert old balance impact
+		const oldAccount = await accountModel.findById(oldTransaction.accountId);
+		if (oldAccount) {
+			oldAccount.balance -= oldTransaction.amount; // reverse old effect
+			await oldAccount.save();
+		}
+
+		const updatedTransaction = await transactionModel.findByIdAndUpdate(
+			{ _id: id },
+			{ $set: data },
+			{ new: true })
+
+		// Apply new balance effect
+		console.log("data", data)
+		console.log("updatedTransaction", updatedTransaction)
+		const newAccount = await accountModel.findById(updatedTransaction.accountId);
+		console.log("newAccount", newAccount)
+		if (newAccount) {
+			balanceUpdate(newAccount, data.amount)
+		}
+
+		return res.status(200).json({ message: "Transaction updated!", transaction: updatedTransaction })
+
+	} catch (error) {
+		return res.status(500).json({ message: "Internal server error" });
+	}
+
 }
 
 
