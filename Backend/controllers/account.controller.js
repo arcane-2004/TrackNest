@@ -1,4 +1,5 @@
 const accountModel = require('../models/account.model');
+const transactionModel = require('../models/transaction.model')
 const userModel = require('../models/user.model');
 const accountService = require('../services/account.services');
 
@@ -121,5 +122,25 @@ module.exports.getAccountById = async (req, res, next) => {
         return res.status(200).json({ account });
     } catch (error) {
         return res.status(500).json({ message: "Internal server error", error: error.message });
+    }
+}
+
+module.exports.deleteAccount = async (req, res, next) => {
+
+    const {id} = req.params;
+  
+    try{
+        const account = await accountModel.findById(id);
+        if(!account){
+            return res.status(404).json({message:"Something went wrong", error:"account not found"})
+        }
+
+        await accountModel.findByIdAndDelete(id);
+
+        await transactionModel.deleteMany({accountId: id});
+
+        return res.status(200).json({message: "Account deleted successfully"});
+    }catch(error){
+        return res.status(500).json({message: "Internal server error", error: error.message});
     }
 }
