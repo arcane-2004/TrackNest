@@ -3,8 +3,7 @@ import { useParams } from 'react-router-dom'
 import axios from 'axios'
 import { Switch } from "../components/ui/switch";
 import { toast } from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
-import { ChevronUp, ChevronDown, Loader2 } from 'lucide-react';
+import { ChevronUp, ChevronDown, Loader2, Trash2 } from 'lucide-react';
 import TransactionCard from '../components/TransactionCard';
 
 
@@ -17,10 +16,11 @@ import {
 } from "@/components/ui/table";
 import CreateAccount from '../components/CreateAccount';
 import Sidebar from '../components/Sidebar';
+import ConfirmAccountDelete from '../components/ConfirmAccountDelete';
 
 const AccountViewPage = () => {
 
-	const navigate = useNavigate();
+
 
 	const { id } = useParams()
 	const [transactions, setTransactions] = useState([])
@@ -61,7 +61,6 @@ const AccountViewPage = () => {
 		fetchAccount()
 	}, [])
 
-	
 
 	const onUpdateAccount = () => {
 		fetchAccount();
@@ -71,7 +70,7 @@ const AccountViewPage = () => {
 		fetchAccountTransactions();
 	}
 
-	const handelDelete = async (id) => {
+	const handelDeleteTransaction = async (id) => {
 
 		try {
 			const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/transaction/delete`, { id },
@@ -87,6 +86,19 @@ const AccountViewPage = () => {
 		} catch (error) {
 			toast.error(error.response?.data.message || "Something went wrong");
 
+		}
+	}
+
+	const handleDeleteAccount = async () => {
+		try {
+			const response = await axios.delete(`${import.meta.env.VITE_BASE_URL}/account/delete/${id}`, {
+				withCredentials: true
+			});
+		
+			toast.success(response.data.message);
+		} catch (error) {
+
+			toast.error(error.response?.data?.message || "Something went wrong")
 		}
 	}
 
@@ -116,7 +128,7 @@ const AccountViewPage = () => {
 
 	return (
 		<div className='h-full w-full bg-[#0f0f0f] text-white flex'>
-			<Sidebar/>
+			<Sidebar />
 			<div className="min-h-screen w-full bg-[#0f0f0f] text-white px-10 py-8 font-sans">
 				{/* Header */}
 				<header className="flex justify-between items-center mb-10">
@@ -125,37 +137,26 @@ const AccountViewPage = () => {
 					</h2>
 
 					<div className="flex gap-4">
-						{/* Dashboard Button */}
-						<button className="relative group px-6 py-2 rounded-full bg-zinc-900 border border-zinc-800 text-sm font-semibold text-white hover:bg-zinc-800 transition-all duration-300 hover:cursor-pointer"
-							onClick={() => navigate('/dashboard')}>
-							<span className="relative z-10 flex items-center gap-2">
-								Dashboard
-								<svg
-									fill="none"
-									height="16"
-									viewBox="0 0 24 24"
-									width="16"
-									xmlns="http://www.w3.org/2000/svg"
-									className="group-hover:translate-x-1 transition-transform duration-300"
-								>
-									<path
-										d="M10.75 8.75L14.25 12L10.75 15.25"
-										stroke="currentColor"
-										strokeLinecap="round"
-										strokeLinejoin="round"
-										strokeWidth="1.5"
-									/>
-								</svg>
-							</span>
-							<span className="absolute inset-0 rounded-full bg-gradient-to-r from-orange-400 to-amber-500 opacity-0 group-hover:opacity-20 transition-opacity duration-300" />
-						</button>
+						{/* Delete Button */}
+						<ConfirmAccountDelete
+							accountName={account?.name}
+							onConfirm={handleDeleteAccount}
+						>
+							<div
+								className="flex items-center gap-2 px-5 py-2 rounded-full border border-zinc-700 bg-zinc-900 text-white text-sm font-medium hover:bg-red-600 hover:border-red-600 transition-colors duration-200 cursor-pointer"
+							>
+								<Trash2 className="h-4 w-4" />
+								<span>Delete</span>
+							</div>
+
+						</ConfirmAccountDelete>
 
 						{/* Add Transaction Button */}
-						<CreateAccount 
-						account={account}
-						onUpdateAccount={onUpdateAccount}
-						id={id}>
-							
+						<CreateAccount
+							account={account}
+							onUpdateAccount={onUpdateAccount}
+							id={id}>
+
 							<div className="relative group px-6 py-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-400 text-sm font-semibold text-white hover:scale-[1.03] transition-transform duration-300 hover:cursor-pointer shadow-md shadow-orange-500/10">
 
 
@@ -246,7 +247,7 @@ const AccountViewPage = () => {
 										<TransactionCard
 											key={i}
 											t={t}
-											handelDelete={handelDelete}
+											handelDelete={handelDeleteTransaction}
 											onSuccess={onSuccess}
 										/>
 									))}

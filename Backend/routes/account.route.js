@@ -14,4 +14,6 @@ router.put('/update/:id', authMiddleware.authUser, accountController.updateAccou
 
 router.get('/get/account/:id', authMiddleware.authUser, accountController.getAccountById)
 
+router.delete('/delete/:id', authMiddleware.authUser, accountController.deleteAccount)
+
 module.exports = router;
