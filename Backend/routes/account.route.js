@@ -10,4 +10,8 @@ router.get('/get-accounts', authMiddleware.authUser, accountController.getAccoun
 
 router.post('/update-default', authMiddleware.authUser, accountController.updateDefault)
 
+router.put('/update/:id', authMiddleware.authUser, accountController.updateAccount)
+
+router.get('/get/account/:id', authMiddleware.authUser, accountController.getAccountById)
+
 module.exports = router;

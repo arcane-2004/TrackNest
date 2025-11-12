@@ -17,12 +17,9 @@ import { Switch } from "./ui/switch";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { toast } from 'react-hot-toast'
-import { Loader2 } from "lucide-react";
-import HoverBorderGradient from "./ui/hover-border-gradient";
+import { Loader2, PlusCircle, Pencil } from "lucide-react";
 
-
-
-const CreateAccount = ({ children, onAccountAdded }) => {
+const CreateAccount = ({ children, onAccountAdded, account, onUpdateAccount, id }) => {
     const [open, setOpen] = useState(false);
     const [isCreating, setIsCreating] = useState(null);
 
@@ -32,26 +29,39 @@ const CreateAccount = ({ children, onAccountAdded }) => {
         isDefault: Yup.boolean(),
     });
 
-    const initialValues = {
+    const initialValues = account ? {
+        name: account.name,
+        type: account.type,
+        balance: account.balance,
+        isDefault: account.isDefault
+    } : {
         name: "",
         type: "",
-        initialBalance: "",
+        balance: "",
         isDefault: false
-    }
+    };
 
     const handleSubmit = async (values, { resetForm }) => {
-        console.log("Form Submitted:", values);
         try {
             setIsCreating(true);
-            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/account/add`, values, { withCredentials: true });
-            resetForm();
-            if (response.status === 201) {
-                toast.success(response.data.message)
-                onAccountAdded()
 
+            let response;
+            if (account) {
+                response = await axios.put(`${import.meta.env.VITE_BASE_URL}/account/update/${id}`, { values }, { withCredentials: true });
+                console.log("response", response);
+                toast.success(response.data.message);
+                resetForm();
+                onUpdateAccount();
+            } else {
+                response = await axios.post(`${import.meta.env.VITE_BASE_URL}/account/add`, values, { withCredentials: true });
+                toast.success(response.data.message);
+                console.log("response 1", response);
+                resetForm();
+                onAccountAdded();
             }
-        } catch (err) {
-            toast.error(err.response?.data.error || "Something went wrong");
+        } catch (error) {
+            toast.error(error.response?.data.message || "Something went wrong");
+            console.log("response 3", error.response);
         } finally {
             setIsCreating(false);
             setOpen(false);
@@ -60,10 +70,25 @@ const CreateAccount = ({ children, onAccountAdded }) => {
 
     return (
         <Drawer open={open} onOpenChange={setOpen}>
-            <DrawerTrigger>{children}</DrawerTrigger>
-            <DrawerContent className="bg-white/5 backdrop-blur-2xl shadow-2xl">
-                <DrawerHeader>
-                    <DrawerTitle>Create Account</DrawerTitle>
+            <DrawerTrigger asChild>
+                {children}
+            </DrawerTrigger>
+
+            <DrawerContent className="bg-[#121212]/90 backdrop-blur-2xl border border-gray-800 shadow-2xl rounded-t-2xl text-gray-200">
+                <DrawerHeader className="pb-2 border-b border-gray-700">
+                    <DrawerTitle className="text-2xl font-semibold flex items-center gap-2">
+                        {account ? (
+                            <>
+                                <Pencil className="w-5 h-5 text-orange-400" />
+                                Edit Account
+                            </>
+                        ) : (
+                            <>
+                                <PlusCircle className="w-5 h-5 text-orange-400" />
+                                Create Account
+                            </>
+                        )}
+                    </DrawerTitle>
                 </DrawerHeader>
 
                 <Formik
@@ -72,31 +97,31 @@ const CreateAccount = ({ children, onAccountAdded }) => {
                     onSubmit={handleSubmit}
                 >
                     {({ setFieldValue, values }) => (
-                        <Form className="space-y-4 p-10">
+                        <Form className="space-y-6 p-8">
                             {/* Name */}
-                            <div className="">
-                                <Label htmlFor="name" className=" text-lg font-medium">Account Name</Label>
+                            <div>
+                                <Label htmlFor="name" className="text-lg font-medium">Account Name</Label>
                                 <Field
                                     as={Input}
                                     id="name"
                                     name="name"
                                     placeholder="e.g. My Savings Account"
+                                    className="bg-[#1e1e1e] border-gray-700 text-gray-200 focus:ring-2 focus:ring-orange-400"
                                 />
-                                <ErrorMessage name="name" component="p" className="text-red-500 text-sm" />
+                                <ErrorMessage name="name" component="p" className="text-red-400 text-sm mt-1" />
                             </div>
 
-                            {/* Type (Select) */}
-                            <div className="w-full">
-                                <Label htmlFor="type" className="mb-5 text-lg font-medium">Account Type</Label>
+                            {/* Type */}
+                            <div>
+                                <Label htmlFor="type" className="text-lg font-medium">Account Type</Label>
                                 <Select
                                     onValueChange={(val) => setFieldValue("type", val)}
                                     value={values.type}
-
                                 >
-                                    <SelectTrigger className={'bg-[#27272a] w-full py-6 text-[#939393]'}>
+                                    <SelectTrigger className="bg-[#1e1e1e] border-gray-700 text-gray-300 py-6">
                                         <SelectValue placeholder="Select type" />
                                     </SelectTrigger>
-                                    <SelectContent className={'bg-[#27272a] text-[#a4a4a4]'}>
+                                    <SelectContent className="bg-[#1e1e1e] text-gray-300 border-gray-700">
                                         <SelectItem value="Current">Current</SelectItem>
                                         <SelectItem value="Savings">Savings</SelectItem>
                                         <SelectItem value="Investment">Investment</SelectItem>
@@ -105,62 +130,68 @@ const CreateAccount = ({ children, onAccountAdded }) => {
                                         <SelectItem value="Other">Other</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <ErrorMessage name="type" component="p" className="text-red-500 text-sm" />
+                                <ErrorMessage name="type" component="p" className="text-red-400 text-sm mt-1" />
                             </div>
 
-                            {/* Initial Balance */}
+                            {/* Balance */}
                             <div>
-                                <Label htmlFor="initialBalance" className="mb-5 text-lg font-medium">Initial Balance</Label>
+                                <Label htmlFor="balance" className="text-lg font-medium">Initial Balance</Label>
                                 <Field
                                     as={Input}
-                                    id="initialBalance"
-                                    name="initialBalance"
+                                    id="balance"
+                                    name="balance"
                                     type="number"
                                     placeholder="0.00"
+                                    className="bg-[#1e1e1e] border-gray-700 text-gray-200 focus:ring-2 focus:ring-orange-400"
                                 />
-                                <ErrorMessage name="initialBalance" component="p" className="text-red-500 text-sm" />
+                                <ErrorMessage name="balance" component="p" className="text-red-400 text-sm mt-1" />
                             </div>
 
-                            {/* Is Default (Switch) */}
-                            <div className="flex items-center justify-between border rounded-lg p-4 border-gray-700">
+                            {/* Default Switch */}
+                            {!account && 
+                            
+                            <div className="flex items-center justify-between border rounded-lg p-4 border-gray-700 bg-[#1b1b1b]/60">
                                 <div>
-                                    <Label htmlFor="isDefault" className="mb-5 text-lg font-medium">Set as Default Account</Label>
-                                    <p className="text-white font-medium text-sm">This account will be used as the default account for transactions.</p>
+                                    <Label htmlFor="isDefault" className="text-lg font-medium">Set as Default Account</Label>
+                                    <p className="text-sm text-gray-400">This account will be used as the default for transactions.</p>
                                 </div>
 
                                 <Switch
                                     id="isDefault"
                                     checked={values.isDefault}
                                     onCheckedChange={(val) => setFieldValue("isDefault", val)}
-                                    className={' text-white border border-gray-400'}
                                 />
-                            </div>
+                            </div>}
 
-                            {/* Submit */}
-                            <div className="flex justify-center items-center gap-3 text-lg font-medium">
+                            {/* Buttons */}
+                            <div className="flex justify-end items-center gap-4 pt-4">
                                 <DrawerClose asChild>
-                                    <button type='button' variant='outline'
-                                        className=" bg-[#fff] rounded-full p-3 hover:cursor-pointer"
-                                        onClick={() => setOpen(false)}>
-                                        Cancle
-                                    </button>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        className="bg-transparent border border-gray-700 text-gray-300 hover:bg-gray-800"
+                                        onClick={() => setOpen(false)}
+                                    >
+                                        Cancel
+                                    </Button>
                                 </DrawerClose>
-                                {/* <HoverBorderGradient> */}
-                                <button type="submit" className=" bg-[#e9700e] rounded-full p-3 text-[#f6ece3] flex gap-1.5 items-center justify-center hover:cursor-pointer"
+
+                                <Button
+                                    type="submit"
+                                    className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-full flex items-center gap-2 font-medium"
                                     disabled={isCreating}
                                 >
-                                    {
-                                        isCreating ?
-                                            (<>
-                                                <Loader2 className="animate-spin" />
-                                                Creating...
-                                            </>) :
-                                            (
-                                                "Create Account"
-                                            )
-                                    }
-                                </button>
-                                {/* </HoverBorderGradient> */}
+                                    {isCreating ? (
+                                        <>
+                                            <Loader2 className="animate-spin h-5 w-5" />
+                                            {account ? "Updating..." : "Creating..."}
+                                        </>
+                                    ) : (
+                                        <>
+                                            {account ? "Update Account" : "Create Account"}
+                                        </>
+                                    )}
+                                </Button>
                             </div>
                         </Form>
                     )}

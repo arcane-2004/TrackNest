@@ -74,8 +74,8 @@ module.exports.updateDefault = async (req, res, next) => {
             return res.status(404).json({ message: "Account not found" });
         }
 
-        if (account.isDefault === true){
-            return res.status(400).json({message: "Need atleast 1 default account"});
+        if (account.isDefault === true) {
+            return res.status(400).json({ message: "Need atleast 1 default account" });
         }
 
         await accountModel.updateOne({ userId: user._id, isDefault: true }, { isDefault: false })
@@ -83,8 +83,43 @@ module.exports.updateDefault = async (req, res, next) => {
         account.isDefault = true;
         await account.save();
 
-        return res.status(200).json({ message: 'Default account updated successfully' , account: account})
+        return res.status(200).json({ message: 'Default account updated successfully', account: account })
     } catch (error) {
         return res.status(500).json({ message: 'Internal server error' })
+    }
+}
+
+module.exports.updateAccount = async (req, res, next) => {
+
+    const { id } = req.params;
+    const { values } = req.body;
+
+    try {
+        const account = await accountModel.findById(id);
+
+        if (!account) {
+            return res.status(404).json({ message: "Something went wrong", error: "Account not found" });
+        }
+
+        const updatedAccount = await accountModel.findByIdAndUpdate({ _id: id }, { $set: values }, { new: true });
+        console.log("updatedAccount", updatedAccount)
+        return res.status(200).json({ message: "Account updated successfully", account: updatedAccount });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error", error: error.message });
+    }
+}
+
+module.exports.getAccountById = async (req, res, next) => {
+
+    const { id } = req.params;
+
+    try {
+        const account = await accountModel.findById(id);
+        if (!account) {
+            return res.status(404).json({ message: "Something went wrong", error: "Account not found" });
+        }
+        return res.status(200).json({ account });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal server error", error: error.message });
     }
 }

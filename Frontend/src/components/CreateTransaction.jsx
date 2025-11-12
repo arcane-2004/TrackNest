@@ -31,6 +31,7 @@ import axios from "axios"
 const CreateTransaction = ({ onSuccess, children, transaction }) => {
     const [categories, setCategories] = useState([])
     const [accounts, setAccounts] = useState([])
+    const [open, setOpen] = useState(false)
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -119,6 +120,7 @@ const CreateTransaction = ({ onSuccess, children, transaction }) => {
 
     const handleSubmit = async (values, { setSubmitting, resetForm }) => {
         try {
+            setSubmitting(true)
             const data = {
                 ...values,
                 amount: values.isExpense ? -Math.abs(values.amount) : Math.abs(values.amount),
@@ -153,13 +155,14 @@ const CreateTransaction = ({ onSuccess, children, transaction }) => {
             toast.error(error.response?.data?.message || "Failed to create transaction")
         } finally {
             setSubmitting(false)
+            setOpen(false)
         }
     }
 
     
 
     return (
-        <Sheet>
+        <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>{children}</SheetTrigger>
 
             <SheetContent

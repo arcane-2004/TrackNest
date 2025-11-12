@@ -13,7 +13,7 @@ module.exports.addTransaction = async (req, res, next) => {
 	try {
 		const accounts = await accountModel.find({ userId: user._id });
 
-		const { name, amount, isExpense, category, account, date, time, description, paymentMethod, receiptUrl, isRecurring, recurringInterval, nextRecurringDate, lastProcessed } = req.body;
+		const { name, amount, isExpense, category, accountId, date, time, description, paymentMethod, receiptUrl, isRecurring, recurringInterval, nextRecurringDate, lastProcessed } = req.body;
 
 		// Combine date + time if provided, else use current timestamp
 		let dateTime;
@@ -43,8 +43,8 @@ module.exports.addTransaction = async (req, res, next) => {
 
 		//Get current account
 		let currentAccount
-		if (account) {
-			currentAccount = accounts.find(acc => acc._id.toString() === account);
+		if (accountId) {
+			currentAccount = accounts.find(acc => acc._id.toString() === accountId);
 			if (!currentAccount) {
 				return res.status(400).json({ message: "Account not found" });
 			}
@@ -104,21 +104,15 @@ module.exports.getAccountTransactions = async (req, res, next) => {
 			return res.status(401).json({ message: "Unauthorized access" });
 		}
 
-		const account = await accountModel.findOne({ _id: id, userId: user._id });
-		if (!account) {
-			return res.status(404).json({ message: "Account not found" });
-		}
-
 		const transactions = await transactionModel
 			.find({ userId: user._id, accountId: id })
-			.sort({ createdAt: -1 }); // latest first
+			.sort({ dateTime: -1 }).populate('categoryId').populate('accountId'); // latest first
 
 		return res.status(200).json({
 			message:
 				transactions.length > 0
 					? "Transactions fetched successfully"
 					: "No transactions found for this account",
-			account,
 			transactions,
 		});
 	} catch (error) {
