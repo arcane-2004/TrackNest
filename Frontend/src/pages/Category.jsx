@@ -1,27 +1,35 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "../components/Sidebar";
+import CreateCategory from "../components/CreateCategory";
 
 
 const Category = () => {
 	const [categories, setCategories] = useState([]);
 
+
+	const fetchCategories = async () => {
+		try {
+			const response = await axios.get(
+				`${import.meta.env.VITE_BASE_URL}/category/get-categories`,
+				{ withCredentials: true }
+			);
+			setCategories(response.data.categories || []);
+		} catch (error) {
+			console.log(
+				error.response?.data?.message || "Failed to fetch categories"
+			);
+		}
+	};
+
 	useEffect(() => {
-		const fetchCategories = async () => {
-			try {
-				const response = await axios.get(
-					`${import.meta.env.VITE_BASE_URL}/category/get-categories`,
-					{ withCredentials: true }
-				);
-				setCategories(response.data.categories || []);
-			} catch (error) {
-				console.log(
-					error.response?.data?.message || "Failed to fetch categories"
-				);
-			}
-		};
 		fetchCategories();
 	}, []);
+
+
+	const handleCategoryAdded = (newCategory) => {
+		setCategories((prev) => [...prev, newCategory]);
+	};
 
 	const incomeCategories = categories.filter(
 		(cat) => cat.type === "income"
@@ -32,7 +40,7 @@ const Category = () => {
 
 	return (
 		<div className="flex h-full w-full bg-[#111010] text-white">
-			<Sidebar/>
+			<Sidebar />
 
 			<div className="w-full text-white p-10 font-sans">
 				{/* Header */}
@@ -40,10 +48,13 @@ const Category = () => {
 					<h2 className="font-bold text-3xl tracking-tight bg-gradient-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent">
 						Categories
 					</h2>
-
-					<button className="px-6 py-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-400 text-sm font-semibold text-white hover:scale-[1.03] transition-transform duration-300 shadow-md shadow-orange-500/20 hover:cursor-pointer">
-						Add Category
-					</button>
+					<CreateCategory
+					onCategoryAdded={handleCategoryAdded}
+					>
+						<button className="px-6 py-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-400 text-sm font-semibold text-white hover:scale-[1.03] transition-transform duration-300 shadow-md shadow-orange-500/20 hover:cursor-pointer">
+							Add Category
+						</button>
+					</CreateCategory>
 				</header>
 
 				<hr className="border-zinc-800 mb-10" />

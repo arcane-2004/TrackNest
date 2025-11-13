@@ -1,6 +1,6 @@
 const categoryModel = require("../models/category.model");
 
-module.exports.createCategory = async ({userId, name, color, icon, type}) => {
+module.exports.createCategory = async ({userId, name, type, color, icon,}) => {
     if(!name || !type){
         throw new Error('Fields required');
     }
@@ -8,9 +8,10 @@ module.exports.createCategory = async ({userId, name, color, icon, type}) => {
         const category = await categoryModel.create({
             userId,
             name,
+            type,
             color,
             icon,
-            type
+            
         })
         return category;
     }
