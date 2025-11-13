@@ -17,7 +17,7 @@ import { Loader2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 
-const CreateCategory = ({ children, onCategoryAdded }) => {
+const CreateCategory = ({ children, onCategoryAdded, category, fetchCategories }) => {
     const [open, setOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -51,31 +51,51 @@ const CreateCategory = ({ children, onCategoryAdded }) => {
     });
 
     // ✅ Initial Values
-    const initialValues = {
-        name: "",
-        type: "",
-        color: "",
-        icon: ""
-    };
+    const initialValues = category ?
+        {
+            name: category.name,
+            type: category.type,
+            color: category.color,
+            icon: category.icon
+        } : {
+            name: "",
+            type: "",
+            color: "",
+            icon: ""
+        };
 
     // ✅ Submit Handler
     const handleSubmit = async (values, { resetForm }) => {
         try {
             setIsSubmitting(true);
-            const response = await axios.post(
-                `${import.meta.env.VITE_BASE_URL}/category/add`,
-                values,
-                { withCredentials: true }
-            );
 
-            toast.success(response.data.message || "Category created successfully!");
-            onCategoryAdded?.(response.data.category);
-            resetForm();
-            setOpen(false);
-            
+            if (category) {
+                const response = await axios.put(`${import.meta.env.VITE_BASE_URL}/category/update/${category._id}`,
+                    {values},
+                    { withCredentials: true }
+                );
+                toast.success(response.data.message);
+                fetchCategories()
+
+                resetForm();
+                setOpen(false);
+
+            } else {
+                const response = await axios.post(
+                    `${import.meta.env.VITE_BASE_URL}/category/add`,
+                    values,
+                    { withCredentials: true }
+                );
+
+                toast.success(response.data.message || "Category created successfully!");
+                onCategoryAdded?.(response.data.category);
+
+                resetForm();
+                setOpen(false);
+            }
+
         } catch (error) {
             toast.error(error.response?.data?.message || "Something went wrong");
-            console.log(error.response)
         } finally {
             setIsSubmitting(false);
         }
@@ -87,7 +107,7 @@ const CreateCategory = ({ children, onCategoryAdded }) => {
             <SheetContent className="bg-zinc-900/95 backdrop-blur-xl border border-zinc-800 shadow-2xl text-white">
                 <SheetHeader>
                     <SheetTitle className="text-xl font-semibold text-white">
-                        Create New Category
+                        {category ? "Edit Category " : "Create New Category"}
                     </SheetTitle>
                 </SheetHeader>
 
@@ -118,28 +138,30 @@ const CreateCategory = ({ children, onCategoryAdded }) => {
                             </div>
 
                             {/* Type */}
-                            <div>
-                                <Label htmlFor="type" className="text-sm font-medium">
-                                    Category Type
-                                </Label>
-                                <Select
-                                    value={values.type}
-                                    onValueChange={(val) => setFieldValue("type", val)}
-                                >
-                                    <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white mt-1">
-                                        <SelectValue placeholder="Select type" />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
-                                        <SelectItem value="income">Income</SelectItem>
-                                        <SelectItem value="expense">Expense</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                                <ErrorMessage
-                                    name="type"
-                                    component="p"
-                                    className="text-red-500 text-xs mt-1"
-                                />
-                            </div>
+                            {!category &&
+                                <div>
+                                    <Label htmlFor="type" className="text-sm font-medium">
+                                        Category Type
+                                    </Label>
+                                    <Select
+                                        value={values.type}
+                                        onValueChange={(val) => setFieldValue("type", val)}
+                                    >
+                                        <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white mt-1">
+                                            <SelectValue placeholder="Select type" />
+                                        </SelectTrigger>
+                                        <SelectContent className="bg-zinc-800 border-zinc-700 text-white">
+                                            <SelectItem value="income">Income</SelectItem>
+                                            <SelectItem value="expense">Expense</SelectItem>
+                                        </SelectContent>
+                                    </Select>
+                                    <ErrorMessage
+                                        name="type"
+                                        component="p"
+                                        className="text-red-500 text-xs mt-1"
+                                    />
+                                </div>
+                            }
 
                             {/* Color Dropdown */}
                             <div className="space-y-2">
@@ -186,11 +208,11 @@ const CreateCategory = ({ children, onCategoryAdded }) => {
                                     </SelectTrigger>
                                     <SelectContent className="bg-[#1a1a1a] text-white border border-zinc-700">
                                         <div className="grid grid-cols-4 p-3">
-                                        {icons.map((icon) => (
-                                            <SelectItem key={icon} value={icon}>
-                                                <span className="flex justify-center items-center text-2xl p-2 hover:bg-zinc-800 rounded-lg cursor-pointer">{icon}</span>
-                                            </SelectItem>
-                                        ))}
+                                            {icons.map((icon) => (
+                                                <SelectItem key={icon} value={icon}>
+                                                    <span className="flex justify-center items-center text-2xl p-2 hover:bg-zinc-800 rounded-lg cursor-pointer">{icon}</span>
+                                                </SelectItem>
+                                            ))}
                                         </div>
                                     </SelectContent>
                                 </Select>
@@ -222,6 +244,7 @@ const CreateCategory = ({ children, onCategoryAdded }) => {
                                             Saving...
                                         </>
                                     ) : (
+                                        category ? "Update Category" :
                                         "Create Category"
                                     )}
                                 </Button>

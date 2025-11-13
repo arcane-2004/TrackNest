@@ -49,7 +49,7 @@ const Category = () => {
 						Categories
 					</h2>
 					<CreateCategory
-					onCategoryAdded={handleCategoryAdded}
+						onCategoryAdded={handleCategoryAdded}
 					>
 						<button className="px-6 py-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-400 text-sm font-semibold text-white hover:scale-[1.03] transition-transform duration-300 shadow-md shadow-orange-500/20 hover:cursor-pointer">
 							Add Category
@@ -70,33 +70,41 @@ const Category = () => {
 							No income categories found.
 						</p>
 					) : (
+
 						<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
 							{incomeCategories.map((cat) => (
-								<div
+								<CreateCategory
 									key={cat._id}
-									className="rounded-xl p-4 shadow-md hover:scale-[1.02] transition-transform duration-200"
-									style={{
-										backgroundColor: `${cat.color}22`, // translucent color bg
-										border: `1px solid ${cat.color}55`,
-									}}
+									category={cat}
+									fetchCategories={fetchCategories}
 								>
-									<div className="flex flex-col items-center gap-2">
-										<div
-											className="w-12 h-12 flex items-center justify-center rounded-full text-2xl"
-											style={{
-												backgroundColor: cat.color,
-												color: "#fff",
-											}}
-										>
-											{cat.icon || "💰"}
+									<div
+
+										className="rounded-xl p-4 shadow-md hover:scale-[1.02] transition-transform duration-200"
+										style={{
+											backgroundColor: `${cat.color}22`, // translucent color bg
+											border: `1px solid ${cat.color}55`,
+										}}
+									>
+										<div className="flex flex-col items-center gap-2">
+											<div
+												className="w-12 h-12 flex items-center justify-center rounded-full text-2xl"
+												style={{
+													backgroundColor: cat.color,
+													color: "#fff",
+												}}
+											>
+												{cat.icon || "💰"}
+											</div>
+											<h4 className="font-semibold text-lg text-white mt-2 text-center">
+												{cat.name}
+											</h4>
 										</div>
-										<h4 className="font-semibold text-lg text-white mt-2 text-center">
-											{cat.name}
-										</h4>
 									</div>
-								</div>
+								</CreateCategory>
 							))}
 						</div>
+
 					)}
 				</section>
 
@@ -113,35 +121,41 @@ const Category = () => {
 					) : (
 						<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
 							{expenseCategories.map((cat) => (
-								<div
+								<CreateCategory
 									key={cat._id}
-									className="rounded-xl p-4 shadow-md hover:scale-[1.02] transition-transform duration-200"
-									style={{
-										backgroundColor: `${cat.color}22`,
-										border: `1px solid ${cat.color}55`,
-									}}
+									fetchCategories={fetchCategories}
+									category={cat}
 								>
-									<div className="flex flex-col items-center gap-2">
-										<div
-											className="w-12 h-12 flex items-center justify-center rounded-full text-2xl"
-											style={{
-												backgroundColor: cat.color,
-												color: "#fff",
-											}}
-										>
-											{cat.icon || "💸"}
+									<div
+
+										className="rounded-xl p-4 shadow-md hover:scale-[1.02] transition-transform duration-200"
+										style={{
+											backgroundColor: `${cat.color}22`,
+											border: `1px solid ${cat.color}55`,
+										}}
+									>
+										<div className="flex flex-col items-center gap-2">
+											<div
+												className="w-12 h-12 flex items-center justify-center rounded-full text-2xl"
+												style={{
+													backgroundColor: cat.color,
+													color: "#fff",
+												}}
+											>
+												{cat.icon || "💸"}
+											</div>
+											<h4 className="font-semibold text-lg text-white mt-2 text-center">
+												{cat.name}
+											</h4>
 										</div>
-										<h4 className="font-semibold text-lg text-white mt-2 text-center">
-											{cat.name}
-										</h4>
 									</div>
-								</div>
+								</CreateCategory>
 							))}
 						</div>
 					)}
 				</section>
-			</div>
-		</div>
+			</div >
+		</div >
 	);
 };
 
