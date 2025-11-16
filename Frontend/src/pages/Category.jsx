@@ -2,10 +2,13 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "../components/Sidebar";
 import CreateCategory from "../components/CreateCategory";
+import { Icons } from "../assets/icons/CategoryIcons";
 
 
 const Category = () => {
 	const [categories, setCategories] = useState([]);
+	const [selectedCategory, setSelectedCategory] = useState(null);
+	const [sheetOpen, setSheetOpen] = useState(false);
 
 
 	const fetchCategories = async () => {
@@ -71,39 +74,48 @@ const Category = () => {
 						</p>
 					) : (
 
+
+
 						<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
 							{incomeCategories.map((cat) => (
-								<CreateCategory
+								<div
 									key={cat._id}
-									category={cat}
-									fetchCategories={fetchCategories}
+									onClick={() => {
+										setSelectedCategory(cat)
+										setSheetOpen(true);
+									}}
+									className="rounded-xl p-4 shadow-md hover:scale-[1.02] transition-transform duration-200"
+									style={{
+										backgroundColor: `${cat.color}22`, // translucent color bg
+										border: `1px solid ${cat.color}55`,
+									}}
 								>
-									<div
-
-										className="rounded-xl p-4 shadow-md hover:scale-[1.02] transition-transform duration-200"
-										style={{
-											backgroundColor: `${cat.color}22`, // translucent color bg
-											border: `1px solid ${cat.color}55`,
-										}}
-									>
-										<div className="flex flex-col items-center gap-2">
-											<div
-												className="w-12 h-12 flex items-center justify-center rounded-full text-2xl"
-												style={{
-													backgroundColor: cat.color,
-													color: "#fff",
-												}}
-											>
-												{cat.icon || "💰"}
-											</div>
-											<h4 className="font-semibold text-lg text-white mt-2 text-center">
-												{cat.name}
-											</h4>
+									<div className="flex flex-col items-center gap-2">
+										<div
+											className="w-12 h-12 flex items-center justify-center rounded-full text-2xl"
+											style={{
+												backgroundColor: cat.color,
+												color: cat.color,
+											}}
+										>
+											{(() => {
+												const Icon = Icons[cat.icon];
+												console.log("Icon", Icon)
+												return (
+													<Icon className="brightness-40 size-8 " />
+												)
+											})()}
 										</div>
+										<h4 className="font-semibold text-lg text-white mt-2 text-center">
+											{cat.name}
+										</h4>
 									</div>
-								</CreateCategory>
+								</div>
+
 							))}
 						</div>
+
+
 
 					)}
 				</section>
@@ -121,39 +133,50 @@ const Category = () => {
 					) : (
 						<div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
 							{expenseCategories.map((cat) => (
-								<CreateCategory
+								<div
 									key={cat._id}
-									fetchCategories={fetchCategories}
-									category={cat}
+									onClick={() => {
+										setSelectedCategory(cat)
+										setSheetOpen(true);
+									}}
+									className="rounded-xl p-4 shadow-md hover:scale-[1.02] transition-transform duration-200"
+									style={{
+										backgroundColor: `${cat.color}22`,
+										border: `1px solid ${cat.color}55`,
+									}}
 								>
-									<div
-
-										className="rounded-xl p-4 shadow-md hover:scale-[1.02] transition-transform duration-200"
-										style={{
-											backgroundColor: `${cat.color}22`,
-											border: `1px solid ${cat.color}55`,
-										}}
-									>
-										<div className="flex flex-col items-center gap-2">
-											<div
-												className="w-12 h-12 flex items-center justify-center rounded-full text-2xl"
-												style={{
-													backgroundColor: cat.color,
-													color: "#fff",
-												}}
-											>
-												{cat.icon || "💸"}
-											</div>
-											<h4 className="font-semibold text-lg text-white mt-2 text-center">
-												{cat.name}
-											</h4>
+									<div className="flex flex-col items-center gap-2">
+										<div
+											className="w-12 h-12 flex items-center justify-center rounded-full text-2xl"
+											style={{
+												backgroundColor: cat.color,
+												color: cat.color,
+											}}
+										>
+											{(() => {
+												const Icon = Icons[cat.icon];
+												console.log("Icon", Icon)
+												return (
+													<Icon className="brightness-40 size-8 " />
+												)
+											})()}
 										</div>
+										<h4 className="font-semibold text-lg text-white mt-2 text-center">
+											{cat.name}
+										</h4>
 									</div>
-								</CreateCategory>
+								</div>
+
 							))}
 						</div>
 					)}
 				</section>
+				<CreateCategory
+					category={selectedCategory}
+					open={sheetOpen}
+					setOpen={setSheetOpen}
+					onCategoryAdded={handleCategoryAdded}
+				/>
 			</div >
 		</div >
 	);

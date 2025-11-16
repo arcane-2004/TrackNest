@@ -1,3 +1,4 @@
+"use client";
 import React, { useState } from "react";
 import {
     Sheet,
@@ -17,21 +18,49 @@ import { Loader2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 
-const CreateCategory = ({ children, onCategoryAdded, category, fetchCategories }) => {
-    const [open, setOpen] = useState(false);
+import { Icons, categoryIconNames } from "../assets/icons/CategoryIcons"
+
+const CreateCategory = ({ children, onCategoryAdded, category, fetchCategories, setOpen, open }) => {
+    // const [open, setOpen] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+  
     const colors = [
-        "#ef4444",
-        "#f97316",
-        "#facc15",
-        "#10b981",
-        "#3b82f6",
-        "#8b5cf6",
-        "#6b7280",
-    ]
+        // Reds
+        "#fee2e2", "#fecaca", "#fca5a5", "#f87171", "#ef4444", "#dc2626", "#b91c1c", "#991b1b",
 
-    const icons = ["💰", "🍔", "🏠", "🚗", "🎁", "🎓", "🛒", "💳", "📈", "📚"]
+        // Oranges
+        "#ffedd5", "#fed7aa", "#fdba74", "#fb923c", "#f97316", "#ea580c", "#c2410c", "#9a3412",
+
+        // Yellows / Ambers
+        "#fef9c3", "#fef08a", "#fde047", "#facc15", "#eab308", "#ca8a04", "#a16207", "#854d0e",
+
+        // Greens (Lime + Emerald)
+        "#ecfccb", "#d9f99d", "#bef264", "#a3e635", "#84cc16", "#65a30d",
+        "#d1fae5", "#a7f3d0", "#6ee7b7", "#34d399", "#10b981", "#059669", "#047857", "#065f46",
+
+        // Teals / Cyans
+        "#cffafe", "#a5f3fc", "#67e8f9", "#22d3ee", "#06b6d4", "#0891b2", "#0e7490", "#155e75",
+
+        // Blues
+        "#dbeafe", "#bfdbfe", "#93c5fd", "#60a5fa", "#3b82f6", "#2563eb", "#1d4ed8", "#1e40af",
+
+        // Indigo
+        "#e0e7ff", "#c7d2fe", "#a5b4fc", "#818cf8", "#6366f1", "#4f46e5", "#4338ca", "#3730a3",
+
+        // Violet / Purple
+        "#ede9fe", "#ddd6fe", "#c4b5fd", "#a78bfa", "#8b5cf6", "#7c3aed", "#6d28d9", "#5b21b6",
+
+        // Pink / Fuchsia / Rose
+        "#fce7f3", "#fbcfe8", "#f9a8d4", "#f472b6", "#ec4899", "#db2777", "#be185d", "#9d174d",
+        "#ffe4e6", "#fecdd3", "#fda4af", "#fb7185", "#f43f5e", "#e11d48", "#be123c", "#9f1239",
+
+        // Gray / Neutral
+        "#f4f4f5", "#e4e4e7", "#d4d4d8", "#a1a1aa", "#71717a", "#52525b", "#3f3f46", "#27272a"
+    ];
+
+
+    // const icons = ["💰", "🍔", "🏠", "🚗", "🎁", "🎓", "🛒", "💳", "📈", "📚"]
 
     // ✅ Validation Schema
     const validationSchema = Yup.object({
@@ -46,7 +75,6 @@ const CreateCategory = ({ children, onCategoryAdded, category, fetchCategories }
             .oneOf(colors, "Invalid color")
             .required("Category color is required"),
         icon: Yup.string()
-            .oneOf(icons, "Invalid icon")
             .required("Category icon is required"),
     });
 
@@ -66,12 +94,13 @@ const CreateCategory = ({ children, onCategoryAdded, category, fetchCategories }
 
     // ✅ Submit Handler
     const handleSubmit = async (values, { resetForm }) => {
+       
         try {
             setIsSubmitting(true);
-
+            
             if (category) {
                 const response = await axios.put(`${import.meta.env.VITE_BASE_URL}/category/update/${category._id}`,
-                    {values},
+                    { values },
                     { withCredentials: true }
                 );
                 toast.success(response.data.message);
@@ -115,6 +144,7 @@ const CreateCategory = ({ children, onCategoryAdded, category, fetchCategories }
                     initialValues={initialValues}
                     validationSchema={validationSchema}
                     onSubmit={handleSubmit}
+                    enableReinitialize
                 >
                     {({ setFieldValue, values }) => (
                         <Form className="mt-6 space-y-5">
@@ -202,24 +232,29 @@ const CreateCategory = ({ children, onCategoryAdded, category, fetchCategories }
                                 <Select
                                     onValueChange={(val) => setFieldValue("icon", val)}
                                     value={values.icon}
+                    
                                 >
                                     <SelectTrigger className="bg-[#27272a] w-full py-6 text-[#939393]">
                                         <SelectValue placeholder="Select icon" />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-[#1a1a1a] text-white border border-zinc-700">
-                                        <div className="grid grid-cols-4 p-3">
-                                            {icons.map((icon) => (
-                                                <SelectItem key={icon} value={icon}>
-                                                    <span className="flex justify-center items-center text-2xl p-2 hover:bg-zinc-800 rounded-lg cursor-pointer">{icon}</span>
-                                                </SelectItem>
-                                            ))}
+                                    <SelectContent className="bg-[#1a1a1a] text-white border border-zinc-700 ">
+                                        <div className="grid grid-cols-5 place-items-center">
+                                            {categoryIconNames.map((name) => {
+                                                const Icon = Icons[name];
+                                                
+                                                return (
+                                                    <SelectItem key={name} value={name}>
+                                                        <span className="flex justify-center items-center hover:bg-zinc-800 rounded-lg cursor-pointer p-2">
+                                                            <Icon style={{ width: '25px', height: '25px' }} />
+                                                        </span>
+                                                    </SelectItem>
+                                                );
+                                            })}
                                         </div>
                                     </SelectContent>
                                 </Select>
-                                <ErrorMessage name="icon" component="p" className="text-red-500 text-xs mt-1" />
+
                             </div>
-
-
                             {/* Buttons */}
                             <div className="flex justify-end gap-3 pt-4">
                                 <SheetClose asChild>
@@ -239,13 +274,14 @@ const CreateCategory = ({ children, onCategoryAdded, category, fetchCategories }
                                     disabled={isSubmitting}
                                 >
                                     {isSubmitting ? (
+                                        
                                         <>
                                             <Loader2 className="animate-spin h-4 w-4" />
                                             Saving...
                                         </>
                                     ) : (
                                         category ? "Update Category" :
-                                        "Create Category"
+                                            "Create Category"
                                     )}
                                 </Button>
                             </div>
