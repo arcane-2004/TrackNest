@@ -43,5 +43,7 @@ router.post('/verify/otp', userController.verifyOtp)
 
 router.post('/update/password', authMiddleware.authUser, userController.updatePassword)
 
+router.delete('/delete/user-account', authMiddleware.authUser, userController.deleteUserAccount)
+
 module.exports = router
 

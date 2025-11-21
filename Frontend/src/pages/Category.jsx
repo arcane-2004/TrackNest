@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Sidebar from "../components/Sidebar";
 import CreateCategory from "../components/CreateCategory";
-import { Icons } from "../assets/icons/CategoryIcons";
+import { Icons } from "../assets/CategoryIcons";
 
 
 const Category = () => {
@@ -86,7 +86,7 @@ const Category = () => {
 									}}
 									className="rounded-xl p-4 shadow-md hover:scale-[1.02] transition-transform duration-200"
 									style={{
-										backgroundColor: `${cat.color}22`, // translucent color bg
+										backgroundColor: `${cat.color}22`, 
 										border: `1px solid ${cat.color}55`,
 									}}
 								>

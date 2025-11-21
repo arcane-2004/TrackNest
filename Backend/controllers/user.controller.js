@@ -1,5 +1,7 @@
 const userModel = require('../models/user.model');
 const categoryModel = require('../models/category.model');
+const transactionModel = require('../models/transaction.model')
+const accountModel = require('../models/account.model')
 const blackListTokenModel = require('../models/blackListToken.model')
 const userService = require('../services/user.service');
 const { validationResult } = require('express-validator')
@@ -248,5 +250,23 @@ module.exports.updatePassword = async (req, res, next) => {
 
         return res.status(500).json({ message: 'Internal server error' });
         next(error);
+    }
+}
+
+module.exports.deleteUserAccount = async(req, res, next) => {
+    const user = req.user;
+
+    try{
+        await transactionModel.deleteMany({userId: user.id});
+        await categoryModel.deleteMany({userId: user._id});
+        await accountModel.deleteMany({userId:user._id});
+        await userModel.findByIdAndDelete(user._id);
+
+        res.clearCookie('accessToken');
+        res.clearCookie('connect.sid');
+
+        return res.status(200).json({message: 'Successfully deleted user account'});
+    }catch(error){
+        return res.status(500).json({message: "Internal server error", error:error.message})
     }
 }

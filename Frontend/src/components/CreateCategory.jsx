@@ -18,49 +18,13 @@ import { Loader2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 
-import { Icons, categoryIconNames } from "../assets/icons/CategoryIcons"
+import { Icons, categoryIconNames } from "../assets/CategoryIcons"
+import { colors } from "../assets/CategoryColor"
 
 const CreateCategory = ({ children, onCategoryAdded, category, fetchCategories, setOpen, open }) => {
-    // const [open, setOpen] = useState(false);
+
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-  
-    const colors = [
-        // Reds
-        "#fee2e2", "#fecaca", "#fca5a5", "#f87171", "#ef4444", "#dc2626", "#b91c1c", "#991b1b",
-
-        // Oranges
-        "#ffedd5", "#fed7aa", "#fdba74", "#fb923c", "#f97316", "#ea580c", "#c2410c", "#9a3412",
-
-        // Yellows / Ambers
-        "#fef9c3", "#fef08a", "#fde047", "#facc15", "#eab308", "#ca8a04", "#a16207", "#854d0e",
-
-        // Greens (Lime + Emerald)
-        "#ecfccb", "#d9f99d", "#bef264", "#a3e635", "#84cc16", "#65a30d",
-        "#d1fae5", "#a7f3d0", "#6ee7b7", "#34d399", "#10b981", "#059669", "#047857", "#065f46",
-
-        // Teals / Cyans
-        "#cffafe", "#a5f3fc", "#67e8f9", "#22d3ee", "#06b6d4", "#0891b2", "#0e7490", "#155e75",
-
-        // Blues
-        "#dbeafe", "#bfdbfe", "#93c5fd", "#60a5fa", "#3b82f6", "#2563eb", "#1d4ed8", "#1e40af",
-
-        // Indigo
-        "#e0e7ff", "#c7d2fe", "#a5b4fc", "#818cf8", "#6366f1", "#4f46e5", "#4338ca", "#3730a3",
-
-        // Violet / Purple
-        "#ede9fe", "#ddd6fe", "#c4b5fd", "#a78bfa", "#8b5cf6", "#7c3aed", "#6d28d9", "#5b21b6",
-
-        // Pink / Fuchsia / Rose
-        "#fce7f3", "#fbcfe8", "#f9a8d4", "#f472b6", "#ec4899", "#db2777", "#be185d", "#9d174d",
-        "#ffe4e6", "#fecdd3", "#fda4af", "#fb7185", "#f43f5e", "#e11d48", "#be123c", "#9f1239",
-
-        // Gray / Neutral
-        "#f4f4f5", "#e4e4e7", "#d4d4d8", "#a1a1aa", "#71717a", "#52525b", "#3f3f46", "#27272a"
-    ];
-
-
-    // const icons = ["💰", "🍔", "🏠", "🚗", "🎁", "🎓", "🛒", "💳", "📈", "📚"]
 
     // ✅ Validation Schema
     const validationSchema = Yup.object({
@@ -94,10 +58,10 @@ const CreateCategory = ({ children, onCategoryAdded, category, fetchCategories, 
 
     // ✅ Submit Handler
     const handleSubmit = async (values, { resetForm }) => {
-       
+
         try {
             setIsSubmitting(true);
-            
+
             if (category) {
                 const response = await axios.put(`${import.meta.env.VITE_BASE_URL}/category/update/${category._id}`,
                     { values },
@@ -205,17 +169,19 @@ const CreateCategory = ({ children, onCategoryAdded, category, fetchCategories, 
                                     <SelectTrigger className="bg-[#27272a] w-full py-6 text-[#939393]">
                                         <SelectValue placeholder="Select color" />
                                     </SelectTrigger>
-                                    <SelectContent className="bg-[#1a1a1a] text-white border border-zinc-700">
+                                    <SelectContent className="bg-[#1a1a1a] w-2/3 text-white border border-zinc-700 left-3">
                                         {colors.map((color, i) => (
-                                            <SelectItem key={i} value={color}>
-                                                <div className="flex items-center gap-2">
-                                                    <span
-                                                        className="w-15 h-8 rounded-4xl border border-zinc-600"
-                                                        style={{ backgroundColor: color }}
-                                                    ></span>
-                                                </div>
+
+                                            <SelectItem key={i} value={color} className="p-0 py-0.5 flex justify-center w-[66%]">
+                                                
+                                                <span
+                                                    className="w-60 h-10 rounded-4xl border border-zinc-600"
+                                                    style={{ backgroundColor: color }}
+                                                ></span>
+
 
                                             </SelectItem>
+
                                         ))}
                                     </SelectContent>
 
@@ -232,20 +198,20 @@ const CreateCategory = ({ children, onCategoryAdded, category, fetchCategories, 
                                 <Select
                                     onValueChange={(val) => setFieldValue("icon", val)}
                                     value={values.icon}
-                    
+
                                 >
                                     <SelectTrigger className="bg-[#27272a] w-full py-6 text-[#939393]">
                                         <SelectValue placeholder="Select icon" />
                                     </SelectTrigger>
                                     <SelectContent className="bg-[#1a1a1a] text-white border border-zinc-700 ">
                                         <div className="grid grid-cols-5 place-items-center">
-                                            {categoryIconNames.map((name) => {
+                                            {categoryIconNames.map((name, i) => {
                                                 const Icon = Icons[name];
-                                                
+
                                                 return (
-                                                    <SelectItem key={name} value={name}>
-                                                        <span className="flex justify-center items-center hover:bg-zinc-800 rounded-lg cursor-pointer p-2">
-                                                            <Icon style={{ width: '25px', height: '25px' }} />
+                                                    <SelectItem key={i} value={name}>
+                                                        <span className="flex justify-center items-center hover:bg-zinc-800 rounded-lg cursor-pointer p-2 ">
+                                                            {Icon ? <Icon style={{ width: "30px", height: '30px' }} weight="thin" /> : name}
                                                         </span>
                                                     </SelectItem>
                                                 );
@@ -274,7 +240,7 @@ const CreateCategory = ({ children, onCategoryAdded, category, fetchCategories, 
                                     disabled={isSubmitting}
                                 >
                                     {isSubmitting ? (
-                                        
+
                                         <>
                                             <Loader2 className="animate-spin h-4 w-4" />
                                             Saving...
