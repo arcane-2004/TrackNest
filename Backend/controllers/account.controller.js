@@ -10,7 +10,7 @@ module.exports.addAccount = async (req, res, next) => {
     }
 
     try {
-        const { name, type, initialBalance } = req.body;
+        const { name, type, balance } = req.body;
         let { isDefault } = req.body;
 
         if (type !== 'Savings' && type !== 'Current' && type !== 'Credit' && type !== 'Loan' && type !== 'Investment' && type !== 'Other') {
@@ -31,7 +31,7 @@ module.exports.addAccount = async (req, res, next) => {
             userId: user.id,
             name,
             type,
-            balance: initialBalance,
+            balance: balance,
             isDefault
         })
 

@@ -53,6 +53,8 @@ const Category = () => {
 					</h2>
 					<CreateCategory
 						onCategoryAdded={handleCategoryAdded}
+						setOpen={setSheetOpen}
+						open={sheetOpen}
 					>
 						<button className="px-6 py-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-400 text-sm font-semibold text-white hover:scale-[1.03] transition-transform duration-300 shadow-md shadow-orange-500/20 hover:cursor-pointer">
 							Add Category
@@ -64,7 +66,7 @@ const Category = () => {
 
 				{/* Income Categories */}
 				<section className="mb-12">
-					<h3 className="text-xl font-semibold mb-6 text-amber-400 tracking-wide">
+					<h3 className="text-xl font-semibold mb-6 text-green-400 tracking-wide">
 						Income Categories
 					</h3>
 
@@ -100,7 +102,6 @@ const Category = () => {
 										>
 											{(() => {
 												const Icon = Icons[cat.icon];
-												console.log("Icon", Icon)
 												return (
 													<Icon className="brightness-40 size-8 " />
 												)
@@ -122,7 +123,7 @@ const Category = () => {
 
 				{/* Expense Categories */}
 				<section>
-					<h3 className="text-xl font-semibold mb-6 text-orange-500 tracking-wide">
+					<h3 className="text-xl font-semibold mb-6 text-red-400 tracking-wide">
 						Expense Categories
 					</h3>
 
@@ -155,7 +156,6 @@ const Category = () => {
 										>
 											{(() => {
 												const Icon = Icons[cat.icon];
-												console.log("Icon", Icon)
 												return (
 													<Icon className="brightness-40 size-8 " />
 												)
@@ -176,6 +176,7 @@ const Category = () => {
 					open={sheetOpen}
 					setOpen={setSheetOpen}
 					onCategoryAdded={handleCategoryAdded}
+					fetchCategories={fetchCategories}
 				/>
 			</div >
 		</div >

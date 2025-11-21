@@ -8,6 +8,6 @@ router.get('/get-categories', authMiddleware.authUser, categoryController.getCat
 
 router.post('/add', authMiddleware.authUser, categoryController.addCategory);
 
-router.put('/update/:id', authMiddleware.authUser, categoryController.updatteCategory)
+router.put('/update/:id', authMiddleware.authUser, categoryController.updateCategory)
 
 module.exports = router;

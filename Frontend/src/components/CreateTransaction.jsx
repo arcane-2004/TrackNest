@@ -130,7 +130,6 @@ const CreateTransaction = ({ onSuccess, children, transaction }) => {
 
             if (transaction) {
                 //  Edit existing transaction
-                console.log("data", data)
                 response = await axios.put(
                     `${import.meta.env.VITE_BASE_URL}/transaction/update/${transaction._id}`,
                     {data},

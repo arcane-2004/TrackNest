@@ -40,10 +40,10 @@ module.exports.addCategory = async(req, res, next) => {
     }
 }
 
-module.exports.updatteCategory = async(req, res, next) => {
+module.exports.updateCategory = async(req, res, next) => {
     const{id} = req.params;
     const {values} = req.body;
-    console.log("id", id)
+
     if(!id){
         return res.status(404).json({message: "Something went Wrong", error: "category not found"})
     }

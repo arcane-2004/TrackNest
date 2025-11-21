@@ -140,6 +140,15 @@ export const categoryIconNames = [
   "BeerBottle",
   "Wine",
 
+  //Fruits & Vegetables
+  "Cherries",
+  "Orange",
+  "Avocado",
+  "OrangeSlice",
+  "Pepper",
+  "Acorn",
+  "Carrot",
+
   // Transport
   "GasPump",
   "Car",

@@ -58,7 +58,7 @@ const CreateCategory = ({ children, onCategoryAdded, category, fetchCategories, 
 
     // ✅ Submit Handler
     const handleSubmit = async (values, { resetForm }) => {
-
+        console.log("FORM SUBMITTED")
         try {
             setIsSubmitting(true);
 
@@ -69,7 +69,6 @@ const CreateCategory = ({ children, onCategoryAdded, category, fetchCategories, 
                 );
                 toast.success(response.data.message);
                 fetchCategories()
-
                 resetForm();
                 setOpen(false);
 
@@ -81,14 +80,16 @@ const CreateCategory = ({ children, onCategoryAdded, category, fetchCategories, 
                 );
 
                 toast.success(response.data.message || "Category created successfully!");
+                console.log("Added", response.data)
                 onCategoryAdded?.(response.data.category);
-
+                console.log("category added")
                 resetForm();
                 setOpen(false);
-            }
+            }   
 
         } catch (error) {
             toast.error(error.response?.data?.message || "Something went wrong");
+            console.log("error", error)
         } finally {
             setIsSubmitting(false);
         }
