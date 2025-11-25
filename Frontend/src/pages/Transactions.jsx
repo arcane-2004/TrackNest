@@ -4,10 +4,11 @@ import Sidebar from "../components/Sidebar";
 import { LogOut } from "lucide-react";
 import { useHandleLogout } from "../utils/user.hooks";
 import axios from "axios";
-import {ChevronUp, ChevronDown, Loader2 } from 'lucide-react';
+import { ChevronUp, ChevronDown, Loader2 } from 'lucide-react';
 import CreateTransaction from "../components/createTransaction";
 import toast from 'react-hot-toast'
 import TransactionCard from "../components/TransactionCard"
+import { ScrollArea } from '../components/ui/scroll-area'
 
 import {
 	Table,
@@ -146,7 +147,7 @@ const Transactions = () => {
 
 				{/* Transactions Table */}
 				{isLoading ? <Loader2 className="animate-spin mx-auto" /> :
-					<div className="bg-zinc-900 rounded-2xl p-6 shadow-xl border border-zinc-800/80">
+					<div className="h-[93%] overflow-y-scroll bg-zinc-900 rounded-2xl p-6 shadow-xl border border-zinc-800/80">
 						<h3 className="text-xl font-semibold mb-4 bg-gradient-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent drop-shadow">
 							Recent Transactions
 						</h3>
@@ -156,38 +157,63 @@ const Transactions = () => {
 								No transactions found.
 							</p>
 						) : (
-							<Table>
-								<TableHeader>
-									<TableRow>
-										<TableHead className="w-[180px]">Name</TableHead>
-										<TableHead
-											className="cursor-pointer"
-											onClick={() => handleSort("dateTime")}
-										>
-											<div className="flex items-center">
-												Date {sortConfig.field === "dateTime" && sortConfig.direction === "asc" ?
-													<ChevronUp className="text-zinc-400 font-light text-sm h-5" />
-													: <ChevronDown className="text-zinc-400 font-light text-sm h-5" />}
-											</div>
-										</TableHead>
-										<TableHead>Category</TableHead>
-										<TableHead>Account</TableHead>
-										<TableHead>Payment Method</TableHead>
-										<TableHead className="text-right">Amount</TableHead>
-									</TableRow>
-								</TableHeader>
+							<div>
+								<Table className="min-w-full">
+									<colgroup>
+										<col style={{ width: "180px" }} />
+										<col style={{ width: "180px" }} />
+										<col style={{ width: "180px" }} />
+										<col style={{ width: "180px" }} />
+										<col style={{ width: "180px" }} />
+										<col style={{ width: "180px" }} />
+									</colgroup>
+									<TableHeader>
+										<TableRow>
+											<TableHead>Name</TableHead>
+											<TableHead
+												className="cursor-pointer"
+												onClick={() => handleSort("dateTime")}
+											>
+												<div className="flex items-center">
+													Date {sortConfig.field === "dateTime" && sortConfig.direction === "asc" ?
+														<ChevronUp className="text-zinc-400 font-light text-sm h-5" />
+														: <ChevronDown className="text-zinc-400 font-light text-sm h-5" />}
+												</div>
+											</TableHead>
+											<TableHead>Category</TableHead>
+											<TableHead>Account</TableHead>
+											<TableHead>Payment Method</TableHead>
+											<TableHead>Amount</TableHead>
+										</TableRow>
+									</TableHeader>
+								</Table>
+								{/* <ScrollArea className='p-5 h-[80%] bg-amber-400'> */}
+								<div className="max-h-[71vh] overflow-y-auto">
+									<Table className="min-w-full">
+										<colgroup>
+											<col style={{ width: "220px" }} />
+											<col style={{ width: "220px" }} />
+											<col style={{ width: "220px" }} />
+											<col style={{ width: "220px" }} />
+											<col style={{ width: "220px" }} />
+											<col style={{ width: "150px" }} />
+										</colgroup>
+										<TableBody className="scroll-y-auto h-[80%]">
+											{sortedTransactions.map((t, i) => (
+												<TransactionCard
+													key={i}
+													t={t}
+													handelDelete={handelDelete}
+													onSuccess={onSuccess}
+												/>
+											))}
+										</TableBody>
+									</Table>
+								</div>
 
-								<TableBody>
-									{sortedTransactions.map((t, i) => (
-										<TransactionCard
-											key={i}
-											t={t}
-											handelDelete={handelDelete}	
-											onSuccess = {onSuccess}
-										/>
-									))}
-								</TableBody>
-							</Table>
+
+							</div>
+
 						)}
 					</div>
 				}

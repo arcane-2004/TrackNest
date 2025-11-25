@@ -2,7 +2,6 @@ const categoryModel = require("../models/category.model");
 const mongoose = require('mongoose');
 require('dotenv').config();
 
-mongoose.connect(process.env.MONGO_URI);
 
 const defaultCategories = [
 	{ name: "Food", icon: "Hamburger", type: "expense", color: "#fef08a" },

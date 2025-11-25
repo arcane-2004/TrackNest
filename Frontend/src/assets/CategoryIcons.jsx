@@ -197,6 +197,21 @@ export const categoryIconNames = [
   "Pencil",
   "Chalkboard",
 
+  //games sports and fittness
+  "SoccerBall",
+  "PingPong",
+  "TennisBall",
+  "Cricket",
+  "BowlingBall",
+  "Boules",
+  "Basketball",
+  "PersonSimpleSwim",
+  "PersonSimpleSnowboard",
+  "PersonSimpleBike",
+  "PersonSimpleThrow",
+  "PersonSimpleRun",
+  "Barbell",
+
   // Gifts & Celebration
   "Gift",
   "Confetti",

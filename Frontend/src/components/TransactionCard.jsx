@@ -23,7 +23,9 @@ import {
 const TransactionCard = ({ handelDelete, t, i, onSuccess }) => (
 
 
+
     <TableRow key={i} className="hover:bg-zinc-800/50 transition-colors">
+        
         <TableCell className="font-medium text-white">
             {t.name || "Untitled"}
         </TableCell>
@@ -49,7 +51,7 @@ const TransactionCard = ({ handelDelete, t, i, onSuccess }) => (
                 <span className="text-zinc-500">N/A</span>
             )}
         </TableCell>
-        <TableCell className="text-zinc-300 flex items-center ">
+        <TableCell className="text-zinc-300 ">
             {/* <div
             className="rounded-xl w-fit h-7 p-4 shadow-md flex items-center justify-center gap-4"
             style={{
@@ -57,9 +59,8 @@ const TransactionCard = ({ handelDelete, t, i, onSuccess }) => (
                 border: `1px solid ${t.categoryId.color}55`,
             }}
         > */}
-            <div className='w-1/3 flex items-center justify-center'>
-                <div
-                    className="w-10 h-10 flex items-center justify-center border-1 rounded-full text-xl"
+            <div className=' w-full'>
+                <div className='h-10 w-10 rounded-full flex items-center justify-center'
                     style={{
                         // backgroundColor: t.categoryId.color,
                         borderColor: t.categoryId.color,
@@ -90,13 +91,13 @@ const TransactionCard = ({ handelDelete, t, i, onSuccess }) => (
             {t.paymentMethod || "—"}
         </TableCell>
         <TableCell
-            className={`text-right font-semibold ${!t.isExpense
+            className={`font-semibold ${!t.isExpense
                 ? "text-emerald-400"
                 : "text-red-400"}`}
         >
             {t.amount < 0 ? `-₹${Math.abs(t.amount)}` : `+₹${t.amount}`}
         </TableCell>
-        <TableCell align="right">
+        <TableCell>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
 
@@ -105,7 +106,7 @@ const TransactionCard = ({ handelDelete, t, i, onSuccess }) => (
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent
-                    align="end"
+                    // align="end"
                     className="w-40 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xl shadow-lg p-1"
                 >
                     <DropdownMenuLabel className="text-xs uppercase tracking-wider text-zinc-500 px-2 py-1">
@@ -126,7 +127,7 @@ const TransactionCard = ({ handelDelete, t, i, onSuccess }) => (
                         className="flex items-center gap-2 px-3 py-2.5 rounded-md hover:bg-red-600/10 hover:text-red-400 cursor-pointer transition-colors"
                         onClick={() => {
                             handelDelete(t._id);
-                        } }
+                        }}
                     >
                         <Trash2 className="h-4 w-4 text-zinc-400 group-hover:text-red-400" />
                         <span>Delete</span>
@@ -135,7 +136,10 @@ const TransactionCard = ({ handelDelete, t, i, onSuccess }) => (
 
             </DropdownMenu>
         </TableCell>
-    </TableRow>
+
+        </TableRow >
+  
+
 
 
 
