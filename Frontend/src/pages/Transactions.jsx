@@ -18,6 +18,15 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select"
+import { Label } from "@/components/ui/label"
+
 const Transactions = () => {
 	const [transactions, setTransactions] = useState([]);
 	const [sortConfig, setSortConfig] = useState({
@@ -25,6 +34,7 @@ const Transactions = () => {
 		direction: "desc"
 	})
 	const [isLoading, setIsLoading] = useState(null);
+	const [typeFilter, setTypeFilter] = useState("All")
 
 	const handleLogout = useHandleLogout();
 
@@ -72,20 +82,33 @@ const Transactions = () => {
 	}
 
 
-	// sorting the transactions
 	const sortedTransactions = useMemo(() => {
-		const sorted = [...transactions];
+
+		// 1. Make a copy
+		let sorted = [...transactions];
+
+		// 2. Sort
 		sorted.sort((a, b) => {
 			const field = sortConfig.field;
 			const direction = sortConfig.direction === "asc" ? 1 : -1;
-
 
 			if (a[field] < b[field]) return -1 * direction;
 			if (a[field] > b[field]) return 1 * direction;
 			return 0;
 		});
+
+		// 3. Filter by type
+		if (typeFilter !== "All") {
+			sorted = sorted.filter(t =>
+				typeFilter === "Income" ? !t.isExpense : t.isExpense
+			);
+		}
+
+		// 4. Return result
 		return sorted;
-	}, [transactions, sortConfig]);
+
+	}, [transactions, sortConfig, typeFilter]);
+
 
 
 	const handleSort = (field) => {
@@ -96,14 +119,14 @@ const Transactions = () => {
 	}
 
 	return (
-		<div className="h-full w-full bg-[#0f0f0f] text-white flex">
+		<div className="h-full w-full bg-[#0f0f0f] text-white flex overflow-hidden">
 			{/* Sidebar */}
 			<Sidebar />
 
 			{/* Main Content */}
-			<div className="flex-1 p-8">
+			<div className="flex-1 px-5 overflow-y-auto h-screen relative">
 				{/* Header */}
-				<div className="relative mb-10 flex items-center justify-between">
+				<div className="sticky top-0 z-10 bg-[#0f0f0f] my-5 flex items-center justify-between h-16">
 					<h2 className="text-3xl font-bold bg-gradient-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent">
 						Transactions
 					</h2>
@@ -145,9 +168,40 @@ const Transactions = () => {
 					</div>
 				</div>
 
+				<div className="flex items-center justify-end gap-3 mb-4">
+					<Label htmlFor="typeFilter" className="text-zinc-300 text-sm">
+						Type
+					</Label>
+
+					<Select value={typeFilter} onValueChange={setTypeFilter}>
+						<SelectTrigger
+							id="typeFilter"
+							className="w-[180px] bg-zinc-800 text-zinc-200 hover:bg-zinc-700 transition-all duration-200 ring-0 outline-none focus:outline-none focus:ring-0 focus-visible:ring-0 border-0 shadow-none"
+						>
+							<SelectValue placeholder={typeFilter} />
+						</SelectTrigger>
+
+						<SelectContent
+							className="bg-zinc-900  border-0 text-zinc-200 shadow-xl rounded-md"
+						>
+							<SelectItem value="All" className="cursor-pointer focus:bg-zinc-800">
+								All
+							</SelectItem>
+							<SelectItem value="Income" className="cursor-pointer focus:bg-zinc-800 text-emerald-400">
+								Income
+							</SelectItem>
+							<SelectItem value="Expense" className="cursor-pointer focus:bg-zinc-800 text-red-400">
+								Expense
+							</SelectItem>
+						</SelectContent>
+					</Select>
+				</div>
+
+
+
 				{/* Transactions Table */}
 				{isLoading ? <Loader2 className="animate-spin mx-auto" /> :
-					<div className="h-[93%] overflow-y-scroll bg-zinc-900 rounded-2xl p-6 shadow-xl border border-zinc-800/80">
+					<div className=" bg-zinc-900 rounded-2xl p-6 shadow-xl border border-zinc-800/80 mb-4">
 						<h3 className="text-xl font-semibold mb-4 bg-gradient-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent drop-shadow">
 							Recent Transactions
 						</h3>
@@ -159,14 +213,7 @@ const Transactions = () => {
 						) : (
 							<div>
 								<Table className="min-w-full">
-									<colgroup>
-										<col style={{ width: "180px" }} />
-										<col style={{ width: "180px" }} />
-										<col style={{ width: "180px" }} />
-										<col style={{ width: "180px" }} />
-										<col style={{ width: "180px" }} />
-										<col style={{ width: "180px" }} />
-									</colgroup>
+
 									<TableHeader>
 										<TableRow>
 											<TableHead>Name</TableHead>
@@ -186,33 +233,22 @@ const Transactions = () => {
 											<TableHead>Amount</TableHead>
 										</TableRow>
 									</TableHeader>
+
+									<TableBody className="scroll-y-auto h-[80%]">
+										{sortedTransactions.map((t, i) => (
+											<TransactionCard
+												key={i}
+												t={t}
+												handelDelete={handelDelete}
+												onSuccess={onSuccess}
+											/>
+										))}
+									</TableBody>
 								</Table>
-								{/* <ScrollArea className='p-5 h-[80%] bg-amber-400'> */}
-								<div className="max-h-[71vh] overflow-y-auto">
-									<Table className="min-w-full">
-										<colgroup>
-											<col style={{ width: "220px" }} />
-											<col style={{ width: "220px" }} />
-											<col style={{ width: "220px" }} />
-											<col style={{ width: "220px" }} />
-											<col style={{ width: "220px" }} />
-											<col style={{ width: "150px" }} />
-										</colgroup>
-										<TableBody className="scroll-y-auto h-[80%]">
-											{sortedTransactions.map((t, i) => (
-												<TransactionCard
-													key={i}
-													t={t}
-													handelDelete={handelDelete}
-													onSuccess={onSuccess}
-												/>
-											))}
-										</TableBody>
-									</Table>
-								</div>
-
-
 							</div>
+
+
+
 
 						)}
 					</div>
