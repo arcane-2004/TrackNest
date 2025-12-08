@@ -71,7 +71,6 @@ const TransactionCard = ({ handelDelete, t, i, onSuccess }) => (
                 >
                     {(() => {
                         const Icon = Icons[t.categoryId.icon];
-                        console.log("Icon", Icon);
                         return (
                             <Icon style={{ height: "25px", width: "25px" }} />
                         );

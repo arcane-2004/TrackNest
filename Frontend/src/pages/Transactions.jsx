@@ -35,7 +35,7 @@ const Transactions = () => {
 	})
 	const [isLoading, setIsLoading] = useState(null);
 	const [typeFilter, setTypeFilter] = useState("All")
-
+	
 	const handleLogout = useHandleLogout();
 
 	// fetching transactions

@@ -11,6 +11,8 @@ import Accounts from "./pages/Accounts"
 import Category from "./pages/Category"
 import AccountViewPage from "./pages/AccountViewPage"
 import PageNotFound from "./pages/PageNotFound"
+import Budget from "./pages/Budget"
+import Analysis from "./pages/Analysis"
 
 function App() {
 
@@ -30,6 +32,8 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/update/password" element={<UpdatePassword />} />
         </Route>
+        <Route path="/budget" element={<Budget/>} />
+        <Route path="/analysis" element={<Analysis/>} />
       </Routes>
     </>
   )
