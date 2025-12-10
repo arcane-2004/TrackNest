@@ -13,28 +13,32 @@ import AccountViewPage from "./pages/AccountViewPage"
 import PageNotFound from "./pages/PageNotFound"
 import Budget from "./pages/Budget"
 import Analysis from "./pages/Analysis"
+import { AccountProvider } from "./context/AccountContext"
+
 
 function App() {
 
   return (
     <>
-      <Routes>
-        <Route path="/" element={<GettingStarted/>} />
-        <Route path="/*" element={<PageNotFound/>} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/forget/password" element={<ForgetPassword />} />
-        <Route path="/verify/otp" element={<VerifyOTP />} />
-        <Route path="/transactions" element={<Transactions/>}/>
-        <Route path="/accounts" element={<Accounts/>}/>
-        <Route path="/category" element={<Category/>}/>
-        <Route path="/account/:id" element={<AccountViewPage/>} />
-        <Route element={<Super />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/update/password" element={<UpdatePassword />} />
-        </Route>
-        <Route path="/budget" element={<Budget/>} />
-        <Route path="/analysis" element={<Analysis/>} />
-      </Routes>
+      <AccountProvider>
+        <Routes>
+          <Route path="/" element={<GettingStarted />} />
+          <Route path="/*" element={<PageNotFound />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/forget/password" element={<ForgetPassword />} />
+          <Route path="/verify/otp" element={<VerifyOTP />} />
+          <Route path="/transactions" element={<Transactions />} />
+          <Route path="/accounts" element={<Accounts />} />
+          <Route path="/category" element={<Category />} />
+          <Route path="/account/:id" element={<AccountViewPage />} />
+          <Route element={<Super />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/update/password" element={<UpdatePassword />} />
+          </Route>
+          <Route path="/budget" element={<Budget />} />
+          <Route path="/analysis" element={<Analysis />} />
+        </Routes>
+      </AccountProvider>
     </>
   )
 }

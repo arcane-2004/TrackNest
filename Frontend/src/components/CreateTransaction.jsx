@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, } from "react"
 import {
     Sheet,
     SheetTrigger,
@@ -29,6 +29,7 @@ import { Loader2 } from "lucide-react"
 import axios from "axios"
 
 const CreateTransaction = ({ onSuccess, children, transaction }) => {
+
     const [categories, setCategories] = useState([])
     const [accounts, setAccounts] = useState([])
     const [open, setOpen] = useState(false)
@@ -127,15 +128,15 @@ const CreateTransaction = ({ onSuccess, children, transaction }) => {
             }
 
             let response;
-
             if (transaction) {
                 //  Edit existing transaction
                 response = await axios.put(
                     `${import.meta.env.VITE_BASE_URL}/transaction/update/${transaction._id}`,
-                    {data},
+                    { data },
                     { withCredentials: true }
                 );
                 toast.success(response.data.message);
+                
                 resetForm()
                 onSuccess()
             } else {
@@ -147,6 +148,7 @@ const CreateTransaction = ({ onSuccess, children, transaction }) => {
                 );
 
                 toast.success(response.data.message)
+
                 resetForm()
                 onSuccess()
             }
@@ -158,7 +160,7 @@ const CreateTransaction = ({ onSuccess, children, transaction }) => {
         }
     }
 
-    
+
 
     return (
         <Sheet open={open} onOpenChange={setOpen}>
@@ -309,7 +311,7 @@ const CreateTransaction = ({ onSuccess, children, transaction }) => {
                                         <Select
                                             onValueChange={(val) => setFieldValue("paymentMethod", val)}
                                             value={values.paymentMethod}
-                                        >   
+                                        >
                                             <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                                                 <SelectValue placeholder="Select Payment Method" />
                                             </SelectTrigger>

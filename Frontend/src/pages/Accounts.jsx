@@ -4,48 +4,24 @@ import { Loader2, LogOut, Plus } from 'lucide-react';
 import { useHandleLogout } from '../utils/user.hooks'
 import CreateAccount from '../components/CreateAccount';
 import axios from 'axios';
-import { useState, useEffect } from 'react';
+import { useState, useContext } from 'react';
 import { toast } from 'react-hot-toast'
 import { ScrollArea } from '../components/ui/scroll-area'
 import { Link } from 'react-router-dom';
 import AccountCard from '../components/AccountCard';
-
+import { AccountContext } from "../context/AccountContext";
 
 const Accounts = () => {
 
-
-    const [accounts, setAccounts] = useState([])
     const [isLoading, setIsLoading] = useState(null);
 
+    const { accounts, setAccounts, refreshAccounts, setSelectedAccountId } = useContext(AccountContext);
 
-    const fetchAccounts = async () => {
-        try {
-            setIsLoading(true);
-            const response = await axios.get(
-                `${import.meta.env.VITE_BASE_URL}/account/get-accounts`,
-                { withCredentials: true }
-            );
 
-            if (response.status === 200) {
-                setAccounts(response.data.accounts);
-            }
-            else {
-                toast.error(response.data.message || "Something went wrong")
-            }
-        } catch (err) {
-            toast.error(err.response?.data?.message || "Something went wrong");
-        } finally {
-            setIsLoading(false);
-        }
+    const handleSelect = (accountId) => {
+        setSelectedAccountId(accountId);
     };
 
-    useEffect(() => {
-        fetchAccounts();
-    }, []);
-
-    const refreshAccounts = () => {
-        fetchAccounts(); // re-fetch accounts when a new account is added
-    };
 
     const handleUpdateIsDefault = async (accountId) => {
         const previousAccounts = [...accounts];
@@ -74,6 +50,7 @@ const Accounts = () => {
             toast.error(error.response?.data?.message || "Something went wrong");
         } finally {
             setIsLoading(false);
+            handleSelect(accountId)
         }
     }
 

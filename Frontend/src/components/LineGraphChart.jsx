@@ -108,10 +108,13 @@ const LineGraphChart = ({ transactions, setIncome, setExpense }) => {
                         <CartesianGrid strokeDasharray="4 4" stroke="rgba(255,255,255,0.05)" />
                         <XAxis dataKey="date"
                             tick={{ fill: "#cfcfcf" }}
-                            stroke="rgba(255,255,255,0.2)" />
+                            stroke="rgba(255,255,255,0.2)" 
+                            fontSize={13} />
 
                         <YAxis tick={{ fill: "#cfcfcf" }}
-                            stroke="rgba(255,255,255,0.2)" />
+                            stroke="rgba(255,255,255,0.2)" 
+                            tickFormatter={(value) => `₹${value}`}
+                            fontSize={13} />
                         <Tooltip
                             contentStyle={{
                                 background: "rgba(24, 24, 27, 0.9)",
