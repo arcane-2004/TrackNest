@@ -5,6 +5,7 @@ import axios from 'axios'
 import { LogOut } from 'lucide-react';
 import { useHandleLogout } from '../utils/user.hooks';
 import LineGraphChart from '../components/LineGraphChart'
+import StackedCards from '../components/StackedCards';
 
 const Dashboard = () => {
 
@@ -30,7 +31,6 @@ const Dashboard = () => {
 		fetchTransactions();
 	}, []);
 
-
 	return (
 
 		<div className="h-full w-full bg-[#111010] text-white flex">
@@ -50,7 +50,8 @@ const Dashboard = () => {
 
 						<div className=' w-3/4 flex gap-2'>
 
-							<div className='w-4/7 border-2 border-white'>
+							<div className='w-4/7 h-full '>
+								<StackedCards/>
 							</div>
 
 							<div className=' h-full w-3/7 flex flex-col gap-4 '>

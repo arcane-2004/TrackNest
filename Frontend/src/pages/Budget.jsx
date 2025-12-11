@@ -3,8 +3,9 @@ import Sidebar from '../components/Sidebar'
 import { useHandleLogout } from '../utils/user.hooks'
 import { LogOut } from 'lucide-react'
 
-const Budget = () => {
 
+
+const Budget = () => {
 	const handleLogout = useHandleLogout();
 
 	return (

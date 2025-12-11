@@ -31,7 +31,6 @@ import { Label } from "@/components/ui/label"
 const Transactions = () => {
 
 	const { selectedAccountId, selectedAccount, loadingAccount } = useContext(AccountContext);
-	console.log(selectedAccount)
 
 	const [transactions, setTransactions] = useState([]);
 	const [sortConfig, setSortConfig] = useState({
