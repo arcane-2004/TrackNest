@@ -68,7 +68,7 @@ const CreateTransaction = ({ onSuccess, children, transaction }) => {
         name: Yup.string().required("Name is required"),
         amount: Yup.number().required("Amount is required").positive("Must be positive"),
         description: Yup.string().max(200, "Max 200 characters"),
-        category: Yup.string().required("Select a category"),
+        categoryId: Yup.string().required("Select a category"),
         accountId: Yup.string(),
         date: Yup.date(),
         time: Yup.string(),
@@ -99,7 +99,7 @@ const CreateTransaction = ({ onSuccess, children, transaction }) => {
         name: transaction.name,
         amount: Math.abs(transaction.amount),
         description: transaction.description || "",
-        category: String(transaction.categoryId?._id || ""),
+        categoryId: String(transaction.categoryId?._id || ""),
         accountId: String(transaction.accountId?._id || ""),
         paymentMethod: transaction.paymentMethod || "",
         date: formatDateForInput(transaction.dateTime),
@@ -109,7 +109,7 @@ const CreateTransaction = ({ onSuccess, children, transaction }) => {
         name: "",
         amountId: "",
         description: "",
-        category: "",
+        categoryId: "",
         accountId: "",
         paymentMethod: "upi",
         date: "",
@@ -130,6 +130,7 @@ const CreateTransaction = ({ onSuccess, children, transaction }) => {
             let response;
             if (transaction) {
                 //  Edit existing transaction
+                console.log('updating', data)
                 response = await axios.put(
                     `${import.meta.env.VITE_BASE_URL}/transaction/update/${transaction._id}`,
                     { data },
@@ -245,8 +246,8 @@ const CreateTransaction = ({ onSuccess, children, transaction }) => {
                                         <div>
                                             <Label>Category</Label>
                                             <Select
-                                                onValueChange={(val) => setFieldValue("category", val)}
-                                                value={values.category}
+                                                onValueChange={(val) => setFieldValue("categoryId", val)}
+                                                value={values.categoryId}
                                             >
                                                 <SelectTrigger className="bg-zinc-800 border-zinc-700 text-white">
                                                     <SelectValue placeholder="Select Category" />

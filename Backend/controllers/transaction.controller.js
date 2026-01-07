@@ -13,7 +13,7 @@ module.exports.addTransaction = async (req, res, next) => {
 	try {
 		const accounts = await accountModel.find({ userId: user._id });
 
-		const { name, amount, isExpense, category, accountId, date, time, description, paymentMethod, receiptUrl, isRecurring, recurringInterval, nextRecurringDate, lastProcessed } = req.body;
+		const { name, amount, isExpense, categoryId, accountId, date, time, description, paymentMethod, receiptUrl, isRecurring, recurringInterval, nextRecurringDate, lastProcessed } = req.body;
 
 		// Combine date + time if provided, else use current timestamp
 		let dateTime;
@@ -55,7 +55,7 @@ module.exports.addTransaction = async (req, res, next) => {
 		const newTransaction = await transactionService.createTransaction({
 			userId: user._id,
 			accountId: currentAccount._id,
-			categoryId: category,
+			categoryId: categoryId,
 			name,
 			amount,
 			isExpense,
@@ -152,6 +152,7 @@ module.exports.updateTransaction = async (req, res, next) => {
 
 	const { id } = req.params;
 	const { data } = req.body;
+	console.log('data,', data)
 
 	if (!id) {
 		return res.status(401).json({ message: "Transaction id is required" });
@@ -162,6 +163,16 @@ module.exports.updateTransaction = async (req, res, next) => {
 		if (!oldTransaction) {
 			return res.status(404).json({ message: "Transaction not found" });
 		}
+
+		/* -------------------- HANDLE date + time -------------------- */
+		if (data.date && data.time) {
+			// Combine date + time into Date object
+			data.dateTime = new Date(`${data.date}T${data.time}:00`);
+		}
+
+		// Remove fields that do NOT exist in schema
+		delete data.date;
+		delete data.time;
 
 		// Revert old balance impact
 		const oldAccount = await accountModel.findById(oldTransaction.accountId);
@@ -177,7 +188,7 @@ module.exports.updateTransaction = async (req, res, next) => {
 
 		// Apply new balance effect
 		const newAccount = await accountModel.findById(updatedTransaction.accountId);
-		
+
 		if (newAccount) {
 			balanceUpdate(newAccount, data.amount)
 		}
