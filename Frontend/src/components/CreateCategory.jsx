@@ -58,7 +58,7 @@ const CreateCategory = ({ children, onCategoryAdded, category, fetchCategories, 
 
     // ✅ Submit Handler
     const handleSubmit = async (values, { resetForm }) => {
-        console.log("FORM SUBMITTED")
+
         try {
             setIsSubmitting(true);
 
@@ -92,6 +92,7 @@ const CreateCategory = ({ children, onCategoryAdded, category, fetchCategories, 
             console.log("error", error)
         } finally {
             setIsSubmitting(false);
+
         }
     };
 

@@ -1,13 +1,34 @@
 const mongoose = require('mongoose')
 
-const budgetSchema = new mongoose.Schema({
+const BudgetSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
     },
 
-    amount: {
+    accountId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Account'
+    },
+
+    isCategoryBudget: {
+        type: Boolean,
+        default: false
+    },
+
+    categoryId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Category'
+    },
+
+    limit: {
         type: Number,
+    },
+
+    period: {
+        type: String,
+        enum: ['Daily', 'Weekly', 'Monthly', 'Yearly'],
+        default: 'Monthly'
     },
 
     lastAlertSent: {
@@ -23,12 +44,15 @@ const budgetSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     }
-,
+    ,
 },
-{
-    timestamps: true,
-    toJSON: {virtuals: true, getters: true},
-    toObject: {virtuals: true, getters: true}
-})
+    {
+        timestamps: true,
+        toJSON: { virtuals: true, getters: true },
+        toObject: { virtuals: true, getters: true }
+    })
 
-module.exports = mongoose.model('Budget', budgetSchema)
+
+
+module.exports = mongoose.model('Budget', BudgetSchema)
+
