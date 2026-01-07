@@ -101,7 +101,7 @@ const Budget = () => {
 					) : (
 						<div>
 							{budget.map((bgt) => {
-								const used = currentExpenses?.[bgt._id]?.period ?? 0;
+								const used = currentExpenses?.[bgt.period] ?? 0;
 
 								const percentUsed = bgt.limit
 									? Math.min((used / bgt.limit) * 100, 100)
@@ -112,18 +112,11 @@ const Budget = () => {
 											<h3 className="text-lg font-semibold">{bgt.categoryId}</h3>
 											<p className="text-sm text-gray-400">Limit: ₹{bgt.limit}</p>
 											<p className="text-sm text-gray-400">Period: {bgt.period}</p>
-											<p className="text-sm text-gray-400">Current Expense: ₹{currentExpenses?.bgt?.period || 0}</p>
+											<p className="text-sm text-gray-400">Current Expense: ₹{currentExpenses?.[bgt?.period] || 0}</p>
 
 											<Progress
 												value={percentUsed}
-												className="w-full h-1 mt-1 bg-zinc-600"
-												indicatorClassName={
-													percentUsed > 90
-														? "bg-red-500"
-														: percentUsed > 70
-															? "bg-amber-400"
-															: "bg-emerald-500"
-												}
+												className="w-full mt-1"
 											/>
 											<div className="flex justify-between text-sm text-zinc-400">
 												<span>{bgt.name}</span>

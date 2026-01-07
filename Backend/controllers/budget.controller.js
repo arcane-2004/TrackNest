@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const budgetModel = require('../models/budget.model');
 const budgetService = require('../services/budget.services')
 const transactionModel = require('../models/transaction.model');
@@ -48,31 +49,38 @@ module.exports.getBudget = async (req, res, next) => {
 
         const now = new Date();
 
-        // ---------- Date ranges ----------
-        const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const endOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+        // DAY
+        const startOfDay = new Date(Date.UTC(
+            now.getUTCFullYear(),
+            now.getUTCMonth(),
+            now.getUTCDate()
+        ));
+        const endOfDay = new Date(Date.UTC(
+            now.getUTCFullYear(),
+            now.getUTCMonth(),
+            now.getUTCDate() + 1
+        ));
 
-        // Week (Monday start)
-        const day = now.getDay();
-        const diff = now.getDate() - day + (day === 0 ? -6 : 1);
-        const startOfWeek = new Date(now.getFullYear(), now.getMonth(), diff);
-        startOfWeek.setHours(0, 0, 0, 0);
+        // WEEK (Monday)
+        const startOfWeek = new Date(startOfDay);
+        startOfWeek.setUTCDate(startOfDay.getUTCDate() - (startOfDay.getUTCDay() || 7) + 1);
         const endOfWeek = new Date(startOfWeek);
-        endOfWeek.setDate(startOfWeek.getDate() + 7);
+        endOfWeek.setUTCDate(startOfWeek.getUTCDate() + 7);
 
-        // Month
-        const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+        // MONTH
+        const startOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+        const endOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
 
-        // Year
-        const startOfYear = new Date(now.getFullYear(), 0, 1);
-        const endOfYear = new Date(now.getFullYear() + 1, 0, 1);
+        // YEAR
+        const startOfYear = new Date(Date.UTC(now.getUTCFullYear(), 0, 1));
+        const endOfYear = new Date(Date.UTC(now.getUTCFullYear() + 1, 0, 1));
 
         // ---------- Aggregation ----------
+        const accountObjectId = new mongoose.Types.ObjectId(accountId);
         const result = await transactionModel.aggregate([
             {
                 $match: {
-                    accountId,
+                    accountId: accountObjectId,
                     userId: user._id,
                     isExpense: true
                 }
@@ -80,20 +88,20 @@ module.exports.getBudget = async (req, res, next) => {
             {
                 $facet: {
                     Daily: [
-                        { $match: { date: { $gte: startOfDay, $lt: endOfDay } } },
-                        { $group: { _id: null, total: { $sum: "$amount" } } }
+                        { $match: { dateTime: { $gte: startOfDay, $lt: endOfDay } } },
+                        { $group: { _id: null, total: { $sum: { $abs: "$amount" } } } }
                     ],
                     Weekly: [
-                        { $match: { date: { $gte: startOfWeek, $lt: endOfWeek } } },
-                        { $group: { _id: null, total: { $sum: "$amount" } } }
+                        { $match: { dateTime: { $gte: startOfWeek, $lt: endOfWeek } } },
+                        { $group: { _id: null, total: { $sum: { $abs: "$amount" } } } }
                     ],
                     Monthly: [
-                        { $match: { date: { $gte: startOfMonth, $lt: endOfMonth } } },
-                        { $group: { _id: null, total: { $sum: "$amount" } } }
+                        { $match: { dateTime: { $gte: startOfMonth, $lt: endOfMonth } } },
+                        { $group: { _id: null, total: { $sum: { $abs: "$amount" } } } }
                     ],
                     Yearly: [
-                        { $match: { date: { $gte: startOfYear, $lt: endOfYear } } },
-                        { $group: { _id: null, total: { $sum: "$amount" } } }
+                        { $match: { dateTime: { $gte: startOfYear, $lt: endOfYear } } },
+                        { $group: { _id: null, total: { $sum: { $abs: "$amount" } } } }
                     ]
                 }
             }
@@ -103,10 +111,10 @@ module.exports.getBudget = async (req, res, next) => {
         const agg = result?.[0] || {};
 
         const expenses = {
-            Daily: agg.daily?.[0]?.total ?? 0,
-            Weekly: agg.weekly?.[0]?.total ?? 0,
-            Monthly: agg.monthly?.[0]?.total ?? 0,
-            Yearly: agg.yearly?.[0]?.total ?? 0,
+            Daily: agg.Daily?.[0]?.total ?? 0,
+            Weekly: agg.Weekly?.[0]?.total ?? 0,
+            Monthly: agg.Monthly?.[0]?.total ?? 0,
+            Yearly: agg.Yearly?.[0]?.total ?? 0,
         };
 
         console.log('budget', budget)
