@@ -7,7 +7,9 @@ router.post('/create/:accountId', authMiddleware.authUser, budgetController.crea
 
 router.get('/get-budget/:accountId', authMiddleware.authUser, budgetController.getBudget);
 
-router.put('/update-budget/:accountId', authMiddleware.authUser, budgetController.updateBudget)
+router.put('/update-budget/:budgetId', authMiddleware.authUser, budgetController.updateBudget);
+
+router.delete('/delete-budget/:budgetId', authMiddleware.authUser, budgetController.deleteBudget);
 
 
 module.exports = router;

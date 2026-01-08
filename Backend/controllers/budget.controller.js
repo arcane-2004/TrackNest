@@ -131,19 +131,19 @@ module.exports.updateBudget = async (req, res, next) => {
     const { budgetId } = req.params;
     const user = req.user;
     const values = req.body;
-    
+
     if (!user) {
         return res.status(401).json({ message: "Unauthorized", error: "user not found" })
     }
 
     if (!budgetId) {
-        return res.status(404).json({message: "Something went Wrong", error: "budget not found"})
+        return res.status(404).json({ message: "Something went Wrong", error: "budget not found" })
     }
 
     try {
 
         const budget = await budgetModel.findByIdAndUpdate(
-            { _id: budgetId , userId: user._id },
+            { _id: budgetId, userId: user._id },
             { $set: values },
             { new: true }
         );
@@ -157,5 +157,30 @@ module.exports.updateBudget = async (req, res, next) => {
     } catch (error) {
         return res.status(500).json({ message: "Internal server error", error: error.message });
 
+    }
+}
+
+module.exports.deleteBudget = async (req, res, next) => {
+    const { budgetId } = req.params;
+    const user = req.user;
+
+    if (!user) {
+        return res.status(401).json({ message: "Unauthorized", error: "User not found" })
+    }
+    console.log(budgetId);
+    if (!budgetId) {
+        return res.status(404).json({ message: "Something went wrong", error: "Budget not found" })
+    }
+    try {
+        const deletedBudget = await budgetModel.findByIdAndDelete(
+            {
+                _id: budgetId,
+                userId: user._id
+            }
+        )
+        return res.status(200).json({message: "Budget deleted successfully", deletedBudget : deletedBudget});
+    }
+    catch(error){
+        return res.status(500).json({mesage: "Internal server error", error: error.message});
     }
 }

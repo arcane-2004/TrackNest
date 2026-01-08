@@ -1,5 +1,5 @@
 import React from 'react'
-import { useState, useEffect, useContext } from "react";
+import { useState, useContext } from "react";
 import {
     Drawer,
     DrawerContent,
@@ -16,36 +16,38 @@ import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { Loader2, PlusCircle, Pencil } from "lucide-react";
-// import { toast } from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import axios from "axios";
 import { AccountContext } from "../context/AccountContext"
 
 const CreateBudget = ({ children, budget, fetchBudget }) => {
 
-    const {selectedAccountId} = useContext(AccountContext)
+    const { selectedAccountId } = useContext(AccountContext)
 
     const [open, setOpen] = useState(false);
     const [isCreating, setCreating] = useState(false);
-    const [categories, setCategories] = useState([])
 
-    useEffect(() => {
-        const fetchCategories = async () => {
-            try {
-                const response = await axios.get(
-                    `${import.meta.env.VITE_BASE_URL}/category/get-categories`,
-                    { withCredentials: true }
-                )
-                setCategories(response.data.categories || [])
-            } catch (error) {
-                console.error(error.response?.data || "Something went wrong")
-            }
-        }
-        fetchCategories()
-    }, [])
+    // ---------- category for budget ----------
+    // const [categories, setCategories] = useState([])
+
+    // useEffect(() => {
+    //     const fetchCategories = async () => {
+    //         try {
+    //             const response = await axios.get(
+    //                 `${import.meta.env.VITE_BASE_URL}/category/get-categories`,
+    //                 { withCredentials: true }
+    //             )
+    //             setCategories(response.data.categories || [])
+    //         } catch (error) {
+    //             console.error(error.response?.data || "Something went wrong")
+    //         }
+    //     }
+    //     fetchCategories()
+    // }, [])
 
     const validationSchema = Yup.object({
         // categoryId: Yup.string(),
-        isCategoryBudget: Yup.boolean(),
+        // isCategoryBudget: Yup.boolean(),
         limit: Yup.number().required("Limit is required").min(0, "Limit must be a positive number"),
         period: Yup.string().required("Period is required").oneOf(['Daily', 'Weekly', 'Monthly', 'Yearly']),
 
@@ -54,12 +56,12 @@ const CreateBudget = ({ children, budget, fetchBudget }) => {
 
     const initialValues = budget ? {
 
-        isCategoryBudget: budget.isCategoryBudget,
+        // isCategoryBudget: budget.isCategoryBudget,
         limit: budget.limit,
         period: budget.period
 
     } : {
-        isCategoryBudget: false,
+        // isCategoryBudget: false,
         limit: "",
         period: "Monthly"
     }
@@ -67,20 +69,32 @@ const CreateBudget = ({ children, budget, fetchBudget }) => {
     // ✅ Submit Handler
     const handleSubmit = async (values, { resetForm }) => {
 
-        try{
+        try {
             setCreating(true);
-            console.log(values)
-            const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/budget/create/${selectedAccountId}`, values, {
-                withCredentials: true
-            })
-            console.log(response.data);
+            if (budget) {
+                const response = await axios.put(`${import.meta.env.VITE_BASE_URL}/budget/update-budget/${budget._id}`, values,
+                    { withCredentials: true }
+                )
+                toast.success(response.data.message);
+
+            }
+
+            else {
+                const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/budget/create/${selectedAccountId}`, values, {
+                    withCredentials: true
+                })
+                toast.success(response.data.message);
+
+            }
             resetForm()
             setOpen(false);
 
-        }catch(error){
+
+        } catch (error) {
             console.log(error.response?.data)
+            toast.error(error.response?.data?.message || "Something went wrong");
         }
-        finally{
+        finally {
             setCreating(false)
             fetchBudget()
         }
@@ -112,7 +126,7 @@ const CreateBudget = ({ children, budget, fetchBudget }) => {
                 <Formik
                     initialValues={initialValues}
                     validationSchema={validationSchema}
-                onSubmit={handleSubmit}
+                    onSubmit={handleSubmit}
                 >
                     {({ setFieldValue, values }) => (
                         <Form className="space-y-6 p-8">
