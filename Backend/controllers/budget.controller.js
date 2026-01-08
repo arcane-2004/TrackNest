@@ -117,9 +117,6 @@ module.exports.getBudget = async (req, res, next) => {
             Yearly: agg.Yearly?.[0]?.total ?? 0,
         };
 
-        console.log('budget', budget)
-        console.log('expenses', expenses)
-
         return res.status(200).json({
             budget,
             expenses
@@ -131,19 +128,23 @@ module.exports.getBudget = async (req, res, next) => {
 }
 
 module.exports.updateBudget = async (req, res, next) => {
-    const { accountId } = req.params;
+    const { budgetId } = req.params;
     const user = req.user;
-    const { amount } = req.body;
-
+    const values = req.body;
+    
     if (!user) {
         return res.status(401).json({ message: "Unauthorized", error: "user not found" })
     }
 
+    if (!budgetId) {
+        return res.status(404).json({message: "Something went Wrong", error: "budget not found"})
+    }
+
     try {
 
-        const budget = await budgetModel.findOneAndUpdate(
-            { accountId: accountId, userId: user._id },
-            { amount: amount },
+        const budget = await budgetModel.findByIdAndUpdate(
+            { _id: budgetId , userId: user._id },
+            { $set: values },
             { new: true }
         );
 
