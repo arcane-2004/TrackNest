@@ -14,7 +14,7 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 
-const PieChart = () => {
+const PieChart = ({ setCategoryData }) => {
     const { selectedAccountId, loadingAccount } = useContext(AccountContext);
 
     const [data, setData] = useState({});
@@ -40,6 +40,10 @@ const PieChart = () => {
 
     }, [loadingAccount, selectedAccountId])
 
+    useEffect( () => {
+        setCategoryData(data[0]?.[range] || []);
+    },[data, range])
+
     return (
         <div className='h-100' >
             <div>
@@ -56,6 +60,7 @@ const PieChart = () => {
                     </SelectTrigger>
                 </Select>
             </div>
+            
             <ResponsivePie
                 data={data[0]?.[range] || []}
                 margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
@@ -70,7 +75,7 @@ const PieChart = () => {
                 arcLabel={d => `${d.data.percentage.toFixed(2)}%`}  // custom
                 enableArcLinkLabels={true}
                 // arcLinkLabel="lable"
-                arcLinkLabel={d => `${d.label} (${d.value})`}
+                arcLinkLabel={d => `${d.label} (₹${d.value.toLocaleString()})`}
 
                 arcLabelsSkipAngle={10}
                 arcLinkLabelsSkipAngle={10}

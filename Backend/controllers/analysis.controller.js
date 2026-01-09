@@ -76,6 +76,7 @@ module.exports.categorySummary = async (req, res, next) => {
                     id: { $toString: "$category._id" }, // Nivo requires string id
                     label: "$category.name",
                     color: "$category.color",
+                    icon: "$category.icon",
                     value: { $abs: "$categories.total" },
                     percentage: {
                         $multiply: [
