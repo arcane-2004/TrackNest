@@ -3,9 +3,14 @@ import axios from "axios";
 import Sidebar from "../components/Sidebar";
 import CreateCategory from "../components/CreateCategory";
 import { Icons } from "../assets/CategoryIcons";
+import { useHandleLogout } from '../utils/user.hooks';
+import { LogOut } from 'lucide-react'
 
 
 const Category = () => {
+
+	const handleLogout = useHandleLogout();
+
 	const [categories, setCategories] = useState([]);
 	const [selectedCategory, setSelectedCategory] = useState(null);
 	const [sheetOpen, setSheetOpen] = useState(false);
@@ -51,15 +56,27 @@ const Category = () => {
 					<h2 className="font-bold text-3xl tracking-tight bg-gradient-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent">
 						Categories
 					</h2>
-					<CreateCategory
-						onCategoryAdded={handleCategoryAdded}
-						setOpen={setSheetOpen}
-						open={sheetOpen}
-					>
-						<button className="px-6 py-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-400 text-sm font-semibold text-white hover:scale-[1.03] transition-transform duration-300 shadow-md shadow-orange-500/20 hover:cursor-pointer">
-							Add Category
-						</button>
-					</CreateCategory>
+
+					<div className="flex items-center gap-6">
+						<CreateCategory
+							onCategoryAdded={handleCategoryAdded}
+							setOpen={setSheetOpen}
+							open={sheetOpen}
+						>
+							<button className="px-6 py-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-400 text-sm font-semibold text-white hover:scale-[1.03] transition-transform duration-300 shadow-md shadow-orange-500/20 hover:cursor-pointer">
+								Add Category
+							</button>
+						</CreateCategory>
+
+						{/* Logout */}
+						<span
+							className="text-orange-500 hover:text-orange-400 hover:scale-110 transition-transform duration-200 cursor-pointer"
+							onClick={handleLogout}
+							title="Logout"
+						>
+							<LogOut size={22} />
+						</span>
+					</div>
 				</header>
 
 				<hr className="border-zinc-800 mb-10" />
@@ -88,7 +105,7 @@ const Category = () => {
 									}}
 									className="rounded-xl p-4 shadow-md hover:scale-[1.02] transition-transform duration-200"
 									style={{
-										backgroundColor: `${cat.color}22`, 
+										backgroundColor: `${cat.color}22`,
 										border: `1px solid ${cat.color}55`,
 									}}
 								>

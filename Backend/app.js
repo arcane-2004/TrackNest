@@ -11,6 +11,7 @@ const accountRoute = require('./routes/account.route');
 const transctionRoute = require('./routes/transaction.route');
 const budgetRoute = require('./routes/budget.route')
 const categoryRoute = require('./routes/category.route');
+const analysisRoute = require('./routes/analysis.route');
 
 const app = express();
 
@@ -51,6 +52,8 @@ app.use('/transaction', transctionRoute);
 app.use('/budget', budgetRoute);
 
 app.use('/category', categoryRoute);
+
+app.use('/analysis', analysisRoute);
 
 
 
