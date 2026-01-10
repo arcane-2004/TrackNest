@@ -1,6 +1,12 @@
 const categoryModel = require('../models/category.model');
 const transactionModel = require('../models/transaction.model');
 const mongoose = require("mongoose");
+const { getUTCRange } = require("../utils/dateRanges");
+
+const daily = getUTCRange("Daily");
+const weekly = getUTCRange("Weekly");
+const monthly = getUTCRange("Monthly");
+const yearly = getUTCRange("Yearly");
 
 module.exports.categorySummary = async (req, res, next) => {
 
@@ -13,34 +19,6 @@ module.exports.categorySummary = async (req, res, next) => {
 
     try {
         const accountObjectId = new mongoose.Types.ObjectId(accountId);
-
-        const now = new Date();
-
-        // DAY
-        const startOfDay = new Date(Date.UTC(
-            now.getUTCFullYear(),
-            now.getUTCMonth(),
-            now.getUTCDate()
-        ));
-        const endOfDay = new Date(Date.UTC(
-            now.getUTCFullYear(),
-            now.getUTCMonth(),
-            now.getUTCDate() + 1
-        ));
-
-        // WEEK (Monday)
-        const startOfWeek = new Date(startOfDay);
-        startOfWeek.setUTCDate(startOfDay.getUTCDate() - (startOfDay.getUTCDay() || 7) + 1);
-        const endOfWeek = new Date(startOfWeek);
-        endOfWeek.setUTCDate(startOfWeek.getUTCDate() + 7);
-
-        // MONTH
-        const startOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
-        const endOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
-
-        // YEAR
-        const startOfYear = new Date(Date.UTC(now.getUTCFullYear(), 0, 1));
-        const endOfYear = new Date(Date.UTC(now.getUTCFullYear() + 1, 0, 1));
 
         const groupAndProjectStage = () => ([
             {
@@ -105,25 +83,21 @@ module.exports.categorySummary = async (req, res, next) => {
             {
                 $facet: {
                     Daily: [
-                        { $match: { dateTime: { $gte: startOfDay, $lt: endOfDay } } },
+                        { $match: { dateTime: { $gte: daily.start, $lt: daily.end } } },
                         ...groupAndProjectStage()
                     ],
-
                     Weekly: [
-                        { $match: { dateTime: { $gte: startOfWeek, $lt: endOfWeek } } },
+                        { $match: { dateTime: { $gte: weekly.start, $lt: weekly.end } } },
                         ...groupAndProjectStage()
                     ],
-
                     Monthly: [
-                        { $match: { dateTime: { $gte: startOfMonth, $lt: endOfMonth } } },
+                        { $match: { dateTime: { $gte: monthly.start, $lt: monthly.end } } },
                         ...groupAndProjectStage()
                     ],
-
                     Yearly: [
-                        { $match: { dateTime: { $gte: startOfYear, $lt: endOfYear } } },
+                        { $match: { dateTime: { $gte: yearly.start, $lt: yearly.end } } },
                         ...groupAndProjectStage()
                     ],
-
                     All: [
                         ...groupAndProjectStage()
                     ]
@@ -131,7 +105,6 @@ module.exports.categorySummary = async (req, res, next) => {
             }
         ]);
 
-        console.log("summary", summary)
         return res.status(200).json({ message: "Category summary fetched successfully", data: summary });
 
     }
@@ -140,4 +113,44 @@ module.exports.categorySummary = async (req, res, next) => {
     }
 
 
+}
+
+module.exports.getTransactions = async (req, res, next) => {
+    const { categoryId } = req.params;
+    const user = req.user;
+    const { range } = req.query;
+
+    if (!user) {
+        return res.status(401).json({ message: "Unauthorized", error: "user not found" });
+    }
+
+    const { start, end } = getUTCRange(range);
+
+    try {
+        const categoryObjectId = new mongoose.Types.ObjectId(categoryId);
+
+        
+
+
+        const transactions = await transactionModel.find({
+            userId: user._id,
+            categoryId: categoryId,
+            isExpense: true,
+            dateTime: { $gte: start, $lt: end }
+        }).sort({ dateTime: -1 }).populate('categoryId').populate('accountId');
+
+        console.log("transaction", transactions)
+
+        return res.status(200).json({
+            message: "Transactions fetched successfully",
+            transactions : transactions
+        });
+    } catch (error) {
+        return res.status(500).json({
+            message: "Internal server error",
+            error: error.message
+        });
+
+
+    }
 }
