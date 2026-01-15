@@ -14,11 +14,11 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 
-const PieChart = ({ setCategoryData }) => {
+const PieChart = ({ setCategoryData, range, setRange }) => {
     const { selectedAccountId, loadingAccount } = useContext(AccountContext);
 
     const [data, setData] = useState({});
-    const [range, setRange] = useState('Monthly')
+    
 
     const fetchCategorySummary = async () => {
         try {
@@ -26,7 +26,7 @@ const PieChart = ({ setCategoryData }) => {
                 { withCredentials: true }
             )
             setData(response.data.data);
-            console.log('pie data', response.data)
+
         }
         catch (error) {
             console.log(error.response?.data?.message || "some")

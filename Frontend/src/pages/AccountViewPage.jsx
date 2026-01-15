@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react'
 import { useParams } from 'react-router-dom'
 import axios from 'axios'
-import { Switch } from "../components/ui/switch";
 import { toast } from 'react-hot-toast';
 import { ChevronUp, ChevronDown, Loader2, Trash2 } from 'lucide-react';
 import TransactionCard from '../components/TransactionCard';

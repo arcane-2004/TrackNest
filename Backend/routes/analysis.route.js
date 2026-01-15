@@ -5,4 +5,8 @@ const analysisController = require('../controllers/analysis.controller');
 
 router.get('/category-summary/:accountId', authMiddleware.authUser, analysisController.categorySummary);
 
+router.get('/category/get-transactions/:categoryId', authMiddleware.authUser, analysisController.getTransactions);
+
+router.get('/monthly-trend/:accountId', authMiddleware.authUser, analysisController.monthlyTrend);
+
 module.exports = router;

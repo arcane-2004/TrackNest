@@ -7,7 +7,8 @@ import CreateBudget from '../components/CreateBudget';
 import { AccountContext } from '../context/AccountContext';
 import axios from 'axios';
 import { Progress } from "@/components/ui/progress";
-import {toast} from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
+import SimpleGauge from '../components/ProgressGauge';
 
 
 
@@ -44,14 +45,14 @@ const Budget = () => {
 
 	// ------------- handleDelete to delete budget ----------
 	const handleDelete = async (budgetId) => {
-		try{
+		try {
 			const response = await axios.delete(`${import.meta.env.VITE_BASE_URL}/budget/delete-budget/${budgetId}`,
-				{withCredentials: true}
+				{ withCredentials: true }
 			)
 			toast.success(response.data.message);
 			fetchBudget();
 
-		}catch(error){
+		} catch (error) {
 			toast.error(error?.response?.data.message || "Something Went Wrong");
 		}
 	}
@@ -133,10 +134,14 @@ const Budget = () => {
 													value={percentUsed}
 													className="w-full mt-1"
 												/>
+												<SimpleGauge
+													percentage={percentUsed}
+												/>
 												<div className="flex justify-between text-sm text-zinc-400">
 													<span>{bgt.name}</span>
 													<span>{percentUsed.toFixed(1)}%</span>
 												</div>
+												
 											</div>
 											<div className="flex flex-col gap-4 items-center">
 												{/* Action buttons for edit and delete */}
@@ -144,16 +149,16 @@ const Budget = () => {
 													budget={bgt}
 													fetchBudget={fetchBudget}
 												>
-												<span className="text-orange-500 hover:text-orange-400 hover:scale-110 transition-transform duration-200 cursor-pointer"
-												>
-													<SquarePen/>
-												</span>
+													<span className="text-orange-500 hover:text-orange-400 hover:scale-110 transition-transform duration-200 cursor-pointer"
+													>
+														<SquarePen />
+													</span>
 												</CreateBudget>
 
 												<span className=" hover:text-red-500 hover:scale-110 transition-transform duration-200 cursor-pointer"
-												onClick={() => {handleDelete(bgt._id)}}
+													onClick={() => { handleDelete(bgt._id) }}
 												>
-													<Trash2/>
+													<Trash2 />
 												</span>
 											</div>
 										</div>

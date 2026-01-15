@@ -13,6 +13,7 @@ import AccountViewPage from "./pages/AccountViewPage"
 import PageNotFound from "./pages/PageNotFound"
 import Budget from "./pages/Budget"
 import Analysis from "./pages/Analysis"
+import FilteredTransactionPage from "./pages/FilteredTransactionPage"
 import { AccountProvider } from "./context/AccountContext"
 
 
@@ -37,6 +38,7 @@ function App() {
           </Route>
           <Route path="/budget" element={<Budget />} />
           <Route path="/analysis" element={<Analysis />} />
+          <Route path="/filtered/transactions/:categoryId" element={<FilteredTransactionPage/>} />
         </Routes>
       </AccountProvider>
     </>

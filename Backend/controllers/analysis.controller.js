@@ -129,7 +129,7 @@ module.exports.getTransactions = async (req, res, next) => {
     try {
         const categoryObjectId = new mongoose.Types.ObjectId(categoryId);
 
-        
+
 
 
         const transactions = await transactionModel.find({
@@ -139,11 +139,9 @@ module.exports.getTransactions = async (req, res, next) => {
             dateTime: { $gte: start, $lt: end }
         }).sort({ dateTime: -1 }).populate('categoryId').populate('accountId');
 
-        console.log("transaction", transactions)
-
         return res.status(200).json({
             message: "Transactions fetched successfully",
-            transactions : transactions
+            transactions: transactions
         });
     } catch (error) {
         return res.status(500).json({
@@ -153,4 +151,62 @@ module.exports.getTransactions = async (req, res, next) => {
 
 
     }
+}
+
+module.exports.monthlyTrend = async (req, res, next) => {
+    const { accountId } = req.params;
+    const user = req.user;
+
+    const year = Number(req.query.year);
+    const now = new Date();
+
+    const selectedYear = year || now.getUTCFullYear();
+
+    const startOfYear = new Date(Date.UTC(selectedYear, 0, 1));
+    const endOfYear = new Date(Date.UTC(selectedYear + 1, 0, 1));
+
+    try {
+        const accountObjectId = new mongoose.Types.ObjectId(accountId);
+
+        const dailySpending = await transactionModel.aggregate([
+            {
+                $match: {
+                    userId: user._id,
+                    accountId: accountObjectId,
+                    isExpense: true,
+                    dateTime: {
+                        $gte: startOfYear,
+                        $lt: endOfYear
+                    }
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        $dateToString: {
+                            format: "%Y-%m-%d",
+                            date: "$dateTime"
+                        }
+                    },
+                    total: { $sum: { $abs: "$amount" } }
+                }
+            },
+            {
+                $project: {
+                    _id: 0,
+                    date: "$_id",
+                    total: 1
+                }
+            },
+            { $sort: { date: 1 } }
+        ]);
+        console.log("daily", dailySpending)
+
+        return res.status(200).json({dailySpending: dailySpending});
+
+    }
+    catch (error) {
+        return res.status(500).json({ message: "Internal server error", error: error.message });
+    }
+
 }

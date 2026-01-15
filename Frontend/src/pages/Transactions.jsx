@@ -1,14 +1,12 @@
 "use client";
 import React, { useState, useEffect, useMemo, useContext } from "react";
 import Sidebar from "../components/Sidebar";
-import { LogOut } from "lucide-react";
+import { LogOut,  ChevronUp, ChevronDown, Loader2 } from "lucide-react";
 import { useHandleLogout } from "../utils/user.hooks";
 import axios from "axios";
-import { ChevronUp, ChevronDown, Loader2 } from 'lucide-react';
 import CreateTransaction from "../components/createTransaction";
 import toast from 'react-hot-toast'
 import TransactionCard from "../components/TransactionCard"
-import { ScrollArea } from '../components/ui/scroll-area'
 import { AccountContext } from "../context/AccountContext"
 
 import {
@@ -52,6 +50,8 @@ const Transactions = () => {
 				{ withCredentials: true }
 			);
 			setTransactions(response.data.transactions || []);
+
+			console.log("tra", response.data.transactions)
 		} catch (error) {
 			console.error(error.response?.data.message || "Something went wrong");
 		} finally {
@@ -69,7 +69,7 @@ const Transactions = () => {
 	const onSuccess = () => {
 		fetchTransactions();
 	}
-
+	console.log("tra2", transactions)
 
 	const handelDelete = async (id) => {
 
@@ -116,6 +116,7 @@ const Transactions = () => {
 		return sorted;
 
 	}, [transactions, sortConfig, typeFilter]);
+	console.log('sorted', sortedTransactions)
 
 	const handleSort = (field) => {
 		setSortConfig((current) => ({
