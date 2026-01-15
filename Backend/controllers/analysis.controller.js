@@ -168,12 +168,11 @@ module.exports.monthlyTrend = async (req, res, next) => {
     try {
         const accountObjectId = new mongoose.Types.ObjectId(accountId);
 
-        const dailySpending = await transactionModel.aggregate([
+        const dailySummary = await transactionModel.aggregate([
             {
                 $match: {
                     userId: user._id,
                     accountId: accountObjectId,
-                    isExpense: true,
                     dateTime: {
                         $gte: startOfYear,
                         $lt: endOfYear
@@ -181,28 +180,57 @@ module.exports.monthlyTrend = async (req, res, next) => {
                 }
             },
             {
-                $group: {
-                    _id: {
-                        $dateToString: {
-                            format: "%Y-%m-%d",
-                            date: "$dateTime"
+                $facet: {
+                    expense: [
+                        { $match: { isExpense: true } },
+                        {
+                            $group: {
+                                _id: {
+                                    $dateToString: {
+                                        format: "%Y-%m-%d",
+                                        date: "$dateTime"
+                                    }
+                                },
+                                total: { $sum: { $abs: "$amount" } }
+                            }
+                        },
+                        {
+                            $project: {
+                                _id: 0,
+                                date: "$_id",
+                                title: "$total",
+                                color: '#E31212'
+                            }
                         }
-                    },
-                    total: { $sum: { $abs: "$amount" } }
-                }
-            },
-            {
-                $project: {
-                    _id: 0,
-                    date: "$_id",
-                    total: 1
-                }
-            },
-            { $sort: { date: 1 } }
-        ]);
-        console.log("daily", dailySpending)
+                    ],
 
-        return res.status(200).json({dailySpending: dailySpending});
+                    income: [
+                        { $match: { isExpense: false } },
+                        {
+                            $group: {
+                                _id: {
+                                    $dateToString: {
+                                        format: "%Y-%m-%d",
+                                        date: "$dateTime"
+                                    }
+                                },
+                                total: { $sum: "$amount" }
+                            }
+                        },
+                        {
+                            $project: {
+                                _id: 0,
+                                date: "$_id",
+                                title: "$total",
+                                color: '#3AD611'
+                            }
+                        }
+                    ]
+                }
+            }
+        ]);
+
+        return res.status(200).json({ dailySummary: dailySummary });
 
     }
     catch (error) {

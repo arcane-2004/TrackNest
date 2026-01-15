@@ -10,7 +10,8 @@ const CalendarView = () => {
 	// ----------------- Fetching and making data for events ------------------------
 	const { selectedAccountId, loadingAccount } = useContext(AccountContext);
 
-	const [dailySpending, setDailySpending] = useState([])
+	const [dailyExpense, setDailyExpense] = useState([])
+	const [dailyIncome, setDailyIncome] = useState([])
 
 	const fetchCalenderData = async () => {
 
@@ -18,8 +19,10 @@ const CalendarView = () => {
 			const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/analysis/monthly-trend/${selectedAccountId}?year=2025`,
 				{ withCredentials: true }
 			)
-			setDailySpending(response.data.dailySpending);
-			console.log('spending', response.data.dailySpending)
+			console.log('response',response.data)
+			setDailyExpense(response.data.dailySummary[0].expense)
+			setDailyIncome(response.data.dailySummary[0].income)
+
 		}
 		catch (error) {
 			console.log(error)
@@ -27,11 +30,11 @@ const CalendarView = () => {
 	}
 
 	// /-------------- Changing the dailySpending to events format ------------
-	const eventData = dailySpending.map((event) => ({
-		...event,
-		title: event.total,
-		color: '#ED0C0C'
-	}))
+	// const eventData = dailySpending.map((event) => ({
+	// 	...event,
+	// 	title: event.total,
+	// 	color: '#ED0C0C'
+	// }))
 
 	useEffect(() => {
 		if (selectedAccountId && !loadingAccount) {
@@ -39,7 +42,8 @@ const CalendarView = () => {
 		}
 	}, [selectedAccountId, loadingAccount])
 
-
+console.log('ex', dailyExpense)
+console.log('in', dailyIncome)
 	// ================ calendar =====================
 	// const events = [
 	// 	{ title: 'Product Review', date: '2026-01-14' },
@@ -54,12 +58,12 @@ const CalendarView = () => {
 
 	// Group events by date
 	const eventMap = useMemo(() => {
-		return eventData.reduce((acc, e) => {
+		return [...dailyExpense, ...dailyIncome].reduce((acc, e) => {
 			acc[e.date] = acc[e.date] || []
 			acc[e.date].push(e)
 			return acc
 		}, {})
-	}, [eventData])
+	}, [dailyExpense, dailyIncome])
 	console.log('eventmap', eventMap)
 	const today = new Date().toISOString().split('T')[0]
 
@@ -122,7 +126,7 @@ const CalendarView = () => {
 								{eventMap[key]?.map((e, idx) => (
 									<div
 										key={idx}
-										className="text-xs h-[3vh] w-full rounded-2xl truncate"
+										className="mt-1.5 text-xs h-[3vh] w-full rounded-2xl truncate"
 										style={{
 											background: `${e.color}10`,
 											color: `${e.color}`
