@@ -7,6 +7,8 @@ import PieChart from '../components/PieChart';
 import { Icons } from '../assets/CategoryIcons';
 import { Link } from "react-router-dom";
 import Calendar from '../components/Calendar';
+import TinyAreaChart from '../components/AreaChart';
+import TinyBarChart from '../components/BarGraph';
 
 const Analysis = () => {
 
@@ -14,8 +16,12 @@ const Analysis = () => {
 
 	const [categoryData, setCategoryData] = useState([]);
 	const [range, setRange] = useState('Monthly')
+	const [monthSummary, setMonthSummary] = useState([]);
+	const [dailyExpense, setDailyExpense] = useState([]);
+	const [dailyIncome, setDailyIncome] = useState([]);
 
-
+	console.log('dailyExpense', dailyExpense)
+	console.log('daily ', dailyIncome)
 
 	return (
 
@@ -107,9 +113,55 @@ const Analysis = () => {
 					</div>
 
 					{/* ----------------------- Calendar view ---------------------			 */}
-					<div className='mt-8 '>
-						<Calendar/>
+					<div className="mt-10 flex w-full gap-10">
+						{/* Calendar section */}
+						<div className="w-3/5 rounded-2xl ">
+							<Calendar
+								setMonthSummary={setMonthSummary}
+								setCurrentMonthDailyExpense={setDailyExpense}
+								setCurrentMonthDailyIncome={setDailyIncome}
+							/>
+						</div>
+
+						{/* Stats + charts */}
+						<div className="flex w-2/5 flex-col gap-6">
+
+							{/* Income Card */}
+							<div className="group relative rounded-2xl border border-zinc-800 bg-gradient-to-br from-violet-500/50 to-zinc-900 p-5 shadow-lg transition hover:shadow-emerald-500/10 ">
+								<div className="mb-3 flex items-center justify-between">
+									<span className="text-sm uppercase tracking-wide text-zinc-400">
+										Income
+									</span>
+									<span className="text-xl font-semibold text-emerald-400">
+										₹{monthSummary.income}
+									</span>
+								</div>
+
+								<div className="h-[120px]">
+									<TinyAreaChart data={dailyIncome} />
+								</div>
+							</div>
+
+							{/* Expense Card */}
+							<div className="group relative rounded-2xl border border-zinc-800 p-3 h-[25vh]">
+								<div className="mb-3 flex items-center justify-between">
+									<span className="text-sm uppercase tracking-wide text-zinc-400">
+										Expense
+									</span>
+
+								</div>
+								<span className="text-xl font-semibold text-rose-400 text-center">
+									₹{monthSummary.expense}
+								</span>
+
+								<div className="h-[20vh]">
+									<TinyBarChart data={dailyExpense} />
+								</div>
+							</div>
+
+						</div>
 					</div>
+
 
 				</div>
 			</div>

@@ -4,57 +4,74 @@ import axios from 'axios'
 import { AccountContext } from '../context/AccountContext';
 import { getMonthGrid } from '../utils/calendar'
 import { DotOutline } from '@phosphor-icons/react';
-import { ChevronRight, ChevronLeft} from 'lucide-react';
-const CalendarView = () => {
+import { ChevronRight, ChevronLeft } from 'lucide-react';
+
+
+
+const CalendarView = ({setMonthSummary, setCurrentMonthDailyExpense, setCurrentMonthDailyIncome}) => {
 
 	// ----------------- Fetching and making data for events ------------------------
 	const { selectedAccountId, loadingAccount } = useContext(AccountContext);
 
 	const [dailyExpense, setDailyExpense] = useState([])
 	const [dailyIncome, setDailyIncome] = useState([])
+	
 
 	const fetchCalenderData = async () => {
 
 		try {
-			const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/analysis/monthly-trend/${selectedAccountId}?year=2025`,
+			const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/analysis/monthly-trend/${selectedAccountId}?year=${year}`,
 				{ withCredentials: true }
 			)
-			console.log('response',response.data)
 			setDailyExpense(response.data.dailySummary[0].expense)
 			setDailyIncome(response.data.dailySummary[0].income)
 
 		}
 		catch (error) {
-			console.log(error)
+			console.log(error?.response?.data)
 		}
 	}
 
-	// /-------------- Changing the dailySpending to events format ------------
-	// const eventData = dailySpending.map((event) => ({
-	// 	...event,
-	// 	title: event.total,
-	// 	color: '#ED0C0C'
-	// }))
 
-	useEffect(() => {
-		if (selectedAccountId && !loadingAccount) {
-			fetchCalenderData();
+
+	// ---------------------- get Monthly income and expense ----------------------
+	const fetchMonthSummary = async () => {
+		try {
+			const response = await axios.get(
+				`${import.meta.env.VITE_BASE_URL}/analysis/month-summary/${selectedAccountId}?year=${year}&month=${month}`,
+				{ withCredentials: true }
+			);
+			
+			setMonthSummary(response.data.monthSummary);
+			setCurrentMonthDailyExpense(response.data.dailyExpense);
+			setCurrentMonthDailyIncome(response.data.dailyIncome)
+		} catch (error) {
+			console.error(error);
 		}
-	}, [selectedAccountId, loadingAccount])
+	};
 
-console.log('ex', dailyExpense)
-console.log('in', dailyIncome)
+
 	// ================ calendar =====================
-	// const events = [
-	// 	{ title: 'Product Review', date: '2026-01-14' },
-	// 	{ title: 'Project Milestone', date: '2026-01-22' },
-	// ]
+
 	const [current, setCurrent] = useState(new Date())
 
 	const year = current.getFullYear()
 	const month = current.getMonth()
 
 	const days = getMonthGrid(year, month)
+
+	useEffect(() => {
+		if (selectedAccountId && !loadingAccount) {
+			fetchMonthSummary();
+		}
+	}, [year, month, selectedAccountId, loadingAccount]);
+
+	useEffect(() => {
+		if (selectedAccountId && !loadingAccount) {
+			fetchCalenderData();
+		}
+	}, [year, selectedAccountId, loadingAccount])
+
 
 	// Group events by date
 	const eventMap = useMemo(() => {
@@ -64,13 +81,13 @@ console.log('in', dailyIncome)
 			return acc
 		}, {})
 	}, [dailyExpense, dailyIncome])
-	console.log('eventmap', eventMap)
+
 	const today = new Date().toISOString().split('T')[0]
 
 
 	return (
 
-		<div className="w-3/5 mx-auto p-6 rounded-2xl border border-[#1c1d22] text-zinc-200">
+		<div className="  p-6 rounded-2xl border border-[#1c1d22] text-zinc-200">
 
 			{/* Header */}
 			<div className="flex items-center justify-between mb-6">
@@ -78,7 +95,7 @@ console.log('in', dailyIncome)
 					onClick={() => setCurrent(new Date(year, month - 1))}
 					className="w-9 h-9 rounded-full bg-[#0a0f12] hover:bg-zinc-700 flex justify-center items-center"
 				>
-					<ChevronLeft className='text-[#562ca2]'/>
+					<ChevronLeft className='text-[#8e51ff]' />
 				</button>
 
 				<h2 className="text-lg font-semibold">
@@ -89,7 +106,7 @@ console.log('in', dailyIncome)
 					onClick={() => setCurrent(new Date(year, month + 1))}
 					className="w-9 h-9 rounded-full bg-[#0a0f12] hover:bg-zinc-700 flex justify-center items-center"
 				>
-					<ChevronRight className='text-[#562ca2]'/>
+					<ChevronRight className='text-[#8e51ff]' />
 				</button>
 			</div>
 
@@ -111,9 +128,9 @@ console.log('in', dailyIncome)
 					return (
 						<div
 							key={i}
-							className={`relative h-25 p-2
+							className={`relative h-25 p-2 
                 ${d.currentMonth ? 'bg-[#0a0f12]' : 'bg-transparent'}
-                ${isToday && 'ring-2 ring-violet-500 bg-[#100e1e]'}
+                ${isToday && 'border-2 border-[#8e51ff] bg-[#100e1e]'}
               `}
 						>
 							{/* Date */}
@@ -133,7 +150,7 @@ console.log('in', dailyIncome)
 										}}
 									>
 										<div className='h-full w-full flex gap-0 items-center'>
-											<DotOutline className='size-8'/>
+											<DotOutline className='size-8' />
 											<span>{e.title}</span>
 										</div>
 									</div>

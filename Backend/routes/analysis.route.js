@@ -9,4 +9,6 @@ router.get('/category/get-transactions/:categoryId', authMiddleware.authUser, an
 
 router.get('/monthly-trend/:accountId', authMiddleware.authUser, analysisController.monthlyTrend);
 
+router.get('/month-summary/:accountId', authMiddleware.authUser, analysisController.monthSummary);
+
 module.exports = router;

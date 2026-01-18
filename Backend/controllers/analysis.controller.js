@@ -215,7 +215,8 @@ module.exports.monthlyTrend = async (req, res, next) => {
                                     }
                                 },
                                 total: { $sum: "$amount" }
-                            }
+                            },
+
                         },
                         {
                             $project: {
@@ -238,3 +239,117 @@ module.exports.monthlyTrend = async (req, res, next) => {
     }
 
 }
+
+module.exports.monthSummary = async (req, res) => {
+    const { accountId } = req.params;
+    const user = req.user;
+    const { year, month } = req.query;
+    console.log(year, month)
+
+    if (!user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const start = new Date(Date.UTC(+year, +month, 1));
+    const end   = new Date(Date.UTC(+year, +month+1 , 0));
+
+    console.log('seart', start)
+    console.log('end', end)
+    const accountObjectId = new mongoose.Types.ObjectId(accountId);
+
+    try {
+        const result = await transactionModel.aggregate([
+            {
+                $match: {
+                    userId: user._id,
+                    accountId: accountObjectId,
+                    dateTime: { $gte: start, $lt: end }
+                }
+            },
+            {
+                $facet: {
+
+                    // 🔹 Monthly totals
+                    monthSummary: [
+                        {
+                            $group: {
+                                _id: null,
+                                expense: {
+                                    $sum: {
+                                        $cond: ["$isExpense", "$amount", 0]
+                                    }
+                                },
+                                income: {
+                                    $sum: {
+                                        $cond: [{ $eq: ["$isExpense", false] }, "$amount", 0]
+                                    }
+                                }
+                            }
+                        },
+                        { $project: { _id: 0 } }
+                    ],
+
+                    // 🔹 Daily expense array
+                    dailyExpense: [
+                        { $match: { isExpense: true } },
+                        {
+                            $group: {
+                                _id: {
+                                    $dateToString: {
+                                        format: "%Y-%m-%d",
+                                        date: "$dateTime"
+                                    }
+                                },
+                                total: { $sum: { $abs : "$amount"} }
+                            }
+                        },
+                        {
+                            $project: {
+                                _id: 0,
+                                date: "$_id",
+                                total: 1
+                            }
+                        },
+                        { $sort: { date: 1 } }
+                    ],
+
+                    // 🔹 Daily income array
+                    dailyIncome: [
+                        { $match: { isExpense: false } },
+                        {
+                            $group: {
+                                _id: {
+                                    $dateToString: {
+                                        format: "%Y-%m-%d",
+                                        date: "$dateTime"
+                                    }
+                                },
+                                total: { $sum: "$amount" }
+                            }
+                        },
+                        {
+                            $project: {
+                                _id: 0,
+                                date: "$_id",
+                                total: 1
+                            }
+                        },
+                        { $sort: { date: 1 } }
+                    ]
+                }
+            }
+        ]);
+
+        return res.status(200).json({
+            monthSummary: result[0].monthSummary[0] || { expense: 0, income: 0 },
+            dailyExpense: result[0].dailyExpense,
+            dailyIncome: result[0].dailyIncome
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            message: "Internal server error",
+            error: error.message
+        });
+    }
+};
