@@ -95,7 +95,7 @@ const CalendarView = ({setMonthSummary, setCurrentMonthDailyExpense, setCurrentM
 					onClick={() => setCurrent(new Date(year, month - 1))}
 					className="w-9 h-9 rounded-full bg-[#0a0f12] hover:bg-zinc-700 flex justify-center items-center"
 				>
-					<ChevronLeft className='text-[#8e51ff]' />
+					<ChevronLeft className='text-[#ED790C]' />
 				</button>
 
 				<h2 className="text-lg font-semibold">
@@ -106,7 +106,7 @@ const CalendarView = ({setMonthSummary, setCurrentMonthDailyExpense, setCurrentM
 					onClick={() => setCurrent(new Date(year, month + 1))}
 					className="w-9 h-9 rounded-full bg-[#0a0f12] hover:bg-zinc-700 flex justify-center items-center"
 				>
-					<ChevronRight className='text-[#8e51ff]' />
+					<ChevronRight className='text-[#ED790C]' />
 				</button>
 			</div>
 
@@ -130,8 +130,9 @@ const CalendarView = ({setMonthSummary, setCurrentMonthDailyExpense, setCurrentM
 							key={i}
 							className={`relative h-25 p-2 
                 ${d.currentMonth ? 'bg-[#0a0f12]' : 'bg-transparent'}
-                ${isToday && 'border-2 border-[#8e51ff] bg-[#100e1e]'}
+                ${isToday && 'border-2 border-[#ED790C] bg-[#17140A]'}
               `}
+			//   border-[#8e51ff] bg-[#100e1e]
 						>
 							{/* Date */}
 							<span className="absolute top-2 right-2 text-sm">

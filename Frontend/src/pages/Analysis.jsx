@@ -127,35 +127,50 @@ const Analysis = () => {
 						<div className="flex w-2/5 flex-col gap-6">
 
 							{/* Income Card */}
-							<div className="group relative rounded-2xl border border-zinc-800 bg-gradient-to-br from-violet-500/50 to-zinc-900 p-5 shadow-lg transition hover:shadow-emerald-500/10 ">
-								<div className="mb-3 flex items-center justify-between">
-									<span className="text-sm uppercase tracking-wide text-zinc-400">
-										Income
-									</span>
-									<span className="text-xl font-semibold text-emerald-400">
-										₹{monthSummary.income}
-									</span>
-								</div>
+							<div className="group relative rounded-2xl border border-zinc-800 w-4/5 py-2 px-1 h-[23vh] flex flex-col justify-between">
+								<div>
+									<div>
+										<span className="mb-3 text-sm tracking-wide text-zinc-400">
+											Month Income
+										</span>
 
-								<div className="h-[120px]">
-									<TinyAreaChart data={dailyIncome} />
+										<span className="text-xl font-semibold text-emerald-400 flex justify-center">
+											₹{monthSummary.income}
+										</span>
+
+									</div>
+
+									<div className="h-[125px] ">
+										<TinyAreaChart
+											data={dailyIncome}
+											stroke="#06B6D4"
+											fill="#06B6D4"
+										/>
+									</div>
 								</div>
 							</div>
 
 							{/* Expense Card */}
-							<div className="group relative rounded-2xl border border-zinc-800 p-3 h-[25vh]">
-								<div className="mb-3 flex items-center justify-between">
-									<span className="text-sm uppercase tracking-wide text-zinc-400">
-										Expense
+							<div className="group relative rounded-2xl border border-zinc-800  w-4/5 py-2 px-1 h-[23vh] flex flex-col justify-between">
+								<div>
+									<div className="mb-3 flex items-center justify-between">
+										<span className="text-sm tracking-wide text-zinc-400">
+											Month Expense
+										</span>
+
+									</div>
+
+									<span className="text-xl font-semibold text-[#ED0C0C] flex justify-center">
+										₹{monthSummary.expense}
 									</span>
 
 								</div>
-								<span className="text-xl font-semibold text-rose-400 text-center">
-									₹{monthSummary.expense}
-								</span>
-
-								<div className="h-[20vh]">
-									<TinyBarChart data={dailyExpense} />
+								<div className="h-[125px] ">
+									<TinyAreaChart
+										data={dailyExpense}
+										stroke="#FB7185"
+										fill="#FB7185"
+									/>
 								</div>
 							</div>
 
