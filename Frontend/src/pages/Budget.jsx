@@ -124,24 +124,19 @@ const Budget = () => {
 								return (
 									<div key={bgt._id} className=" mb-2 rounded-2xl border border-gray-700 bg-[#1a1a1a1a] ">
 										<div className="p-4 flex justify-between items-center gap-10">
-											<div className="w-full " >
-												<h3 className="text-lg font-semibold">{bgt.categoryId}</h3>
-												<p className="text-sm text-gray-400">Limit: ₹{bgt.limit}</p>
-												<p className="text-sm text-gray-400">Period: {bgt.period}</p>
-												<p className="text-sm text-gray-400">Current Expense: ₹{currentExpenses?.[bgt?.period] || 0}</p>
+											<div className="w-full flex items-center gap-20" >
 
-												<Progress
-													value={percentUsed}
-													className="w-full mt-1"
-												/>
-												<SimpleGauge
-													percentage={percentUsed}
-												/>
-												<div className="flex justify-between text-sm text-zinc-400">
-													<span>{bgt.name}</span>
-													<span>{percentUsed.toFixed(1)}%</span>
+												<div>
+													<h3 className="text-lg font-semibold">{bgt.categoryId}</h3>
+													<p className="text-sm text-gray-400">Limit: ₹{bgt.limit}</p>
+													<p className="text-sm text-gray-400">Period: {bgt.period}</p>
+													<p className="text-sm text-gray-400">Current Expense: ₹{currentExpenses?.[bgt?.period] || 0}</p>
 												</div>
-												
+												<div className='flex justify-center w-[65%]'> 
+													<SimpleGauge
+														value={percentUsed}
+													/>
+												</div>
 											</div>
 											<div className="flex flex-col gap-4 items-center">
 												{/* Action buttons for edit and delete */}
