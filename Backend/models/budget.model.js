@@ -11,18 +11,23 @@ const BudgetSchema = new mongoose.Schema({
         ref: 'Account'
     },
 
-    isCategoryBudget: {
-        type: Boolean,
-        default: false
+    scope: {
+        type: String,
+        enum: ['overall', 'category'],
+        default: 'overall'
     },
 
     categoryId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Category'
+        ref: 'Category',
+        required: function () {
+            return this.scope === 'category';
+        }
     },
 
     limit: {
         type: Number,
+        required: true,
     },
 
     period: {
@@ -51,6 +56,47 @@ const BudgetSchema = new mongoose.Schema({
         toJSON: { virtuals: true, getters: true },
         toObject: { virtuals: true, getters: true }
     })
+
+
+BudgetSchema.statics.getDateRange = async function(period) {
+    const now = new Date();
+
+    switch (period) {
+        case "Daily": {
+            const start = new Date(Date.UTC(
+                now.getUTCFullYear(),
+                now.getUTCMonth(),
+                now.getUTCDate()
+            ));
+            const end = new Date(start);
+            end.setUTCDate(start.getUTCDate() + 1);
+            return { start, end };
+        }
+
+        case "Weekly": {
+            const start = new Date(Date.UTC(
+                now.getUTCFullYear(),
+                now.getUTCMonth(),
+                now.getUTCDate() - (now.getUTCDay() || 7) + 1
+            ));
+            const end = new Date(start);
+            end.setUTCDate(start.getUTCDate() + 7);
+            return { start, end };
+        }
+
+        case "Monthly": {
+            const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+            const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
+            return { start, end };
+        }
+
+        case "Yearly": {
+            const start = new Date(Date.UTC(now.getUTCFullYear(), 0, 1));
+            const end = new Date(Date.UTC(now.getUTCFullYear() + 1, 0, 1));
+            return { start, end };
+        }
+    }
+}
 
 
 

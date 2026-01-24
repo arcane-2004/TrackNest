@@ -9,14 +9,13 @@ import axios from 'axios';
 import { Progress } from "@/components/ui/progress";
 import { toast } from 'react-hot-toast';
 import SimpleGauge from '../components/ProgressGauge';
-
+import { Icons } from "../assets/CategoryIcons"
 
 
 const Budget = () => {
 	const handleLogout = useHandleLogout();
 
-	const [budget, setBudget] = useState([]);
-	const [currentExpenses, setCurrentExpenses] = useState({})
+	const [budgets, setBudgets] = useState([]);
 
 	const { selectedAccountId, loadingAccount } = useContext(AccountContext);
 
@@ -26,9 +25,8 @@ const Budget = () => {
 			const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/budget/get-budget/${selectedAccountId}`, {
 				withCredentials: true
 			})
-			setBudget(response.data.budget);
-			setCurrentExpenses(response.data.expenses);
-
+			setBudgets(response.data.budgets);
+			console.log('res', response.data.budgets)
 		}
 		catch (error) {
 			console.log(error.response?.data);
@@ -109,57 +107,101 @@ const Budget = () => {
 
 				{/* main content */}
 				<div>
-					{budget.length === 0 ? (
+					{budgets.length === 0 ? (
 						<div className="mt-20 text-center text-gray-400">
 							No budget set yet. Click "Add Budget" to create one.
 						</div>
 					) : (
 						<div>
-							{budget.map((bgt) => {
-								const used = currentExpenses?.[bgt.period] ?? 0;
+							{budgets.map((bgt) => (
 
-								const percentUsed = bgt.limit
-									? Math.min((used / bgt.limit) * 100, 100)
-									: 0;
-								return (
-									<div key={bgt._id} className=" mb-2 rounded-2xl border border-gray-700 bg-[#1a1a1a1a] ">
-										<div className="p-4 flex justify-between items-center gap-10">
-											<div className="w-full flex items-center gap-20" >
+								<div
+									key={bgt._id}
+									className="mb-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 hover:border-white/40 hover:shadow-xl hover:shadow-white/10 transition-colors"
+								>
+									<div className="p-5 flex items-center justify-between gap-6">
 
-												<div>
-													<h3 className="text-lg font-semibold">{bgt.categoryId}</h3>
-													<p className="text-sm text-gray-400">Limit: ₹{bgt.limit}</p>
-													<p className="text-sm text-gray-400">Period: {bgt.period}</p>
-													<p className="text-sm text-gray-400">Current Expense: ₹{currentExpenses?.[bgt?.period] || 0}</p>
+										{/* LEFT: Budget info */}
+										<div className="flex items-start gap-6 w-full">
+
+											<div className="min-w-[220px]">
+												<div className="flex items-center gap-3">
+													<div
+														className="h-10 w-10 rounded-full flex items-center justify-center border"
+														style={{
+															color: bgt.categoryId?.color,
+															backgroundColor: `${bgt.categoryId?.color}22`,
+															borderColor: `${bgt.categoryId?.color}55`,
+														}}
+													>
+														{bgt.categoryId?.icon && Icons[bgt.categoryId.icon] ? (
+															(() => {
+																const Icon = Icons[bgt.categoryId.icon];
+																return <Icon className="h-6 w-6" />;
+															})()
+														) : (
+															<span className="text-sm font-semibold">₹</span> // fallback
+														)}
+													</div>
+
+													<h3 className="text-lg font-semibold text-white">
+														{bgt.categoryId?.name || "Overall Budget"}
+													</h3>
 												</div>
-												<div className='flex justify-center w-[65%]'> 
-													<SimpleGauge
-														value={percentUsed}
-													/>
+
+
+												<p className="mt-1 text-sm text-zinc-400">
+													Period: <span className="text-zinc-300">{bgt.period}</span>
+												</p>
+
+												<div className="mt-3 space-y-1">
+													<p className="text-sm text-zinc-400">
+														Limit:
+														<span className="ml-1 font-medium text-zinc-200">
+															₹{bgt.limit}
+														</span>
+													</p>
+
+													<p className="text-sm text-zinc-400">
+														Spent:
+														<span
+															className={`ml-1 font-medium ${bgt.spent > bgt.limit
+																? "text-red-500"
+																: "text-orange-400"
+																}`}
+														>
+															₹{bgt.spent || 0}
+														</span>
+													</p>
 												</div>
 											</div>
-											<div className="flex flex-col gap-4 items-center">
-												{/* Action buttons for edit and delete */}
-												<CreateBudget
-													budget={bgt}
-													fetchBudget={fetchBudget}
-												>
-													<span className="text-orange-500 hover:text-orange-400 hover:scale-110 transition-transform duration-200 cursor-pointer"
-													>
-														<SquarePen />
-													</span>
-												</CreateBudget>
 
-												<span className=" hover:text-red-500 hover:scale-110 transition-transform duration-200 cursor-pointer"
-													onClick={() => { handleDelete(bgt._id) }}
-												>
-													<Trash2 />
-												</span>
+											{/* CENTER: Gauge */}
+											<div className="flex-1 flex justify-center">
+												<SimpleGauge value={bgt.percentUsed} />
 											</div>
 										</div>
+
+										{/* RIGHT: Actions */}
+										<div className="flex flex-col items-center gap-3 pl-4 border-l border-zinc-800">
+											<CreateBudget budget={bgt} fetchBudget={fetchBudget}>
+												<button className="p-2 rounded-lg text-orange-500 hover:text-orange-400 hover:bg-orange-500/10 transition">
+													<SquarePen size={18} />
+												</button>
+											</CreateBudget>
+
+											<button
+												onClick={() => handleDelete(bgt._id)}
+												className="p-2 rounded-lg text-zinc-400 hover:text-red-500 hover:bg-red-500/10 transition"
+											>
+												<Trash2 size={18} />
+											</button>
+										</div>
 									</div>
-								)
-							})}
+								</div>
+
+
+							))}
 						</div>
 					)}
 				</div>

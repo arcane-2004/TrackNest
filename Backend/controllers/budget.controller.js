@@ -19,10 +19,10 @@ module.exports.createBudget = async (req, res, next) => {
         const newBudget = await budgetService.createBudget({
             userId: user._id,
             accountId: accountId,
+            categoryId,
             isCategoryBudget: isCategoryBudget,
             limit: limit,
             period: period,
-            categoryId,
         })
 
         return res.status(201).json({ budget: newBudget, message: "Budget created successfully" })
@@ -40,87 +40,113 @@ module.exports.getBudget = async (req, res, next) => {
     if (!user) {
         return res.status(401).json({ message: "Unauthorized", error: "user not found" })
     }
+
+    // ------------- resolve date range -----------------
+    // function getDateRange(period) {
+    //     const now = new Date();
+
+    //     switch (period) {
+    //         case "Daily": {
+    //             const start = new Date(Date.UTC(
+    //                 now.getUTCFullYear(),
+    //                 now.getUTCMonth(),
+    //                 now.getUTCDate()
+    //             ));
+    //             const end = new Date(start);
+    //             end.setUTCDate(start.getUTCDate() + 1);
+    //             return { start, end };
+    //         }
+
+    //         case "Weekly": {
+    //             const start = new Date(Date.UTC(
+    //                 now.getUTCFullYear(),
+    //                 now.getUTCMonth(),
+    //                 now.getUTCDate() - (now.getUTCDay() || 7) + 1
+    //             ));
+    //             const end = new Date(start);
+    //             end.setUTCDate(start.getUTCDate() + 7);
+    //             return { start, end };
+    //         }
+
+    //         case "Monthly": {
+    //             const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
+    //             const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
+    //             return { start, end };
+    //         }
+
+    //         case "Yearly": {
+    //             const start = new Date(Date.UTC(now.getUTCFullYear(), 0, 1));
+    //             const end = new Date(Date.UTC(now.getUTCFullYear() + 1, 0, 1));
+    //             return { start, end };
+    //         }
+    //     }
+    // }
+
+
     try {
 
-        const budget = await budgetModel.find({ accountId: accountId, userId: user._id });
-        if (!budget) {
+        const budgets = await budgetModel.find({ accountId: accountId, userId: user._id }).populate('categoryId');
+        if (!budgets) {
             return res.status(404).json({ message: "Budget not found." })
         }
-
-        const now = new Date();
-
-        // DAY
-        const startOfDay = new Date(Date.UTC(
-            now.getUTCFullYear(),
-            now.getUTCMonth(),
-            now.getUTCDate()
-        ));
-        const endOfDay = new Date(Date.UTC(
-            now.getUTCFullYear(),
-            now.getUTCMonth(),
-            now.getUTCDate() + 1
-        ));
-
-        // WEEK (Monday)
-        const startOfWeek = new Date(startOfDay);
-        startOfWeek.setUTCDate(startOfDay.getUTCDate() - (startOfDay.getUTCDay() || 7) + 1);
-        const endOfWeek = new Date(startOfWeek);
-        endOfWeek.setUTCDate(startOfWeek.getUTCDate() + 7);
-
-        // MONTH
-        const startOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
-        const endOfMonth = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
-
-        // YEAR
-        const startOfYear = new Date(Date.UTC(now.getUTCFullYear(), 0, 1));
-        const endOfYear = new Date(Date.UTC(now.getUTCFullYear() + 1, 0, 1));
-
-        // ---------- Aggregation ----------
         const accountObjectId = new mongoose.Types.ObjectId(accountId);
-        const result = await transactionModel.aggregate([
-            {
-                $match: {
-                    accountId: accountObjectId,
+
+        // Evaluate each budget
+        const budgetArray = await Promise.all(
+            budgets.map(async (budget) => {
+
+                const { start, end } = await budgetModel.getDateRange(budget.period);
+
+                const match = {
                     userId: user._id,
-                    isExpense: true
-                }
-            },
-            {
-                $facet: {
-                    Daily: [
-                        { $match: { dateTime: { $gte: startOfDay, $lt: endOfDay } } },
-                        { $group: { _id: null, total: { $sum: { $abs: "$amount" } } } }
-                    ],
-                    Weekly: [
-                        { $match: { dateTime: { $gte: startOfWeek, $lt: endOfWeek } } },
-                        { $group: { _id: null, total: { $sum: { $abs: "$amount" } } } }
-                    ],
-                    Monthly: [
-                        { $match: { dateTime: { $gte: startOfMonth, $lt: endOfMonth } } },
-                        { $group: { _id: null, total: { $sum: { $abs: "$amount" } } } }
-                    ],
-                    Yearly: [
-                        { $match: { dateTime: { $gte: startOfYear, $lt: endOfYear } } },
-                        { $group: { _id: null, total: { $sum: { $abs: "$amount" } } } }
-                    ]
-                }
-            }
-        ]);
+                    accountId: accountObjectId,
+                    isExpense: true,
+                    dateTime: { $gte: start, $lt: end }
+                };
 
-        // ---------- Safe extraction ----------
-        const agg = result?.[0] || {};
+                // Category filter only if needed
+                if (budget.scope === "category") {
+                    match.categoryId = budget.categoryId;
+                }
 
-        const expenses = {
-            Daily: agg.Daily?.[0]?.total ?? 0,
-            Weekly: agg.Weekly?.[0]?.total ?? 0,
-            Monthly: agg.Monthly?.[0]?.total ?? 0,
-            Yearly: agg.Yearly?.[0]?.total ?? 0,
-        };
+                const result = await transactionModel.aggregate([
+                    { $match: match },
+                    {
+                        $group: {
+                            _id: null,
+                            spent: { $sum: { $abs: "$amount" } }
+                        }
+                    }
+                ]);
+
+                const spent = result?.[0]?.spent ?? 0;
+
+                // ---------- calculating remaining and percentUsed ----------
+                const remaining = budget.limit - spent;
+                const percentUsed = budget.limit > 0
+                    ? Math.min(100, (spent / budget.limit) * 100)
+                    : 0;
+
+
+                return {
+                    budgetId: budget._id,
+                    scope: budget.scope,
+                    categoryId: budget.categoryId || null,
+                    period: budget.period,
+                    limit: budget.limit,
+                    spent,
+                    remaining,
+                    percentUsed,
+                };
+            })
+        );
+
+        console.log('result', budgetArray)
 
         return res.status(200).json({
-            budget,
-            expenses
+            budgets: budgetArray
         });
+
 
     } catch (error) {
         return res.status(500).json({ message: "Internal server error", error: error.message });
@@ -178,9 +204,9 @@ module.exports.deleteBudget = async (req, res, next) => {
                 userId: user._id
             }
         )
-        return res.status(200).json({message: "Budget deleted successfully", deletedBudget : deletedBudget});
+        return res.status(200).json({ message: "Budget deleted successfully", deletedBudget: deletedBudget });
     }
-    catch(error){
-        return res.status(500).json({mesage: "Internal server error", error: error.message});
+    catch (error) {
+        return res.status(500).json({ mesage: "Internal server error", error: error.message });
     }
 }

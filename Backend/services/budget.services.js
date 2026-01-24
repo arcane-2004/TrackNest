@@ -18,28 +18,3 @@ module.exports.createBudget = async ({ userId, accountId, isCategoryBudget, cate
         return budget;
     }
 }
-
-// module.exports.createBudget = async ({
-//     userId,
-//     accountId,
-//     isCategoryBudget,
-//     categoryId,
-//     limit,
-//     period
-
-// }) => {
-//     console.log('service acc', accountId)
-//     const doc = {
-//         userId, // already ObjectId
-//         accountId: new mongoose.Types.ObjectId(accountId), // ✅ explicit
-//         isCategoryBudget,
-//         limit: Number(limit),
-//         period,
-//     };
-
-//     if (isCategoryBudget) {
-//         doc.categoryId = new mongoose.Types.ObjectId(categoryId);
-//     }
-
-//     return await budgetModel.create(doc);
-// };
