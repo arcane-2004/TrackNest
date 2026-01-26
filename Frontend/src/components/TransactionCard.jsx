@@ -31,7 +31,7 @@ const TransactionCard = ({ handelDelete, t, i, onSuccess }) => {
             <TableCell className="text-zinc-300">
                 {t.dateTime ? (
                     <div className="flex flex-col">
-                        <span className="text-sm font-medium text-white">
+                        <span className="text-sm font-medium text-zinc-300">
                             {new Date(t.dateTime).toLocaleDateString("en-IN", {
                                 day: "2-digit",
                                 month: "short",
@@ -91,7 +91,7 @@ const TransactionCard = ({ handelDelete, t, i, onSuccess }) => {
             <TableCell
                 className={`font-semibold ${!t.isExpense
                     ? "text-emerald-400"
-                    : "text-red-400"}`}
+                    : "text-rose-400"}`}
             >
                 {t.amount < 0 ? `-₹${Math.abs(t.amount)}` : `+₹${t.amount}`}
             </TableCell>
