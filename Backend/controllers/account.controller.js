@@ -31,7 +31,7 @@ module.exports.addAccount = async (req, res, next) => {
             userId: user.id,
             name,
             type,
-            balance: balance,
+            balance: balance || 0,
             isDefault
         })
 

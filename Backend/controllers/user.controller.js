@@ -95,8 +95,13 @@ module.exports.loginUser = async (req, res, next) => {
 }
 
 module.exports.getUserProfile = async (req, res, next) => {
-
-    return res.status(200).json({ user: req.user });
+    const user = req.user;
+    const userData = {
+        name: user.name,
+        email: user.email,
+        createdAt: user.createdAt
+    }
+    return res.status(200).json({ user: userData });
 }
 
 module.exports.logoutUser = async (req, res, next) => {

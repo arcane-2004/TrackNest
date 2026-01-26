@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useMemo, useContext } from "react";
 import Sidebar from "../components/Sidebar";
-import { LogOut,  ChevronUp, ChevronDown, Loader2 } from "lucide-react";
+import { LogOut, ChevronUp, ChevronDown, Loader2 } from "lucide-react";
 import { useHandleLogout } from "../utils/user.hooks";
 import axios from "axios";
 import CreateTransaction from "../components/createTransaction";
@@ -166,13 +166,11 @@ const Transactions = () => {
 							</CreateTransaction>
 
 							{/* Logout */}
-							<span
-								className="text-orange-500 hover:text-orange-400 hover:scale-110 transition-transform duration-200 cursor-pointer"
+							<button className=' rounded-full p-2 transition hover:bg-white/10 hover:cursor-pointer'
 								onClick={handleLogout}
-								title="Logout"
 							>
-								<LogOut size={22} />
-							</span>
+								<LogOut className="text-orange-400" />
+							</button>
 						</div>
 					</div>
 

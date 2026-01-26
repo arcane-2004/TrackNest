@@ -134,7 +134,7 @@
   {
     "userId": "69205f52c1ce765bb51eb82d",
     "accountId": "6921fb2146e004a7557af66c",
-    "categoryId": "69205f53c1ce765bb51eb831",
+    "categoryId": "6977cfb7541934eb7ba3ac4e",
     "name": "Transport",
     "amount": -2103,
     "paymentMethod": "upi",
@@ -278,7 +278,7 @@
   {
     "userId": "69205f52c1ce765bb51eb82d",
     "accountId": "6921fb0046e004a7557af664",
-    "categoryId": "69205f53c1ce765bb51eb831",
+    "categoryId": "6977cfb7541934eb7ba3ac4e",
     "name": "Transport",
     "amount": -1642,
     "paymentMethod": "cash",
@@ -290,7 +290,7 @@
   {
     "userId": "69205f52c1ce765bb51eb82d",
     "accountId": "6921fb2146e004a7557af66c",
-    "categoryId": "69205f53c1ce765bb51eb831",
+    "categoryId": "6977cfb7541934eb7ba3ac4e",
     "name": "Transport",
     "amount": -2869,
     "paymentMethod": "cash",
@@ -362,7 +362,7 @@
   {
     "userId": "69205f52c1ce765bb51eb82d",
     "accountId": "6921fb0046e004a7557af664",
-    "categoryId": "69205f53c1ce765bb51eb831",
+    "categoryId": "6977cfb7541934eb7ba3ac4e",
     "name": "Transport",
     "amount": -2442,
     "paymentMethod": "cash",
@@ -386,7 +386,7 @@
   {
     "userId": "69205f52c1ce765bb51eb82d",
     "accountId": "6921fb2146e004a7557af66c",
-    "categoryId": "69205f53c1ce765bb51eb831",
+    "categoryId": "6977cfb7541934eb7ba3ac4e",
     "name": "Transport",
     "amount": -2312,
     "paymentMethod": "bank transfer",
@@ -530,7 +530,7 @@
   {
     "userId": "69205f52c1ce765bb51eb82d",
     "accountId": "6921fb0046e004a7557af664",
-    "categoryId": "69205f53c1ce765bb51eb831",
+    "categoryId": "6977cfb7541934eb7ba3ac4e",
     "name": "Transport",
     "amount": -2506,
     "paymentMethod": "cash",
@@ -626,7 +626,7 @@
   {
     "userId": "69205f52c1ce765bb51eb82d",
     "accountId": "6921fb2146e004a7557af66c",
-    "categoryId": "69205f53c1ce765bb51eb831",
+    "categoryId": "6977cfb7541934eb7ba3ac4e",
     "name": "Transport",
     "amount": -2469,
     "paymentMethod": "debit card",
@@ -686,7 +686,7 @@
   {
     "userId": "69205f52c1ce765bb51eb82d",
     "accountId": "6921fb2146e004a7557af66c",
-    "categoryId": "69205f53c1ce765bb51eb831",
+    "categoryId": "6977cfb7541934eb7ba3ac4e",
     "name": "Transport",
     "amount": -955,
     "paymentMethod": "auto debit",
@@ -962,7 +962,7 @@
   {
     "userId": "69205f52c1ce765bb51eb82d",
     "accountId": "6921fb2146e004a7557af66c",
-    "categoryId": "69205f53c1ce765bb51eb831",
+    "categoryId": "6977cfb7541934eb7ba3ac4e",
     "name": "Transport",
     "amount": -336,
     "paymentMethod": "auto debit",
@@ -1238,7 +1238,7 @@
   {
     "userId": "69205f52c1ce765bb51eb82d",
     "accountId": "6921fb2146e004a7557af66c",
-    "categoryId": "69205f53c1ce765bb51eb831",
+    "categoryId": "6977cfb7541934eb7ba3ac4e",
     "name": "Transport",
     "amount": -1930,
     "paymentMethod": "upi",
@@ -1454,7 +1454,7 @@
   {
     "userId": "69205f52c1ce765bb51eb82d",
     "accountId": "6921fb0046e004a7557af664",
-    "categoryId": "69205f53c1ce765bb51eb831",
+    "categoryId": "6977cfb7541934eb7ba3ac4e",
     "name": "Transport",
     "amount": -759,
     "paymentMethod": "auto debit",
@@ -1610,7 +1610,7 @@
   {
     "userId": "69205f52c1ce765bb51eb82d",
     "accountId": "6921fb2146e004a7557af66c",
-    "categoryId": "69205f53c1ce765bb51eb831",
+    "categoryId": "6977cfb7541934eb7ba3ac4e",
     "name": "Transport",
     "amount": -2931,
     "paymentMethod": "auto debit",
@@ -1622,7 +1622,7 @@
   {
     "userId": "69205f52c1ce765bb51eb82d",
     "accountId": "6921fb0046e004a7557af664",
-    "categoryId": "69205f53c1ce765bb51eb831",
+    "categoryId": "6977cfb7541934eb7ba3ac4e",
     "name": "Transport",
     "amount": -1338,
     "paymentMethod": "upi",
@@ -1634,7 +1634,7 @@
   {
     "userId": "69205f52c1ce765bb51eb82d",
     "accountId": "6921fb2146e004a7557af66c",
-    "categoryId": "69205f53c1ce765bb51eb831",
+    "categoryId": "6977cfb7541934eb7ba3ac4e",
     "name": "Transport",
     "amount": -459,
     "paymentMethod": "auto debit",
@@ -1682,7 +1682,7 @@
   {
     "userId": "69205f52c1ce765bb51eb82d",
     "accountId": "6921fb2146e004a7557af66c",
-    "categoryId": "69205f53c1ce765bb51eb831",
+    "categoryId": "6977cfb7541934eb7ba3ac4e",
     "name": "Transport",
     "amount": -698,
     "paymentMethod": "credit card",
@@ -1754,7 +1754,7 @@
   {
     "userId": "69205f52c1ce765bb51eb82d",
     "accountId": "6921fb0046e004a7557af664",
-    "categoryId": "69205f53c1ce765bb51eb831",
+    "categoryId": "6977cfb7541934eb7ba3ac4e",
     "name": "Transport",
     "amount": -707,
     "paymentMethod": "bank transfer",
@@ -1898,7 +1898,7 @@
   {
     "userId": "69205f52c1ce765bb51eb82d",
     "accountId": "6921fb0046e004a7557af664",
-    "categoryId": "69205f53c1ce765bb51eb831",
+    "categoryId": "6977cfb7541934eb7ba3ac4e",
     "name": "Transport",
     "amount": -2917,
     "paymentMethod": "auto debit",
@@ -1922,7 +1922,7 @@
   {
     "userId": "69205f52c1ce765bb51eb82d",
     "accountId": "6921fb2146e004a7557af66c",
-    "categoryId": "69205f53c1ce765bb51eb831",
+    "categoryId": "6977cfb7541934eb7ba3ac4e",
     "name": "Transport",
     "amount": -1659,
     "paymentMethod": "other",
@@ -2066,7 +2066,7 @@
   {
     "userId": "69205f52c1ce765bb51eb82d",
     "accountId": "6921fb0046e004a7557af664",
-    "categoryId": "69205f53c1ce765bb51eb831",
+    "categoryId": "6977cfb7541934eb7ba3ac4e",
     "name": "Transport",
     "amount": -1988,
     "paymentMethod": "auto debit",
@@ -2090,7 +2090,7 @@
   {
     "userId": "69205f52c1ce765bb51eb82d",
     "accountId": "6921fb0046e004a7557af664",
-    "categoryId": "69205f53c1ce765bb51eb831",
+    "categoryId": "6977cfb7541934eb7ba3ac4e",
     "name": "Transport",
     "amount": -2115,
     "paymentMethod": "bank transfer",
@@ -2258,7 +2258,7 @@
   {
     "userId": "69205f52c1ce765bb51eb82d",
     "accountId": "6921fb0046e004a7557af664",
-    "categoryId": "69205f53c1ce765bb51eb831",
+    "categoryId": "6977cfb7541934eb7ba3ac4e",
     "name": "Transport",
     "amount": -774,
     "paymentMethod": "cash",

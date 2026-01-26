@@ -18,7 +18,6 @@ const Budget = () => {
 	const [budgets, setBudgets] = useState([]);
 
 	const { selectedAccountId, loadingAccount } = useContext(AccountContext);
-
 	const fetchBudget = async () => {
 
 		try {
@@ -95,13 +94,11 @@ const Budget = () => {
 						</CreateBudget>
 
 						{/* Logout */}
-						<span
-							className="text-orange-500 hover:text-orange-400 hover:scale-110 transition-transform duration-200 cursor-pointer"
+						<button className=' rounded-full p-2 transition hover:bg-white/10 hover:cursor-pointer'
 							onClick={handleLogout}
-							title="Logout"
 						>
-							<LogOut size={22} />
-						</span>
+							<LogOut className="text-orange-400" />
+						</button>
 					</div>
 				</div>
 

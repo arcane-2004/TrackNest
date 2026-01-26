@@ -72,7 +72,7 @@ const LineGraphChart = ({ transactions, setIncome, setExpense }) => {
 
 
     return (
-        <div className="h-[53vh] mx-auto p-3 rounded-2xl bg-zinc-900/60 backdrop-blur-xl border border-zinc-800 shadow-[0_4px_30px_rgba(0,0,0,0.4)]">
+        <div className="h-[52vh] p-3 rounded-2xl bg-zinc-900/60 backdrop-blur-xl border border-zinc-800 shadow-[0_4px_30px_rgba(0,0,0,0.4)]">
             <div className='p-3 flex justify-between items-center '>
                 <h3>Overview</h3>
                 <Select defaultValue={dateRange} onValueChange={setDateRange}>

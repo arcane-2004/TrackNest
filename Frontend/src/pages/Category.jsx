@@ -50,35 +50,34 @@ const Category = () => {
 		<div className="flex h-full w-full bg-[#111010] text-white">
 			<Sidebar />
 
-			<div className="w-full text-white p-10 font-sans">
+			<div className="w-full text-white font-sans flex-1 px-5 overflow-y-auto h-screen relative">
 				{/* Header */}
-				<header className="flex justify-between items-center mb-10">
-					<h2 className="font-bold text-3xl tracking-tight bg-gradient-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent">
-						Categories
-					</h2>
+				<div className="sticky top-0 z-10 bg-[#0f0f0f] pb-1">
+					<header className="flex justify-between items-center h-16">
+						<h2 className="font-bold text-3xl tracking-tight bg-gradient-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent">
+							Categories
+						</h2>
 
-					<div className="flex items-center gap-6">
-						<CreateCategory
-							onCategoryAdded={handleCategoryAdded}
-							setOpen={setSheetOpen}
-							open={sheetOpen}
-						>
-							<button className="px-6 py-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-400 text-sm font-semibold text-white hover:scale-[1.03] transition-transform duration-300 shadow-md shadow-orange-500/20 hover:cursor-pointer">
-								Add Category
+						<div className="flex items-center gap-6">
+							<CreateCategory
+								onCategoryAdded={handleCategoryAdded}
+								setOpen={setSheetOpen}
+								open={sheetOpen}
+							>
+								<button className="px-6 py-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-400 text-sm font-semibold text-white hover:scale-[1.03] transition-transform duration-300 shadow-md shadow-orange-500/20 hover:cursor-pointer">
+									Add Category
+								</button>
+							</CreateCategory>
+
+							{/* Logout */}
+							<button className=' rounded-full p-2 transition hover:bg-white/10 hover:cursor-pointer'
+								onClick={handleLogout}
+							>
+								<LogOut className="text-orange-400" />
 							</button>
-						</CreateCategory>
-
-						{/* Logout */}
-						<span
-							className="text-orange-500 hover:text-orange-400 hover:scale-110 transition-transform duration-200 cursor-pointer"
-							onClick={handleLogout}
-							title="Logout"
-						>
-							<LogOut size={22} />
-						</span>
-					</div>
-				</header>
-
+						</div>
+					</header>
+				</div>
 				<hr className="border-zinc-800 mb-10" />
 
 				{/* Income Categories */}

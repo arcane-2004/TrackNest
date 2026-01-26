@@ -10,7 +10,7 @@ const StackedCards = () => {
     const [startY, setStartY] = useState(0);
     const [scrollOffset, setScrollOffset] = useState(0);
 
-    const {accounts} = useContext(AccountContext);
+    const { accounts } = useContext(AccountContext);
     console.log(accounts);
 
     const containerHeight = 280;
@@ -151,7 +151,14 @@ const StackedCards = () => {
                                         </span>
                                     </CardTitle>
                                     <CardDescription className="text-zinc-300 mt-1.5 text-sm font-medium">
-                                        Balance: {item.balance}
+                                        Balance: {
+                                            new Intl.NumberFormat("en-IN", {
+                                                style: "currency",
+                                                currency: "INR",
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2,
+                                            }).format(item.balance || 0)
+                                        }
                                     </CardDescription>
                                 </CardContent>
                             </Card>

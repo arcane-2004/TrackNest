@@ -1,19 +1,39 @@
 import React from 'react'
 import Sidebar from '../components/Sidebar'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext, useMemo } from 'react'
 import axios from 'axios'
 import { LogOut } from 'lucide-react';
 import { useHandleLogout } from '../utils/user.hooks';
 import LineGraphChart from '../components/LineGraphChart'
 import StackedCards from '../components/StackedCards';
+import { AccountContext } from '../context/AccountContext';
 
 const Dashboard = () => {
 
+	const { accounts } = useContext(AccountContext);
+
 	const [transactions, setTransactions] = useState([]);
+	const [userData, setUserData] = useState([])
 	const [income, setIncome] = useState('');
 	const [expense, setExpense] = useState('');
 
 	const handleLogout = useHandleLogout();
+
+	useEffect(() => {
+		const fetchUser = async () => {
+			try {
+				const response = await axios.get(
+					`${import.meta.env.VITE_BASE_URL}/user/profile`,
+					{ withCredentials: true }
+				);
+				setUserData(response.data.user)
+			} catch (err) {
+				console.error(err.response?.data?.message || "Something went wrong");
+			}
+		};
+
+		fetchUser();
+	}, []);
 
 	useEffect(() => {
 		const fetchTransactions = async () => {
@@ -31,56 +51,87 @@ const Dashboard = () => {
 		fetchTransactions();
 	}, []);
 
+	// -------------- calculate total balance ----------------
+	const totalBalance = useMemo(() => {
+		if (!accounts?.length) return 0
+
+		return accounts.reduce((sum, acc) => sum + acc.balance, 0)
+	}, [accounts])
+
+	const formatINR = value =>
+		new Intl.NumberFormat("en-IN", {
+			style: "currency",
+			currency: "INR",
+			minimumFractionDigits: 2,
+		}).format(value || 0)
+
 	return (
 
 		<div className="h-full w-full bg-[#111010] text-white flex">
 
 			<Sidebar />
 
-			<div className='p-3 h-full flex-1 overflow-y-auto'>
-				<div className='relative w-full h-10 mb-8 flex items-center p-5'>
-					<h2 className='absolute text-2xl font-bold right-20'>Dashboard</h2>
-					<span className='absolute right-5 text-[#ae5921] hover:cursor-pointer'
+			<main className='p-3 h-full flex-1 overflow-y-auto'>
+				{/* ================= Header ================= */}
+				<div className='w-full h-10 mb-8 flex items-center justify-between pl-3'>
+					<h2 className="text-3xl font-bold bg-gradient-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent">
+						Dashboard
+					</h2>
+					<button className=' rounded-full p-2 transition hover:bg-white/10 hover:cursor-pointer'
 						onClick={handleLogout}
-					><LogOut /></span>
+					>
+						<LogOut className="text-orange-400" />
+					</button>
 				</div>
 
-				<div className='h-[92%] w-full flex flex-col items-center gap-5'>
-					<div className='w-full h-2/5 flex gap-4'>
+				<div className='h-[90%] w-full flex flex-col items-center gap-5'>
+					{/* ================= Top Section ================= */}
+					<div className='w-full h-2/5 flex gap-5'>
 
-						<div className=' w-3/4 flex gap-2'>
+						<div className=' w-[70%] flex gap-5' >
 
-							<div className='w-4/7 h-full '>
-								<StackedCards/>
+							<div className='w-4/7  h-full '>
+								<StackedCards />
 							</div>
 
 							<div className=' h-full w-3/7 flex flex-col gap-4 '>
-								<div className='h-1/2 p-3 rounded-4xl border border-[#6d6d6d] bg-[rgba(68,81,98,0.12)] text-white'>
-									<p>Your Income</p>
-									<p className='text-center'>{income}</p>
+								<div className="h-1/2 w-full rounded-2xl bg-gradient-to-br from-emerald-500/20 to-emerald-500/5 p-4 border border-emerald-500/20">
+									<p className="text-sm text-emerald-300">Income</p>
+									<p className="mt-2 text-2xl font-semibold text-emerald-400">
+										{formatINR(income)}
+									</p>
 								</div>
-								<div className='h-1/2 p-3 rounded-4xl border border-[#6d6d6d]  bg-[rgba(68,81,98,0.12)]  backdrop-blur-md shadow-md text-white'>
-									<p>Your Expense</p>
-									<p className='text-center'>{expense} </p>
+								<div className="h-1/2 w-full rounded-2xl bg-gradient-to-br from-rose-500/20 to-rose-500/5 p-4 border border-rose-500/20">
+									<p className="text-sm text-rose-300">Expense</p>
+									<p className="mt-2 text-2xl font-semibold text-rose-400">
+										{formatINR(expense)}
+									</p>
 								</div>
 							</div>
 						</div>
 
+						{/* ================= Profile ================= */}
+						<div className="w-[25%] rounded-3xl bg-gradient-to-b from-white/[0.06] to-white/[0.02] p-6 backdrop-blur-xl border border-white/[0.08] shadow-xl">
+							<h2 className="mb-5 text-sm uppercase tracking-wide text-zinc-400">
+								Profile
+							</h2>
 
-						<div className='w-1/4 border-1 border-[#6d6d6d] bg-gradient-to-b from-black/20 to-white/10 rounded-4xl backdrop-blur-2xl shadow-md '>
-
-							<h2 className='ml-10 mt-4'>Profile</h2>
-
-							<div className='flex flex-col items-center justify-center text-white'>
-								<div className='rounded-full h-30 w-30 bg-white '>
-
+							<div className="flex flex-col items-center">
+								{/* Avatar */}
+								<div className="mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-orange-400 to-amber-300 text-3xl font-bold text-black">
+									{userData.name?.[0]}
 								</div>
-								<span className='text-2xl font-bold mb-4'>Sumit</span>
-								<span className='mt-5 text-xs font-medium'>Total Balance</span>
-								<span className='text-4xl font-bold'>200000</span>
+
+								<p className="text-lg font-semibold">{userData.name}</p>
+
+								<span className="mt-6 text-xs uppercase tracking-wide text-zinc-400">
+									Total Balance
+								</span>
+
+								<span className="mt-2 text-4xl font-semibold bg-gradient-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent">
+									{formatINR(totalBalance)}
+								</span>
 							</div>
-
-
 						</div>
 
 					</div>
@@ -88,7 +139,7 @@ const Dashboard = () => {
 
 
 					{/* line chart */}
-					<div className='h-3/5 w-[90vw]'>
+					<div className='h-2/5 w-[90vw]'>
 						<LineGraphChart
 							transactions={transactions}
 							setIncome={setIncome}
@@ -99,7 +150,7 @@ const Dashboard = () => {
 
 
 				</div>
-			</div>
+			</main>
 		</div>
 
 

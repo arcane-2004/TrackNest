@@ -141,8 +141,6 @@ module.exports.getBudget = async (req, res, next) => {
             })
         );
 
-        console.log('result', budgetArray)
-
         return res.status(200).json({
             budgets: budgetArray
         });

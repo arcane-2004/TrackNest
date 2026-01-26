@@ -63,12 +63,15 @@ const Accounts = () => {
                 <Sidebar />
             </div>
             <div className='p-3 h-full w-full'>
-                <div className='relative w-full h-10 mb-8 flex items-center p-5'>
-                    <h2 className='absolute text-2xl font-bold right-20'>Accounts</h2>
-                    <span className='absolute right-5 text-[#ae5921] hover:cursor-pointer'
+                <div className='w-full h-10 mb-8 flex items-center justify-between pl-3'>
+                    <h2 className="text-3xl font-bold bg-gradient-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent">
+                        Accounts
+                    </h2>
+                    <button className=' rounded-full p-2 transition hover:bg-white/10 hover:cursor-pointer'
                         onClick={handleLogout}
-
-                    ><LogOut /></span>
+                    >
+                        <LogOut className="text-orange-400" />
+                    </button>
                 </div>
 
                 {/* card area */}
