@@ -97,21 +97,6 @@ const PieChart = ({ setCategoryData, range, setRange }) => {
                         ₹{datum.value.toLocaleString()}
                     </div>
                 )}
-
-                legends={[
-                    {
-                        anchor: 'right',
-                        direction: 'column',
-                        translateX: -50,
-                        itemWidth: 100,
-                        itemHeight: 40,
-                        symbolSize: 25,
-                        symbolShape: 'circle',
-                        itemTextColor: '#ddd',
-
-                    }
-                ]}
-
             />
         </div>
 
