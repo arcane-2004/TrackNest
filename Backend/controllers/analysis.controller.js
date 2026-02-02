@@ -80,7 +80,7 @@ module.exports.categorySummary = async (req, res, next) => {
                     isExpense: true
                 }
             },
-            {
+            {   
                 $facet: {
                     Daily: [
                         { $match: { dateTime: { $gte: daily.start, $lt: daily.end } } },
@@ -250,11 +250,28 @@ module.exports.monthSummary = async (req, res) => {
         return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const start = new Date(Date.UTC(year, month -1, 1))
-    const end = new Date(Date.UTC(year, month , 1));
 
-    console.log('start', month)
-    console.log('end', end)
+
+    function getMonthRangeIST(year, month) {
+        // IST offset in milliseconds
+        const IST_OFFSET = 5.5 * 60 * 60 * 1000;
+
+        // Start of month in IST
+        const startIST = new Date(year, month, 1, 0, 0, 0);
+
+        // Start of next month in IST
+        const endIST = new Date(year, month + 1, 1, 0, 0, 0);
+
+        // Convert to UTC
+        const startUTC = new Date(startIST.getTime() - IST_OFFSET);
+        const endUTC = new Date(endIST.getTime() - IST_OFFSET);
+
+        return { startUTC, endUTC };
+    }
+    const { startUTC, endUTC } = getMonthRangeIST(Number(year), Number(month));
+
+    // console.log('start', start)
+    // console.log('end', end)
     const accountObjectId = new mongoose.Types.ObjectId(accountId);
 
     try {
@@ -263,7 +280,7 @@ module.exports.monthSummary = async (req, res) => {
                 $match: {
                     userId: user._id,
                     accountId: accountObjectId,
-                    dateTime: { $gte: start, $lt: end }
+                    dateTime: { $gte: startUTC, $lt: endUTC }
                 }
             },
             {
@@ -291,13 +308,17 @@ module.exports.monthSummary = async (req, res) => {
 
                     // 🔹 Daily expense array
                     dailyExpense: [
-                        { $match: { isExpense: true } },
+                        {
+                            $match: { isExpense: true },
+
+                        },
                         {
                             $group: {
                                 _id: {
                                     $dateToString: {
                                         format: "%Y-%m-%d",
-                                        date: "$dateTime"
+                                        date: "$dateTime",
+                                        timezone: "Asia/Kolkata"
                                     }
                                 },
                                 total: { $sum: { $abs: "$amount" } }
@@ -321,7 +342,8 @@ module.exports.monthSummary = async (req, res) => {
                                 _id: {
                                     $dateToString: {
                                         format: "%Y-%m-%d",
-                                        date: "$dateTime"
+                                        date: "$dateTime",
+                                        timezone: "Asia/Kolkata"
                                     }
                                 },
                                 total: { $sum: "$amount" }

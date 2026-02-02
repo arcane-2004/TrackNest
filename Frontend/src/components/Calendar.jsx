@@ -36,6 +36,7 @@ const CalendarView = ({setMonthSummary, setCurrentMonthDailyExpense, setCurrentM
 
 	// ---------------------- get Monthly income and expense ----------------------
 	const fetchMonthSummary = async () => {
+		console.log('month', month )
 		try {
 			const response = await axios.get(
 				`${import.meta.env.VITE_BASE_URL}/analysis/month-summary/${selectedAccountId}?year=${year}&month=${month}`,
