@@ -24,6 +24,9 @@ const FilteredTransactionPage = () => {
 
     const { categoryId } = useParams();
     const range = searchParams.get('range');
+    const year = searchParams.get('year');
+    const month = searchParams.get('month');
+    const date = searchParams.get('date');
 
     const [transactions, setTransactions] = useState([]);
     const [sortConfig, setSortConfig] = useState({
@@ -43,12 +46,20 @@ const FilteredTransactionPage = () => {
 
             setIsLoading(true)
             const response = await axios.get(
-                `${import.meta.env.VITE_BASE_URL}/analysis/category/get-transactions/${categoryId}?range=${range}`,
-                { withCredentials: true }
+                `${import.meta.env.VITE_BASE_URL}/analysis/category/get-transactions/${categoryId}`,
+                {
+                    params: {
+                        range,                          // Daily | Monthly | Yearly | All
+                        year,                           // e.g. 2025
+                        month: range === "Monthly" ? month : undefined,
+                        date: date
+                    },
+                    withCredentials: true
+                }
             );
             setTransactions(response.data.transactions || []);
             setTotalTransactions(response.data.transactions.length || 0)
-            
+
         } catch (error) {
             console.error(error.response?.data.message || "Something went wrong");
         } finally {
@@ -167,7 +178,7 @@ const FilteredTransactionPage = () => {
                         <div className="flex items-center justify-between">
 
                             <p className="text-xl font-semibold mb-3 p-1.5 border border-zinc-600/40 rounded-lg  bg-gradient-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent drop-shadow">Total Transactions: {totalTransactions}</p>
-                
+
                         </div>
                         {sortedTransactions.length === 0 ? (
                             <p className="text-zinc-400 text-sm italic">

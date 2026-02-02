@@ -14,14 +14,15 @@ const Analysis = () => {
 
 	const handleLogout = useHandleLogout();
 
-	const [categoryData, setCategoryData] = useState([]);
+	// const [categoryData, setCategoryData] = useState([]);
 	const [range, setRange] = useState('Monthly')
+	const [year, setYear] = useState(new Date().getFullYear());
+	const [month, setMonth] = useState(new Date().getMonth() + 1);
+	const [date, setDate] = useState('')
 	const [monthSummary, setMonthSummary] = useState([]);
 	const [dailyExpense, setDailyExpense] = useState([]);
 	const [dailyIncome, setDailyIncome] = useState([]);
-
-	console.log('dailyExpense', dailyExpense)
-	console.log('daily ', dailyIncome)
+	const [data, setData] = useState([]);
 
 	return (
 
@@ -50,30 +51,38 @@ const Analysis = () => {
 				</div>
 
 				{/* ----------- Main content ------------ */}
+
+				{/* =================== pie chart ======================= */}
 				<div className="mb-3 ">
 					<div className="w-full flex justify-between items-start gap-7 ">
 						<div className='w-3/5 h-[55vh] border border-zinc-600'>
 
 							<PieChart
-								setCategoryData={setCategoryData}
+								data={data}
+								setData={setData}
 								range={range}
 								setRange={setRange}
+								year={year}
+								setYear={setYear}
+								month={month}
+								setMonth={setMonth}
+								setDate={setDate}
 							/>
 
 						</div>
 
 						{/* ----------------- Category details ---------------- */}
 						<div className="p-3 pt-10  space-y-2 w-2/5 h-[55vh]  overflow-auto flex flex-col items-center justify-center">
-							{categoryData.length === 0 ? (
+							{data.length === 0 ? (
 								<p className="text-sm text-zinc-400 italic">
 									No expenses for this period
 								</p>
 							) : (
-								categoryData.map((category) => {
+								data.map((category) => {
 									const Icon = Icons[category.icon];
 
 									return (
-										<Link to={`/filtered/transactions/${category.id}?range=${range}`}
+										<Link to={`/filtered/transactions/${category.id}?range=${range}&year=${year}&month=${month}&date=${date}`}
 											key={category.id}
 											className="flex items-center justify-between w-full rounded-xl bg-zinc-900 px-4 py-3 border border-zinc-800 hover:bg-zinc-800/70 transition-colors"
 										>

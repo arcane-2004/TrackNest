@@ -3,15 +3,55 @@ const transactionModel = require('../models/transaction.model');
 const mongoose = require("mongoose");
 const { getUTCRange } = require("../utils/dateRanges");
 
-const daily = getUTCRange("Daily");
-const weekly = getUTCRange("Weekly");
-const monthly = getUTCRange("Monthly");
-const yearly = getUTCRange("Yearly");
+
+const IST_OFFSET_MINUTES = 5 * 60 + 30;
+
+const istToUtc = (date) =>
+    new Date(date.getTime() - IST_OFFSET_MINUTES * 60 * 1000);
+
+const buildUtcRange = ({ range, year, month, date }) => {
+    let startDate, endDate;
+
+    if (range === "Daily") {
+        if (date) {
+            const [y, m, d] = date.split("-").map(Number);
+            const istStart = new Date(y, m - 1, d, 0, 0, 0, 0);
+            const istEnd = new Date(y, m - 1, d, 23, 59, 59, 999);
+            startDate = istToUtc(istStart);
+            endDate = istToUtc(istEnd);
+        } else {
+            const istStart = new Date();
+            istStart.setHours(0, 0, 0, 0);
+            const istEnd = new Date();
+            istEnd.setHours(23, 59, 59, 999);
+            startDate = istToUtc(istStart);
+            endDate = istToUtc(istEnd);
+        }
+    }
+
+    if (range === "Monthly" && year && month) {
+        const istStart = new Date(year, month - 1, 1, 0, 0, 0, 0);
+        const istEnd = new Date(year, month, 0, 23, 59, 59, 999);
+        startDate = istToUtc(istStart);
+        endDate = istToUtc(istEnd);
+    }
+
+    if (range === "Yearly" && year) {
+        const istStart = new Date(year, 0, 1, 0, 0, 0, 0);
+        const istEnd = new Date(year, 11, 31, 23, 59, 59, 999);
+        startDate = istToUtc(istStart);
+        endDate = istToUtc(istEnd);
+    }
+
+    return startDate && endDate ? { $gte: startDate, $lte: endDate } : null;
+};
+
 
 module.exports.categorySummary = async (req, res, next) => {
 
     const { accountId } = req.params;
     const user = req.user;
+    const { range, year, month, date } = req.query;
 
     if (!user) {
         return res.status(401).json({ message: "Unauthorized", error: "user not found" });
@@ -20,30 +60,35 @@ module.exports.categorySummary = async (req, res, next) => {
     try {
         const accountObjectId = new mongoose.Types.ObjectId(accountId);
 
-        const groupAndProjectStage = () => ([
+        const dateFilter = buildUtcRange({
+            range,
+            year: Number(year),
+            month: Number(month),
+            date
+        });
+
+        const match = {
+            userId: user._id,
+            accountId: accountObjectId,
+            isExpense: true,
+            dateTime: dateFilter
+        }
+
+        const summary = await transactionModel.aggregate([
+            {
+                $match: match
+            },
+
             {
                 $group: {
                     _id: "$categoryId",
-                    total: { $sum: "$amount" }
+                    total: { $sum: { $abs: "$amount" } }
                 }
             },
-            {
-                $group: {
-                    _id: null,
-                    categories: {
-                        $push: {
-                            categoryId: "$_id",
-                            total: "$total"
-                        }
-                    },
-                    totalExpense: { $sum: "$total" }
-                }
-            },
-            { $unwind: "$categories" },
             {
                 $lookup: {
                     from: "categories",
-                    localField: "categories.categoryId",
+                    localField: "_id",
                     foreignField: "_id",
                     as: "category"
                 }
@@ -51,61 +96,35 @@ module.exports.categorySummary = async (req, res, next) => {
             { $unwind: "$category" },
             {
                 $project: {
-                    id: { $toString: "$category._id" }, // Nivo requires string id
+                    _id: 0,
+                    id: "$category._id",
                     label: "$category.name",
+                    value: "$total",
                     color: "$category.color",
-                    icon: "$category.icon",
-                    value: { $abs: "$categories.total" },
-                    percentage: {
-                        $multiply: [
-                            {
-                                $divide: [
-                                    { $abs: "$categories.total" },
-                                    { $abs: "$totalExpense" }
-                                ]
-                            },
-                            100
-                        ]
-                    }
+                    icon: "$category.icon"
                 }
             }
+
         ]);
 
+        const grandTotal = summary.reduce((s, i) => s + i.value, 0);
 
-        const summary = await transactionModel.aggregate([
-            {
-                $match: {
-                    userId: user._id,
-                    accountId: accountObjectId,
-                    isExpense: true
-                }
-            },
-            {   
-                $facet: {
-                    Daily: [
-                        { $match: { dateTime: { $gte: daily.start, $lt: daily.end } } },
-                        ...groupAndProjectStage()
-                    ],
-                    Weekly: [
-                        { $match: { dateTime: { $gte: weekly.start, $lt: weekly.end } } },
-                        ...groupAndProjectStage()
-                    ],
-                    Monthly: [
-                        { $match: { dateTime: { $gte: monthly.start, $lt: monthly.end } } },
-                        ...groupAndProjectStage()
-                    ],
-                    Yearly: [
-                        { $match: { dateTime: { $gte: yearly.start, $lt: yearly.end } } },
-                        ...groupAndProjectStage()
-                    ],
-                    All: [
-                        ...groupAndProjectStage()
-                    ]
-                }
-            }
-        ]);
+        const summaryData = summary.map(i => ({
+            ...i,
+            percentage: grandTotal ? (i.value / grandTotal) * 100 : 0
+        }));
 
-        return res.status(200).json({ message: "Category summary fetched successfully", data: summary });
+        // -------------------------
+        // 2️⃣ TRANSACTIONS LIST
+        // -------------------------
+
+
+        const transactions = await transactionModel.find(match)
+            .populate("categoryId", "name color icon")
+            .sort({ date: -1 });
+
+
+        return res.status(200).json({ message: "Category summary fetched successfully", summaryData: summaryData, categoryData: transactions });
 
     }
     catch (error) {
@@ -118,25 +137,27 @@ module.exports.categorySummary = async (req, res, next) => {
 module.exports.getTransactions = async (req, res, next) => {
     const { categoryId } = req.params;
     const user = req.user;
-    const { range } = req.query;
+    const { range, year, month, date } = req.query;
 
     if (!user) {
         return res.status(401).json({ message: "Unauthorized", error: "user not found" });
     }
 
-    const { start, end } = getUTCRange(range);
+    const dateFilter = buildUtcRange({
+        range,
+        year: Number(year),
+        month: Number(month),
+        date
+    });
 
     try {
         const categoryObjectId = new mongoose.Types.ObjectId(categoryId);
-
-
-
 
         const transactions = await transactionModel.find({
             userId: user._id,
             categoryId: categoryId,
             isExpense: true,
-            dateTime: { $gte: start, $lt: end }
+            dateTime: dateFilter
         }).sort({ dateTime: -1 }).populate('categoryId').populate('accountId');
 
         return res.status(200).json({
@@ -244,34 +265,22 @@ module.exports.monthSummary = async (req, res) => {
     const { accountId } = req.params;
     const user = req.user;
     const { year, month } = req.query;
-    console.log(year, month)
+
 
     if (!user) {
         return res.status(401).json({ message: "Unauthorized" });
     }
 
+    const y = Number(year);
+    const m = Number(month);
 
 
-    function getMonthRangeIST(year, month) {
-        // IST offset in milliseconds
-        const IST_OFFSET = 5.5 * 60 * 60 * 1000;
+    const istStart = new Date(y, m, 1, 0, 0, 0, 0);
+    const istEnd = new Date(y, m + 1, 0, 23, 59, 59, 999);
 
-        // Start of month in IST
-        const startIST = new Date(year, month, 1, 0, 0, 0);
+    startDate = istToUtc(istStart);
+    endDate = istToUtc(istEnd);
 
-        // Start of next month in IST
-        const endIST = new Date(year, month + 1, 1, 0, 0, 0);
-
-        // Convert to UTC
-        const startUTC = new Date(startIST.getTime() - IST_OFFSET);
-        const endUTC = new Date(endIST.getTime() - IST_OFFSET);
-
-        return { startUTC, endUTC };
-    }
-    const { startUTC, endUTC } = getMonthRangeIST(Number(year), Number(month));
-
-    // console.log('start', start)
-    // console.log('end', end)
     const accountObjectId = new mongoose.Types.ObjectId(accountId);
 
     try {
@@ -280,7 +289,7 @@ module.exports.monthSummary = async (req, res) => {
                 $match: {
                     userId: user._id,
                     accountId: accountObjectId,
-                    dateTime: { $gte: startUTC, $lt: endUTC }
+                    dateTime: { $gte: startDate, $lt: endDate }
                 }
             },
             {

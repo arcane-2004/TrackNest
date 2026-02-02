@@ -14,39 +14,75 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 
-const PieChart = ({ setCategoryData, range, setRange }) => {
+const PieChart = ({ data, setData, range, setRange, year, setYear, month, setMonth, setDate }) => {
     const { selectedAccountId, loadingAccount } = useContext(AccountContext);
 
-    const [data, setData] = useState({});
+    const now = new Date();
+
     
+    const [day, setDay] = useState(now.getDate());
 
     const fetchCategorySummary = async () => {
+        const date =
+            range === "Daily"
+                ? `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`
+                : undefined;
+        setDate(date)
         try {
-            const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/analysis/category-summary/${selectedAccountId}`,
-                { withCredentials: true }
-            )
-            setData(response.data.data);
+            const response = await axios.get(
+                `${import.meta.env.VITE_BASE_URL}/analysis/category-summary/${selectedAccountId}`,
+                {
+                    params: {
+                        range,                          // Daily | Monthly | Yearly | All
+                        year,                           // e.g. 2025
+                        month: range === "Monthly" ? month : undefined,
+                        date: date
+                    },
+                    withCredentials: true
+                }
+            );
 
+            setData(response.data.summaryData);
+            // setCategoryData(response.data.summaryData)
+
+        } catch (error) {
+            console.error(
+                error.response?.data?.message || "Failed to fetch category summary"
+            );
         }
-        catch (error) {
-            console.log(error.response?.data?.message || "some")
-        }
-    }
+    };
+
 
     useEffect(() => {
         if (!loadingAccount && selectedAccountId) {
             fetchCategorySummary();
         }
 
-    }, [loadingAccount, selectedAccountId])
+    }, [loadingAccount, selectedAccountId, range, year, month, day])
 
-    useEffect( () => {
-        setCategoryData(data[0]?.[range] || []);
-    },[data, range])
+    // useEffect(() => {
+    //     setCategoryData(data[0]?.[range] || []);
+    // }, [data, range])
+
+    // ----------- Years array -----------
+    const years = Array.from(
+        { length: 5 },
+        (_, i) => new Date().getFullYear() - i
+    );
+
+    // ---------------- month array -----------------
+    const months = [
+        "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ];
+
+    // ---------------------- days based on selected month --------------------
+    const daysInMonth = new Date(year, month, 0).getDate();
 
     return (
         <div className='h-100' >
-            <div>
+            <div className='flex items-center justify-between'>
+                {/* ----------------- date Range ----------------------- */}
                 <Select onValueChange={(value) => setRange(value)}>
                     <SelectTrigger className="w-[180px] mb-4 border border-zinc-600">
                         <SelectValue placeholder={range} />
@@ -59,10 +95,59 @@ const PieChart = ({ setCategoryData, range, setRange }) => {
                         </SelectContent>
                     </SelectTrigger>
                 </Select>
+
+                <div className='flex items-center gap-3'>
+                    {/* ---------------------- Year selection ----------------------- */}
+                    <Select onValueChange={(value) => setYear(Number(value))}>
+                        <SelectTrigger className="w-[120px] mb-4 border border-zinc-600">
+                            <SelectValue placeholder={year} />
+                        </SelectTrigger>
+                        <SelectContent className="bg-zinc-700/50 text-white">
+                            {years.map(y => (
+                                <SelectItem key={y} value={String(y)}>
+                                    {y}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+
+                    {/* ---------------------- Month selection ---------------------- */}
+                    {(range === "Monthly" || range === "Daily") && (
+                        <Select onValueChange={(value) => setMonth(Number(value))}>
+                            <SelectTrigger className="w-[160px] mb-4 border border-zinc-600">
+                                <SelectValue placeholder={months[month - 1]} />
+                            </SelectTrigger>
+                            <SelectContent className="bg-zinc-700/50 text-white">
+                                {months.map((m, i) => (
+                                    <SelectItem key={i} value={String(i + 1)}>
+                                        {m}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    )}
+                </div>
+
+                {/* ------------------------------ Day selection ----------------------------- */}
+                {range === "Daily" && (
+                    <Select onValueChange={(v) => setDay(Number(v))}>
+                        <SelectTrigger className="w-[120px] mb-4 border border-zinc-600">
+                            <SelectValue placeholder={day} />
+                        </SelectTrigger>
+
+                        <SelectContent className="bg-zinc-700/50 text-white">
+                            {[...Array(daysInMonth)].map((_, i) => (
+                                <SelectItem key={i + 1} value={String(i + 1)}>
+                                    {i + 1}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                )}
+
             </div>
-            
             <ResponsivePie
-                data={data[0]?.[range] || []}
+                data={data|| []}
                 margin={{ top: 40, right: 80, bottom: 80, left: 80 }}
                 innerRadius={0.6}
                 padAngle={1}
