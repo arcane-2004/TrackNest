@@ -14,13 +14,13 @@ module.exports.createBudget = async (req, res, next) => {
 
     try {
 
-        const { isCategoryBudget, categoryId, limit, period } = req.body;
-
+        const { scope, categoryId, limit, period } = req.body;
+       
         const newBudget = await budgetService.createBudget({
             userId: user._id,
             accountId: accountId,
+            scope:scope,
             categoryId,
-            isCategoryBudget: isCategoryBudget,
             limit: limit,
             period: period,
         })
@@ -40,48 +40,6 @@ module.exports.getBudget = async (req, res, next) => {
     if (!user) {
         return res.status(401).json({ message: "Unauthorized", error: "user not found" })
     }
-
-    // ------------- resolve date range -----------------
-    // function getDateRange(period) {
-    //     const now = new Date();
-
-    //     switch (period) {
-    //         case "Daily": {
-    //             const start = new Date(Date.UTC(
-    //                 now.getUTCFullYear(),
-    //                 now.getUTCMonth(),
-    //                 now.getUTCDate()
-    //             ));
-    //             const end = new Date(start);
-    //             end.setUTCDate(start.getUTCDate() + 1);
-    //             return { start, end };
-    //         }
-
-    //         case "Weekly": {
-    //             const start = new Date(Date.UTC(
-    //                 now.getUTCFullYear(),
-    //                 now.getUTCMonth(),
-    //                 now.getUTCDate() - (now.getUTCDay() || 7) + 1
-    //             ));
-    //             const end = new Date(start);
-    //             end.setUTCDate(start.getUTCDate() + 7);
-    //             return { start, end };
-    //         }
-
-    //         case "Monthly": {
-    //             const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
-    //             const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
-    //             return { start, end };
-    //         }
-
-    //         case "Yearly": {
-    //             const start = new Date(Date.UTC(now.getUTCFullYear(), 0, 1));
-    //             const end = new Date(Date.UTC(now.getUTCFullYear() + 1, 0, 1));
-    //             return { start, end };
-    //         }
-    //     }
-    // }
-
 
     try {
 
@@ -106,8 +64,10 @@ module.exports.getBudget = async (req, res, next) => {
 
                 // Category filter only if needed
                 if (budget.scope === "category") {
-                    match.categoryId = budget.categoryId;
+                    match.categoryId = budget.categoryId._id;
                 }
+
+                
 
                 const result = await transactionModel.aggregate([
                     { $match: match },

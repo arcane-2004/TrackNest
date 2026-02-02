@@ -13,18 +13,18 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form, Field, ErrorMessage} from "formik";
 import * as Yup from "yup";
 import { Loader2, PlusCircle, Pencil } from "lucide-react";
 import { toast } from "react-hot-toast";
 import axios from "axios";
 import { AccountContext } from "../context/AccountContext"
 
-const CreateBudget = ({ children, budget, fetchBudget }) => {
-
+const CreateBudget = ({ children, budget, fetchBudget, open, setOpen, onClose }) => {
+    
     const { selectedAccountId } = useContext(AccountContext)
-    console.log('acc', selectedAccountId)
-    const [open, setOpen] = useState(false);
+
+
     const [isCreating, setCreating] = useState(false);
     // const [isCategoryBudget, setIsCategoryBudget] = useState(false);
 
@@ -47,7 +47,6 @@ const CreateBudget = ({ children, budget, fetchBudget }) => {
     }, [])
 
     const validationSchema = Yup.object({
-        categoryId: Yup.string(),
         scope: Yup.string().oneOf(['overall', 'category']),
         limit: Yup.number().required("Limit is required").min(0, "Limit must be a positive number"),
         period: Yup.string().required("Period is required").oneOf(['Daily', 'Weekly', 'Monthly', 'Yearly']),
@@ -58,24 +57,25 @@ const CreateBudget = ({ children, budget, fetchBudget }) => {
     const initialValues = budget ? {
 
         scope: budget.scope,
-        categoryId: budget.categoryId,
+        categoryId: budget.categoryId || null,
         limit: budget.limit,
         period: budget.period
 
     } : {
         scope: "overall",
-        categoryId: "",
+        categoryId: null,
         limit: "",
         period: "Monthly"
     }
 
+    
     // ✅ Submit Handler
     const handleSubmit = async (values, { resetForm }) => {
-
+        console.log('bgt', budget)
         try {
             setCreating(true);
             if (budget) {
-                const response = await axios.put(`${import.meta.env.VITE_BASE_URL}/budget/update-budget/${budget._id}`, values,
+                const response = await axios.put(`${import.meta.env.VITE_BASE_URL}/budget/update-budget/${budget.budgetId}`, values,
                     { withCredentials: true }
                 )
                 toast.success(response.data.message);
@@ -94,12 +94,13 @@ const CreateBudget = ({ children, budget, fetchBudget }) => {
 
 
         } catch (error) {
-            console.log(error.response?.data)
+            console.log('erroe',error.response?.data)
             toast.error(error.response?.data?.message || "Something went wrong");
         }
         finally {
             setCreating(false)
             fetchBudget()
+            onClose()
         }
     }
 
@@ -141,8 +142,8 @@ const CreateBudget = ({ children, budget, fetchBudget }) => {
                                         type="button"
                                         onClick={() => setFieldValue("scope", "overall")}
                                         className={`relative z-10 px-4 py-2 text-sm rounded-md transition-colors ${values.scope === "overall"
-                                                ? "text-orange-400"
-                                                : "text-zinc-400 hover:text-zinc-200"
+                                            ? "text-orange-400"
+                                            : "text-zinc-400 hover:text-zinc-200"
                                             }`}
                                     >
                                         Overall Budget
@@ -152,8 +153,8 @@ const CreateBudget = ({ children, budget, fetchBudget }) => {
                                         type="button"
                                         onClick={() => setFieldValue("scope", "category")}
                                         className={`relative z-10 px-4 py-2 text-sm rounded-md transition-colors ${values.scope === "category"
-                                                ? "text-orange-400"
-                                                : "text-zinc-400 hover:text-zinc-200"
+                                            ? "text-orange-400"
+                                            : "text-zinc-400 hover:text-zinc-200"
                                             }`}
                                     >
                                         Category Budget
@@ -162,8 +163,8 @@ const CreateBudget = ({ children, budget, fetchBudget }) => {
                                     {/* sliding background */}
                                     <span
                                         className={`absolute top-1 bottom-1 w-1/2 rounded-md bg-zinc-800 transition-transform duration-200 ${values.scope === "category"
-                                                ? "translate-x-full"
-                                                : "translate-x-0"
+                                            ? "translate-x-full"
+                                            : "translate-x-0"
                                             }`}
                                     />
                                 </div>
@@ -243,7 +244,10 @@ const CreateBudget = ({ children, budget, fetchBudget }) => {
                                         type="button"
                                         variant="outline"
                                         className="bg-transparent border border-gray-700 text-gray-300 hover:bg-gray-800"
-                                        onClick={() => setOpen(false)}
+                                        onClick={() => {
+                                            setOpen(false)
+                                            onClose()
+                                        }}
                                     >
                                         Cancel
                                     </Button>

@@ -16,6 +16,8 @@ const Budget = () => {
 	const handleLogout = useHandleLogout();
 
 	const [budgets, setBudgets] = useState([]);
+	const [editBudget, setEditBudget] = useState(null)
+	const [open, setOpen] = useState(false);
 
 	const { selectedAccountId, loadingAccount } = useContext(AccountContext);
 	const fetchBudget = async () => {
@@ -25,6 +27,7 @@ const Budget = () => {
 				withCredentials: true
 			})
 			setBudgets(response.data.budgets);
+			
 			console.log('res', response.data.budgets)
 		}
 		catch (error) {
@@ -69,6 +72,8 @@ const Budget = () => {
 						{/* Add Transaction Button */}
 						<CreateBudget
 							fetchBudget={fetchBudget}
+							open={open}
+							setOpen={setOpen}
 						>
 							<div className="group px-6 py-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-400 text-sm font-semibold text-white hover:scale-[1.03] transition-transform duration-300 shadow-md shadow-orange-500/10 hover:cursor-pointer">
 								<span className="relative z-10 flex items-center gap-2">
@@ -113,7 +118,7 @@ const Budget = () => {
 							{budgets.map((bgt) => (
 
 								<div
-									key={bgt._id}
+									key={bgt.budgetId}
 									className="mb-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 hover:border-white/40 hover:shadow-xl hover:shadow-white/10 transition-colors"
 								>
 									<div className="p-5 flex items-center justify-between gap-6">
@@ -181,14 +186,18 @@ const Budget = () => {
 
 										{/* RIGHT: Actions */}
 										<div className="flex flex-col items-center gap-3 pl-4 border-l border-zinc-800">
-											<CreateBudget budget={bgt} fetchBudget={fetchBudget}>
-												<button className="p-2 rounded-lg text-orange-500 hover:text-orange-400 hover:bg-orange-500/10 transition">
-													<SquarePen size={18} />
-												</button>
-											</CreateBudget>
+											<button className="p-2 rounded-lg text-orange-500 hover:text-orange-400 hover:bg-orange-500/10 transition"
+												onClick={() => {
+													setEditBudget(bgt)
+													setOpen(true);
+												}}
+											>
+												<SquarePen size={18} />
+											</button>
+
 
 											<button
-												onClick={() => handleDelete(bgt._id)}
+												onClick={() => handleDelete(bgt.budgetId)}
 												className="p-2 rounded-lg text-zinc-400 hover:text-red-500 hover:bg-red-500/10 transition"
 											>
 												<Trash2 size={18} />
@@ -199,10 +208,20 @@ const Budget = () => {
 
 
 							))}
+
+
 						</div>
 					)}
+
 				</div>
 			</div>
+			<CreateBudget
+				budget={editBudget}
+				open={open}
+				setOpen={setOpen}
+				onClose={() => setEditBudget(null)}
+				fetchBudget={fetchBudget}>
+			</CreateBudget>
 		</div>
 	)
 }

@@ -155,6 +155,7 @@ const CreateTransaction = ({ onSuccess, children, transaction }) => {
             }
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to create transaction")
+            console.log(error.response?.data?.error)
         } finally {
             setSubmitting(false)
             setOpen(false)

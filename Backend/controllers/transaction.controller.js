@@ -2,6 +2,7 @@ const transactionModel = require('../models/transaction.model');
 const userModel = require('../models/user.model');
 const accountModel = require('../models/account.model');
 const transactionService = require('../services/transaction.service');
+const { evaluateBudgets } = require('../services/budget.services');
 
 module.exports.addTransaction = async (req, res, next) => {
 
@@ -51,7 +52,7 @@ module.exports.addTransaction = async (req, res, next) => {
 		} else {
 			currentAccount = accounts.find(acc => acc.isDefault === true);
 		}
-
+		
 		const newTransaction = await transactionService.createTransaction({
 			userId: user._id,
 			accountId: currentAccount._id,
@@ -70,11 +71,13 @@ module.exports.addTransaction = async (req, res, next) => {
 		})
 
 		await balanceUpdate(currentAccount, amount)
+		// ================Check and evaluate budget==============
+		await evaluateBudgets(user, currentAccount._id);
 
 		return res.status(201).json({ message: 'Transaction added successfully!', transaction: newTransaction });
 
 	} catch (error) {
-		return res.status(500).json({ message: error.message });
+		return res.status(500).json({ message: 'Internal server error', error: error.message });
 	}
 }
 
@@ -150,6 +153,7 @@ module.exports.deleteTransaction = async (req, res, next) => {
 
 module.exports.updateTransaction = async (req, res, next) => {
 
+	const user = req.user;
 	const { id } = req.params;
 	const { data } = req.body;
 	console.log('data,', data)
@@ -192,6 +196,9 @@ module.exports.updateTransaction = async (req, res, next) => {
 		if (newAccount) {
 			balanceUpdate(newAccount, data.amount)
 		}
+
+		// ================Check and evaluate budget==============
+		await evaluateBudgets(user, updatedTransaction.accountId);
 
 		return res.status(200).json({ message: "Transaction updated!", transaction: updatedTransaction })
 

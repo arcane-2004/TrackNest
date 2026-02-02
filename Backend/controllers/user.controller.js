@@ -166,7 +166,8 @@ module.exports.forgetPassword = async (req, res, next) => {
 
         const data = {
             email: email,
-            otp: otp,
+            subject: 'Reset Password OTP',
+            text: `Your OTP is ${otp}`
         }
         await sendEmail(data);
 

@@ -36,8 +36,9 @@ const BudgetSchema = new mongoose.Schema({
         default: 'Monthly'
     },
 
-    lastAlertSent: {
-        type: Date,
+    alert80Sent: {
+        type: Boolean,
+        default: false
     },
 
     createdAt: {
@@ -58,7 +59,7 @@ const BudgetSchema = new mongoose.Schema({
     })
 
 
-BudgetSchema.statics.getDateRange = async function(period) {
+BudgetSchema.statics.getDateRange = async function (period) {
     const now = new Date();
 
     switch (period) {

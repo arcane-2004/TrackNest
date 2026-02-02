@@ -250,10 +250,10 @@ module.exports.monthSummary = async (req, res) => {
         return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const start = new Date(Date.UTC(+year, +month, 1));
-    const end   = new Date(Date.UTC(+year, +month+1 , 0));
+    const start = new Date(Date.UTC(year, month -1, 1))
+    const end = new Date(Date.UTC(year, month , 1));
 
-    console.log('seart', start)
+    console.log('start', month)
     console.log('end', end)
     const accountObjectId = new mongoose.Types.ObjectId(accountId);
 
@@ -300,7 +300,7 @@ module.exports.monthSummary = async (req, res) => {
                                         date: "$dateTime"
                                     }
                                 },
-                                total: { $sum: { $abs : "$amount"} }
+                                total: { $sum: { $abs: "$amount" } }
                             }
                         },
                         {

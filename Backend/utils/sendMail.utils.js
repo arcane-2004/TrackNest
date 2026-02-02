@@ -15,8 +15,8 @@ const sendMail = async (data) => {
         const mailOptions = {
             from: process.env.GMAIL_USER,
             to: data.email,
-            subject: 'Reset Password OTP',
-            text: `Your OTP is ${data.otp}`
+            subject: data.subject,
+            text: data.text,
         }
        const result = await transpoter.sendMail(mailOptions)
         return result;
