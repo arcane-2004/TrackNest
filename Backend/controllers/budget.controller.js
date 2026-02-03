@@ -3,6 +3,13 @@ const budgetModel = require('../models/budget.model');
 const budgetService = require('../services/budget.services')
 const transactionModel = require('../models/transaction.model');
 
+
+const IST_OFFSET_MINUTES = 5 * 60 + 30;
+
+const istToUtc = (date) => {
+    return new Date(date.getTime() - IST_OFFSET_MINUTES * 60 * 1000);
+};
+
 module.exports.createBudget = async (req, res, next) => {
 
     const { accountId } = req.params;
@@ -15,11 +22,11 @@ module.exports.createBudget = async (req, res, next) => {
     try {
 
         const { scope, categoryId, limit, period } = req.body;
-       
+
         const newBudget = await budgetService.createBudget({
             userId: user._id,
             accountId: accountId,
-            scope:scope,
+            scope: scope,
             categoryId,
             limit: limit,
             period: period,
@@ -55,11 +62,14 @@ module.exports.getBudget = async (req, res, next) => {
 
                 const { start, end } = await budgetModel.getDateRange(budget.period);
 
+                const utcStart = istToUtc(new Date(start));
+                const utcEnd = istToUtc(new Date(end));
+
                 const match = {
                     userId: user._id,
                     accountId: accountObjectId,
                     isExpense: true,
-                    dateTime: { $gte: start, $lt: end }
+                    dateTime: { $gte: utcStart, $lt: utcEnd }
                 };
 
                 // Category filter only if needed
@@ -67,7 +77,7 @@ module.exports.getBudget = async (req, res, next) => {
                     match.categoryId = budget.categoryId._id;
                 }
 
-                
+
 
                 const result = await transactionModel.aggregate([
                     { $match: match },

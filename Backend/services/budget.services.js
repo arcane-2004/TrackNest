@@ -70,14 +70,14 @@ getDateRange = async function (period) {
     }
 }
 
-module.exports.evaluateBudgets = async ( user, accountId ) => {
+module.exports.evaluateBudgets = async (user, accountId) => {
 
 
     const budgets = await budgetModel
         .find({ userId: user._id, accountId })
         .populate('categoryId');
 
-        console.log('budgets', budgets)
+    console.log('budgets', budgets)
 
     const accountObjectId = new mongoose.Types.ObjectId(accountId);
 
@@ -155,3 +155,65 @@ module.exports.evaluateBudgets = async ( user, accountId ) => {
         }
     }
 }
+
+
+function startOfUTCWeek(date) {
+    const d = new Date(date);
+    const day = d.getUTCDay(); // 0 = Sun, 1 = Mon
+    const diff = day === 0 ? -6 : 1 - day; // Monday as start
+    d.setUTCDate(d.getUTCDate() + diff);
+    d.setUTCHours(0, 0, 0, 0);
+    return d;
+}
+
+function isPeriodOver(budget) {
+    const now = new Date();
+    const last = new Date(budget.lastResetAt);
+
+    switch (budget.period) {
+        case "Daily":
+            return (
+                now.getUTCFullYear() !== last.getUTCFullYear() ||
+                now.getUTCMonth() !== last.getUTCMonth() ||
+                now.getUTCDate() !== last.getUTCDate()
+            );
+
+        case "Weekly":
+            return (
+                startOfUTCWeek(now).getTime() !==
+                startOfUTCWeek(last).getTime()
+            );
+
+        case "Monthly":
+            return (
+                now.getUTCFullYear() !== last.getUTCFullYear() ||
+                now.getUTCMonth() !== last.getUTCMonth()
+            );
+
+        case "Yearly":
+            return now.getUTCFullYear() !== last.getUTCFullYear();
+
+        default:
+            return false;
+    }
+}
+
+
+module.exports.resetExpiredBudgets = async () => {
+    const budgets = await budgetModel.find();
+    for (const budget of budgets) {
+        if (isPeriodOver(budget)) {
+            await budgetModel.updateOne(
+                { _id: budget._id },
+                {
+                    $set: {
+                        alert80Sent: false,
+                        lastResetAt: new Date()
+                    }
+                }
+            );
+        }
+    }
+}
+
+

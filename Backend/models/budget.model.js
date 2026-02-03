@@ -40,17 +40,17 @@ const BudgetSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    lastResetAt: {
+        type: Date,
+        default: Date.now
+    },
 
     createdAt: {
         type: Date,
         default: Date.now,
     },
 
-    updatedAt: {
-        type: Date,
-        default: Date.now,
-    }
-    ,
+
 },
     {
         timestamps: true,
