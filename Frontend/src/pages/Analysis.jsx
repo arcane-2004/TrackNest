@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import Calendar from '../components/Calendar';
 import TinyAreaChart from '../components/AreaChart';
 import TinyBarChart from '../components/BarGraph';
+import Insights from '../components/Insights';
 
 const Analysis = () => {
 
@@ -184,6 +185,7 @@ const Analysis = () => {
 						</div>
 					</div>
 
+					<Insights />
 
 				</div>
 			</div>

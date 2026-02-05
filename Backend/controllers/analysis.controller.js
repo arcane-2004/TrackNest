@@ -1,7 +1,7 @@
 const categoryModel = require('../models/category.model');
 const transactionModel = require('../models/transaction.model');
 const mongoose = require("mongoose");
-const { getUTCRange } = require("../utils/dateRanges");
+const insightsService = require("../services/insights.service")
 
 
 const IST_OFFSET_MINUTES = 5 * 60 + 30;
@@ -45,7 +45,6 @@ const buildUtcRange = ({ range, year, month, date }) => {
 
     return startDate && endDate ? { $gte: startDate, $lte: endDate } : null;
 };
-
 
 module.exports.categorySummary = async (req, res, next) => {
 
@@ -261,7 +260,7 @@ module.exports.monthlyTrend = async (req, res, next) => {
 
 }
 
-module.exports.monthSummary = async (req, res) => {
+module.exports.monthSummary = async (req, res, next) => {
     const { accountId } = req.params;
     const user = req.user;
     const { year, month } = req.query;
@@ -384,3 +383,38 @@ module.exports.monthSummary = async (req, res) => {
         });
     }
 };
+
+
+module.exports.budgetInsights = async (req, res, next) => {
+    const user = req.user;
+    const budgetArray = req.budgetArray;
+
+    if (!user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    if (!budgetArray) {
+        return res.status(404).json({ message: 'No budget set' })
+    }
+
+    try {
+
+        const insights = await insightsService.buildBudgetInsights(budgetArray, user);
+
+        
+
+        const finalInsigts = insights.map(insights => ({
+            ...insights,
+            message:insightsService.buildInsightMessage(insights)
+        }))
+
+       console.log('inights', finalInsigts);
+
+    } catch(error) {
+        console.error("Failed to process data:", error);
+        throw error;
+    }
+
+
+
+}

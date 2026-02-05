@@ -103,6 +103,8 @@ module.exports.getBudget = async (req, res, next) => {
                     scope: budget.scope,
                     categoryId: budget.categoryId || null,
                     period: budget.period,
+                    periodStart: utcStart,
+                    periodEnd: utcEnd,
                     limit: budget.limit,
                     spent,
                     remaining,
@@ -111,6 +113,7 @@ module.exports.getBudget = async (req, res, next) => {
             })
         );
 
+        req.budgetArray = budgetArray;
         return res.status(200).json({
             budgets: budgetArray
         });
@@ -118,6 +121,9 @@ module.exports.getBudget = async (req, res, next) => {
 
     } catch (error) {
         return res.status(500).json({ message: "Internal server error", error: error.message });
+    } finally {
+
+        next()
     }
 }
 
