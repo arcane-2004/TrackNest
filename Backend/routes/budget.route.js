@@ -12,4 +12,5 @@ router.put('/update-budget/:budgetId', authMiddleware.authUser, budgetController
 router.delete('/delete-budget/:budgetId', authMiddleware.authUser, budgetController.deleteBudget);
 
 
+
 module.exports = router;

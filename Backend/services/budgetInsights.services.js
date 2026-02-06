@@ -83,6 +83,8 @@ function calculateBudgetHealth(budget) {
         return {
             budgetId: budget.budgetId,
             budgetName: budget.categoryId?.name || "Overall",
+            periodStart: budget.periodStart,
+            periodEnd: budget.periodEnd,
             status,
             trend,
             deviation,

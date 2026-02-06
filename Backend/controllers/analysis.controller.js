@@ -1,7 +1,9 @@
 const categoryModel = require('../models/category.model');
 const transactionModel = require('../models/transaction.model');
 const mongoose = require("mongoose");
-const insightsService = require("../services/insights.service")
+const budgetInsightsServices = require("../services/budgetInsights.services")
+const aiInsightsServices = require("../services/aiInsights.services");
+
 
 
 const IST_OFFSET_MINUTES = 5 * 60 + 30;
@@ -385,9 +387,8 @@ module.exports.monthSummary = async (req, res, next) => {
 };
 
 
-module.exports.budgetInsights = async (req, res, next) => {
-    const user = req.user;
-    const budgetArray = req.budgetArray;
+module.exports.systemBudgetInsights = async (req, res, next) => {
+    const { user, budgetArray } = req;
 
     if (!user) {
         return res.status(401).json({ message: "Unauthorized" });
@@ -399,22 +400,41 @@ module.exports.budgetInsights = async (req, res, next) => {
 
     try {
 
-        const insights = await insightsService.buildBudgetInsights(budgetArray, user);
-
-        
-
-        const finalInsigts = insights.map(insights => ({
+        const insights = await budgetInsightsServices.buildBudgetInsights(budgetArray, user);
+        const systemBudgetInsights = insights.map(insights => ({
             ...insights,
-            message:insightsService.buildInsightMessage(insights)
+            messages: budgetInsightsServices.buildInsightMessage(insights)
         }))
 
-       console.log('inights', finalInsigts);
+        req.systemBudgetInsights = systemBudgetInsights;
+        return res.status(200).json({message: "Budget system insights", systemBudgetInsights: systemBudgetInsights});
 
-    } catch(error) {
-        console.error("Failed to process data:", error);
-        throw error;
+    } catch (error) {
+        return res.status(500).json({ message: 'Something went wrong', error: error })
+    }
+    finally{
+        next();
     }
 
+}
 
+module.exports.aiBudgetInsights = async (req, res, next) => {
+
+    const { user, systemBudgetInsights } = req;
+    if (!user) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    if (!systemBudgetInsights) {
+        return res.status(404).json({ message: 'error generating ai insights', error: "system budget insights not found" })
+    }
+
+    try {
+
+        const aiInsights = await aiInsightsServices.generateAIInsights(systemBudgetInsights);
+
+    } catch (error) {
+        return res.status(500).json({ message: 'Something went wrong', error: error })
+    }
 
 }

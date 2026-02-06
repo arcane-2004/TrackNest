@@ -12,6 +12,8 @@ router.get('/monthly-trend/:accountId', authMiddleware.authUser, analysisControl
 
 router.get('/month-summary/:accountId', authMiddleware.authUser, analysisController.monthSummary);
 
-router.get('/insights/budgets/:accountId', authMiddleware.authUser, budgetController.getBudget, analysisController.budgetInsights);
+router.get('/budgets/system-insights/:accountId', authMiddleware.authUser, budgetController.getBudget, analysisController.systemBudgetInsights);
+
+router.get('/budget/ai-insights/:accountId', authMiddleware.authUser, analysisController.systemBudgetInsights, analysisController.aiBudgetInsights)
 
 module.exports = router;    
