@@ -7,7 +7,7 @@ const Insights = () => {
 
     const { selectedAccountId, } = useContext(AccountContext);
 
-    const [insights, setInsights] = useState([]);
+    const [insights, setInsights] = useState(null);
     const [loading, setLoading] = useState(false)
 
     const fetchBudgetInsights = async () => {
@@ -45,9 +45,10 @@ const Insights = () => {
                     </div>
 
                     <button
-                        className="flex items-center gap-2 rounded-xl bg-orange-500/90 px-4 py-2 text-sm font-semibold text-black hover:bg-orange-500 transition"
+                        className="flex items-center gap-2 rounded-xl bg-orange-500/90 px-4 py-2 text-sm font-semibold text-black hover:bg-orange-500 transition disabled:cursor-not-allowed"
 
                         onClick={() => { fetchBudgetInsights() }}
+                        button disabled={loading}
                     >
                         {
                             loading ? '✨ Generating...'
@@ -58,7 +59,7 @@ const Insights = () => {
                 </div>
 
                 {/* ============== overview display =================== */}
-                <div className="mt-4 rounded-2xl border border-orange-500/30 bg-orange-500/5 p-6 shadow-sm hover:shadow-md transition-shadow">
+               { insights &&  (<div className="mt-4 rounded-2xl border border-orange-500/30 bg-orange-500/5 p-6 shadow-sm hover:shadow-md transition-shadow">
                     {/* Tone indicator */}
                     <div className="flex items-center gap-2 mb-3">
                         <span
@@ -103,7 +104,8 @@ const Insights = () => {
                             </ul>
                         </div>
                     )}
-                </div>
+                </div>)
+                }
 
             </div>
 

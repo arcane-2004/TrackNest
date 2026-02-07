@@ -16,7 +16,7 @@ const Budget = () => {
 
 	const [budgets, setBudgets] = useState([]);
 	const [systemBudgetInsights, setSystemBudgetInsights] = useState([]);
-	const [aiBudgetInsights, setAiBudgetInsights] = useState([])
+	const [aiBudgetInsights, setAiBudgetInsights] = useState(null)
 	const [editBudget, setEditBudget] = useState(null)
 	const [open, setOpen] = useState(false);
 	const [loading, setLoading] = useState(false)
