@@ -82,10 +82,11 @@ export default function SignupFormDemo() {
       </h2>
      
 
-      <Formik onSubmit={handleSubmit} validationSchema={validtionSchema} initialValues={initialStates}>
+      <Formik
+      onSubmit={handleSubmit} validationSchema={validtionSchema} initialValues={initialStates}>
         {({ handleBlur, handleChange, touched, errors }) =>
 
-          <Form className="my-8">
+          <Form className="my-8 text-white">
             <LabelInputContainer className="mb-4">
               <Label htmlFor="email">Email Address</Label>
               <Input

@@ -90,28 +90,23 @@ export default function SignupFormDemo() {
 
         {({ handleBlur, handleChange, touched, errors }) =>
 
-          <Form className="my-8">
+          <Form className="my-8 text-white">
             <div
               className="mb-4 flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
               <LabelInputContainer>
-                <Label htmlFor="firstname">First name</Label>
+                <Label htmlFor="firstname">Name</Label>
                 <Input id="name"
                   name="name"
                   placeholder=" "
                   type="text"
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className="bg-white/5 border-1 border-white/20"
+                  className="bg-white/5 border-1 border-white/20 "
                 />
                 {touched.name && errors.name && (
                   <p className="text-red-500 text-sm mt-1">{errors.name} </p>
                 )}
 
-              </LabelInputContainer>
-
-              <LabelInputContainer>
-                <Label htmlFor="lastname">Last name</Label>
-                <Input id="lastname" placeholder=" " type="text" className="bg-white/5 border-1 border-white/20"/>
               </LabelInputContainer>
             </div>
 

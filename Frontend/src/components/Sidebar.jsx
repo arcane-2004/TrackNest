@@ -1,7 +1,7 @@
 import React from 'react'
 import { motion } from 'motion/react'
 import { useState } from 'react';
-import { User, House, NotebookTabs, Wallet, Logs, FileChartColumn, ChartPie } from 'lucide-react';
+import {Settings, House, NotebookTabs, Wallet, Logs, FileChartColumn, ChartPie } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Logo_2 from './Logo_2';
 
@@ -86,7 +86,6 @@ const Sidebar = () => {
 
     const menuItems = [
         { id: "dashboard", icon: House, lable: "Dashboard", path: "/dashboard" },
-        { id: "user", icon: User, lable: "Userdafdadsaf", path: "/profile" },
         { id: "transactions", icon: NotebookTabs, lable: "Transactions", path: "/transactions" },
         { id: "accounts", icon: Wallet, lable: "Accounts", path: "/accounts" },
         { id: "category", icon: Logs, lable: "Category", path: "/category" },
@@ -188,8 +187,8 @@ const Sidebar = () => {
 
                     </div>
                 </div>
-                <div className='h-10 w-10 rounded-full bg-blue-500 flex items-center justify-center absolute bottom-0 m-4'>
-                    <span>SK</span>
+                <div className='h-10 w-10 rounded-full bg-orange-500 flex items-center justify-center absolute bottom-0 m-4 hover:cursor-pointer transition-transform duration-300 hover:scale-105'>
+                    <span><Settings/></span>
                 </div>
             </motion.div >
 
