@@ -1,9 +1,9 @@
 import React from 'react'
 import { motion } from 'motion/react'
 import { useState } from 'react';
-import { User, House, NotebookTabs, Wallet, Logs, FileChartColumn, ChartPie  } from 'lucide-react';
+import { User, House, NotebookTabs, Wallet, Logs, FileChartColumn, ChartPie } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
+import Logo_2 from './Logo_2';
 
 const Sidebar = () => {
 
@@ -90,8 +90,8 @@ const Sidebar = () => {
         { id: "transactions", icon: NotebookTabs, lable: "Transactions", path: "/transactions" },
         { id: "accounts", icon: Wallet, lable: "Accounts", path: "/accounts" },
         { id: "category", icon: Logs, lable: "Category", path: "/category" },
-        { id: "budget", icon: FileChartColumn , lable: "Budget", path: "/budget" },
-        { id: "Analysis", icon: ChartPie , lable: "Analysis", path: "/analysis" },
+        { id: "budget", icon: FileChartColumn, lable: "Budget", path: "/budget" },
+        { id: "Analysis", icon: ChartPie, lable: "Analysis", path: "/analysis" },
     ]
 
     const isActiveRoute = (itemPath) => {
@@ -116,10 +116,15 @@ const Sidebar = () => {
             >
                 <div className="sticky top-0 h-screen overflow-hidden">
                     <div className='h-16 border-[#D9D9DD] border-b p-3'>
-                        <div className='flex items-center'
+                        <div className='flex items-center h-16 -ml-6.5'
                         >
-                            <span>Logo</span>
-                            <motion.h1 className='text-[#fff] m-2 font-bold text-2xl '
+                            <span className=' '><Logo_2
+                                style={{ height: '60px' }}
+                                height={'100'}
+                                color_1={"#C2410C"}
+                                color_2={"#F97316"}
+                            /></span>
+                            <motion.h1 className='text-[#fff] m-2 font-bold text-2xl -mt-4'
                                 variants={textVarient}
                             >
                                 TrackNest
