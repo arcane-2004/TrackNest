@@ -1,10 +1,5 @@
 const formatPeriodForAI = require("../utils/formatPeriodForAI")
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-
-// Initialize Gemini (ensure env var GOOGLE_API_KEY is set)
-const ai = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-
+const {aiResponse} = require("../utils/aiResponse")
 
 function extractAIMessages(messages) {
     return messages.map(m => m.text);
@@ -75,24 +70,7 @@ Respond strictly in the following JSON schema:
 
 }
 
-async function aiResponse(userPrompt) {
-    try {
-        const model = ai.getGenerativeModel({
-            model: "gemini-2.5-flash", // ✅ valid model
-        });
 
-        const result = await model.generateContent(userPrompt);
-        let text = result.response.text();
-        console.log('ai text', text)
-        // ✅ Remove markdown fences if Gemini adds them
-        text = text.replace(/```json|```/g, "").trim();
-
-        return JSON.parse(text);
-    } catch (error) {
-        console.error("AI response error:", error);
-        return null; // graceful fallback
-    }
-}
 
 module.exports.generateAIInsights = async (systemInsights) => {
     try {

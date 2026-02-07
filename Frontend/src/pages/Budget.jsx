@@ -2,24 +2,27 @@ import React from 'react'
 import { useState, useContext, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import { useHandleLogout } from '../utils/user.hooks';
-import { LogOut, SquarePen, Trash2 } from 'lucide-react'
+import { LogOut, } from 'lucide-react'
 import CreateBudget from '../components/CreateBudget';
 import { AccountContext } from '../context/AccountContext';
 import axios from 'axios';
-import { Progress } from "@/components/ui/progress";
 import { toast } from 'react-hot-toast';
-import SimpleGauge from '../components/ProgressGauge';
-import { Icons } from "../assets/CategoryIcons"
+import BudgetCard from '../components/budgetCard';
+
 
 
 const Budget = () => {
 	const handleLogout = useHandleLogout();
 
 	const [budgets, setBudgets] = useState([]);
+	const [systemBudgetInsights, setSystemBudgetInsights] = useState([]);
+	const [aiBudgetInsights, setAiBudgetInsights] = useState([])
 	const [editBudget, setEditBudget] = useState(null)
 	const [open, setOpen] = useState(false);
+	const [loading, setLoading] = useState(false)
 
 	const { selectedAccountId, loadingAccount } = useContext(AccountContext);
+
 	const fetchBudget = async () => {
 
 		try {
@@ -28,20 +31,69 @@ const Budget = () => {
 			})
 			setBudgets(response.data.budgets);
 			
-			console.log('res', response.data.budgets)
 		}
 		catch (error) {
 			console.log(error.response?.data);
 		}
 	}
 
+	const fetchSystemBudgetInsights = async () => {
+		try {
+			const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/analysis/budgets/system-insights/${selectedAccountId}`,
+				{
+					withCredentials: true
+				}
+			)
+			setSystemBudgetInsights(response.data.systemBudgetInsights)
+
+		} catch (error) {
+			console.log(error.response?.data)
+		}
+	}
+
+	const handldFetchAiInsights = async () => {
+
+		try {
+			setLoading(true)
+
+			const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/analysis/budgets/ai-insights/${selectedAccountId}`, { systemBudgetInsights },
+				{
+					withCredentials: true
+				}
+			)
+
+			setAiBudgetInsights(response.data.aiBudgetInsights);
+
+		} catch (error) {
+			console.log(error.response)
+		} finally {
+			setLoading(false)
+		}
+	}
+
 	useEffect(() => {
 		if (!loadingAccount && selectedAccountId) {
 			fetchBudget();
+			fetchSystemBudgetInsights()
 		}
 
 	}, [loadingAccount, selectedAccountId]);
 
+	let budgetsInfo;
+	if (systemBudgetInsights && budgets) {
+		const systemBudgetInsightMap = new Map(
+			(systemBudgetInsights ?? []).map(({ budgetId, messages }) => [
+				budgetId,
+				messages
+			])
+		);
+
+		budgetsInfo = (budgets ?? []).map(budget => ({
+			...budget,
+			messages: systemBudgetInsightMap.get(budget.budgetId) ?? []
+		}));
+
+	}
 
 	// ------------- handleDelete to delete budget ----------
 	const handleDelete = async (budgetId) => {
@@ -109,107 +161,94 @@ const Budget = () => {
 
 				{/* main content */}
 				<div>
-					{budgets.length === 0 ? (
+					{budgetsInfo.length === 0 ? (
 						<div className="mt-20 text-center text-gray-400">
 							No budget set yet. Click "Add Budget" to create one.
 						</div>
 					) : (
 						<div>
-							{budgets.map((bgt) => (
-
+							<div className='w-full mb-6 rounded-2xl border border-white/10 bg-zinc-900/70 backdrop-blur px-6 py-4  hover:border-white/20 transition'>
 								<div
-									key={bgt.budgetId}
-									className="mb-3 rounded-2xl border border-zinc-800 bg-zinc-900/80 hover:border-white/40 hover:shadow-xl hover:shadow-white/10 transition-colors"
+									className="flex items-center justify-between gap-6 mb-6"
 								>
-									<div className="p-5 flex items-center justify-between gap-6">
-
-										{/* LEFT: Budget info */}
-										<div className="flex items-start gap-6 w-full">
-
-											<div className="min-w-[220px]">
-												<div className="flex items-center gap-3">
-													<div
-														className="h-10 w-10 rounded-full flex items-center justify-center border"
-														style={{
-															color: bgt.categoryId?.color,
-															backgroundColor: `${bgt.categoryId?.color}22`,
-															borderColor: `${bgt.categoryId?.color}55`,
-														}}
-													>
-														{bgt.categoryId?.icon && Icons[bgt.categoryId.icon] ? (
-															(() => {
-																const Icon = Icons[bgt.categoryId.icon];
-																return <Icon className="h-6 w-6" />;
-															})()
-														) : (
-															<span className="text-sm font-semibold">₹</span> // fallback
-														)}
-													</div>
-
-													<h3 className="text-lg font-semibold text-white">
-														{bgt.categoryId?.name || "Overall Budget"}
-													</h3>
-												</div>
-
-
-												<p className="mt-1 text-sm text-zinc-400">
-													Period: <span className="text-zinc-300">{bgt.period}</span>
-												</p>
-
-												<div className="mt-3 space-y-1">
-													<p className="text-sm text-zinc-400">
-														Limit:
-														<span className="ml-1 font-medium text-zinc-200">
-															₹{bgt.limit}
-														</span>
-													</p>
-
-													<p className="text-sm text-zinc-400">
-														Spent:
-														<span
-															className={`ml-1 font-medium ${bgt.spent > bgt.limit
-																? "text-red-500"
-																: "text-orange-400"
-																}`}
-														>
-															₹{bgt.spent || 0}
-														</span>
-													</p>
-												</div>
-											</div>
-
-											{/* CENTER: Gauge */}
-											<div className="flex-1 flex justify-center">
-												<SimpleGauge value={bgt.percentUsed} />
-											</div>
-										</div>
-
-										{/* RIGHT: Actions */}
-										<div className="flex flex-col items-center gap-3 pl-4 border-l border-zinc-800">
-											<button className="p-2 rounded-lg text-orange-500 hover:text-orange-400 hover:bg-orange-500/10 transition"
-												onClick={() => {
-													setEditBudget(bgt)
-													setOpen(true);
-												}}
-											>
-												<SquarePen size={18} />
-											</button>
-
-
-											<button
-												onClick={() => handleDelete(bgt.budgetId)}
-												className="p-2 rounded-lg text-zinc-400 hover:text-red-500 hover:bg-red-500/10 transition"
-											>
-												<Trash2 size={18} />
-											</button>
-										</div>
+									{/* LEFT: Text */}
+									<div>
+										<p className="text-sm font-medium text-white">
+											AI Budget Summary
+										</p>
+										<p className="text-xs text-zinc-400 mt-1">
+											Get a clear, combined overview of all your budgets
+										</p>
 									</div>
+
+									{/* RIGHT: Action */}
+									<button
+										className="flex items-center gap-2 bg-orange-500 hover:bg-orange-400 text-black text-sm font-semibold px-4 py-2.5 rounded-xl shadow-lg shadow-orange-500/20 transition disabled:opacity-50 disabled:cursor-not-allowed"
+
+										onClick={() => { handldFetchAiInsights() }}
+										button disabled={loading}
+									>
+										{
+											loading ? 'Generating...' :
+												'Generate'
+										}
+									</button>
+								</div>
+								<div>
+									{aiBudgetInsights && (
+										<div
+											className=" rounded-2xl border border-orange-500/30 bg-orange-500/5 px-6 py-5"
+										>
+											<div className="flex items-center gap-2 mb-2">
+												<span className="text-orange-400 font-semibold text-sm">
+													AI Insight
+												</span>
+											</div>
+
+											<p className="text-white text-sm leading-relaxed">
+												{aiBudgetInsights.summary}
+											</p>
+
+											{aiBudgetInsights.highlights?.length > 0 && (
+												<ul className="mt-3 space-y-1">
+													{aiBudgetInsights.highlights.map((h, i) => (
+														<li key={i} className="text-sm text-zinc-300">
+															• {h}
+														</li>
+													))}
+												</ul>
+											)}
+
+											{aiBudgetInsights.tips?.length > 0 && (
+												<div className="mt-4 pt-3 border-t border-white/10">
+													<p className="text-xs text-zinc-400 mb-2">Suggestions</p>
+													<ul className="space-y-1">
+														{aiBudgetInsights.tips.map((t, i) => (
+															<li key={i} className="text-xs text-zinc-300">
+																– {t}
+															</li>
+														))}
+													</ul>
+												</div>
+											)}
+										</div>
+									)}
+
 								</div>
 
+							</div>
 
-							))}
+							<div>
+								{budgetsInfo.map((bgt) => (
 
-
+									<BudgetCard
+										bgt={bgt}
+										setEditBudget={setEditBudget}
+										handleDelete={handleDelete}
+										setOpen={setOpen}
+									/>
+								))}
+							</div>
 						</div>
 					)}
 

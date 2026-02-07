@@ -27,13 +27,13 @@ const Analysis = () => {
 
 	return (
 
-		<div className="flex h-full w-full bg-[#010101] text-white">
+		<div className="flex h-full w-full bg-[#0f0f0f] text-white">
 			<Sidebar />
 
 			<div className="w-full h-full text-white px-5 overflow-y-auto h-screen relative">
 				{/* Header */}
 
-				<div className="sticky top-0 z-10 bg-[#010101]">
+				<div className="sticky top-0 z-10 bg-[#0f0f0f]">
 					<header className=" flex justify-between items-center mb-2 pb-1 h-16">
 						<h2 className="font-bold text-3xl tracking-tight bg-gradient-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent">
 							Analysis
@@ -48,13 +48,18 @@ const Analysis = () => {
 
 					</header>
 
-					<hr className="border-zinc-800 mb-10" />
+					<hr className="border-zinc-800 mb-3" />
 				</div>
 
 				{/* ----------- Main content ------------ */}
 
-				{/* =================== pie chart ======================= */}
+				
 				<div className="mb-3 ">
+					{/* ==================== insight summary ======================== */}
+					<div>
+						<Insights/>
+					</div>
+					{/* =================== pie chart ======================= */}
 					<div className="w-full flex justify-between items-start gap-7 ">
 						<div className='w-3/5 h-[55vh] border border-zinc-600'>
 
@@ -184,8 +189,6 @@ const Analysis = () => {
 
 						</div>
 					</div>
-
-					<Insights />
 
 				</div>
 			</div>

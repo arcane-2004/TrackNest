@@ -2,6 +2,7 @@ const budgetModel = require("../models/budget.model");
 const mongoose = require('mongoose');
 const sendBudgetAlertMail = require("../utils/sendMail.utils");
 const transactionModel = require("../models/transaction.model")
+const {getDateRange}= require("../utils/getDateRange");
 
 module.exports.createBudget = async ({ userId, accountId, scope, categoryId, limit, period }) => {
     console.log('data', {
@@ -29,47 +30,6 @@ module.exports.createBudget = async ({ userId, accountId, scope, categoryId, lim
     }
 }
 
-
-getDateRange = async function (period) {
-    const now = new Date();
-
-    switch (period) {
-        case "Daily": {
-            const start = new Date(Date.UTC(
-                now.getUTCFullYear(),
-                now.getUTCMonth(),
-                now.getUTCDate()
-            ));
-            const end = new Date(start);
-            end.setUTCDate(start.getUTCDate() + 1);
-            return { start, end };
-        }
-
-        case "Weekly": {
-            const start = new Date(Date.UTC(
-                now.getUTCFullYear(),
-                now.getUTCMonth(),
-                now.getUTCDate() - (now.getUTCDay() || 7) + 1
-            ));
-            const end = new Date(start);
-            end.setUTCDate(start.getUTCDate() + 7);
-            return { start, end };
-        }
-
-        case "Monthly": {
-            const start = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), 1));
-            const end = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth() + 1, 1));
-            return { start, end };
-        }
-
-        case "Yearly": {
-            const start = new Date(Date.UTC(now.getUTCFullYear(), 0, 1));
-            const end = new Date(Date.UTC(now.getUTCFullYear() + 1, 0, 1));
-            return { start, end };
-        }
-    }
-}
-
 module.exports.evaluateBudgets = async (user, accountId) => {
 
 
@@ -83,13 +43,13 @@ module.exports.evaluateBudgets = async (user, accountId) => {
 
     for (const budget of budgets) {
 
-        const { start, end } = await getDateRange(budget.period);
+        const { utcStart, utcEnd } = await getDateRange(budget.period);
 
         const match = {
             userId: user._id,
             accountId: accountObjectId,
             isExpense: true,
-            dateTime: { $gte: start, $lt: end }
+            dateTime: { $gte: utcStart, $lt: utcEnd }
         };
 
         if (budget.scope === "category") {
@@ -100,7 +60,7 @@ module.exports.evaluateBudgets = async (user, accountId) => {
             { $match: match },
             { $group: { _id: null, spent: { $sum: { $abs: "$amount" } } } }
         ]);
-
+        console.log('res', result)
         const spent = result?.[0]?.spent ?? 0;
 
         remaining = budget.limit - spent;
@@ -195,6 +155,62 @@ function isPeriodOver(budget) {
 
         default:
             return false;
+    }
+}
+
+module.exports.getBudgets = async (user, accountId) => {
+
+    const budgetArray = []
+    try {
+        const budgets = await budgetModel
+            .find({ userId: user._id, accountId })
+            .populate('categoryId');
+
+        const accountObjectId = new mongoose.Types.ObjectId(accountId);
+
+        for (const budget of budgets) {
+
+            const { utcStart, utcEnd } = await getDateRange(budget.period);
+
+            const match = {
+                userId: user._id,
+                accountId: accountObjectId,
+                isExpense: true,
+                dateTime: { $gte: utcStart, $lt: utcEnd }
+            };
+
+            if (budget.scope === "category") {
+                match.categoryId = budget.categoryId._id;
+            }
+
+            const result = await transactionModel.aggregate([
+                { $match: match },
+                { $group: { _id: null, spent: { $sum: { $abs: "$amount" } } } }
+            ]);
+            const spent = result?.[0]?.spent ?? 0;
+
+            const remaining = budget.limit - spent;
+            const percentUsed = budget.limit > 0 ? (spent / budget.limit) * 100 : 0;
+
+            budgetArray.push({
+                budgetId: budget._id,
+                scope: budget.scope,
+                categoryId: budget.categoryId || null,
+                period: budget.period,
+                periodStart: utcStart,
+                periodEnd: utcEnd,
+                limit: budget.limit,
+                spent,
+                remaining,
+                percentUsed,
+            });
+        }
+
+        return budgetArray;
+
+    } catch (error) {
+        console.log('Failed to fetch budget', error)
+        return null;
     }
 }
 

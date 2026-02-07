@@ -2,8 +2,8 @@ const categoryModel = require('../models/category.model');
 const transactionModel = require('../models/transaction.model');
 const mongoose = require("mongoose");
 const budgetInsightsServices = require("../services/budgetInsights.services")
-const aiInsightsServices = require("../services/aiInsights.services");
-
+const aiInsightsServices = require("../services/budgetAiInsights.services");
+const completeInsightsServices = require("../services/completeInsights.services");
 
 
 const IST_OFFSET_MINUTES = 5 * 60 + 30;
@@ -395,7 +395,7 @@ module.exports.systemBudgetInsights = async (req, res, next) => {
     }
 
     if (!budgetArray) {
-        return res.status(404).json({ message: 'No budget set' })
+        return res.status(400).json({ message: 'No budget set' })
     }
 
     try {
@@ -420,21 +420,54 @@ module.exports.systemBudgetInsights = async (req, res, next) => {
 
 module.exports.aiBudgetInsights = async (req, res, next) => {
 
-    const { user, systemBudgetInsights } = req;
+    const { user} = req;
+    const {systemBudgetInsights} = req.body;
+    
+
     if (!user) {
-        return res.status(401).json({ message: "Unauthorized" });
+        return res.status(401).json({ message: "Unauthorized", error: 'user not found' });
     }
 
     if (!systemBudgetInsights) {
-        return res.status(404).json({ message: 'error generating ai insights', error: "system budget insights not found" })
+        return res.status(400).json({ message: 'error generating ai insights', error: "system budget insights not found" })
     }
 
     try {
 
         const aiInsights = await aiInsightsServices.generateAIInsights(systemBudgetInsights);
 
+        return res.status(200).json({message: 'AI insights generated', aiBudgetInsights: aiInsights})
+
     } catch (error) {
         return res.status(500).json({ message: 'Something went wrong', error: error })
     }
 
 }
+
+module.exports.completeInsights = async (req, res, next) => {
+
+    const { user} = req;
+    const {accountId} = req.params;
+    
+
+    if (!user) {
+        return res.status(401).json({ message: "Unauthorized", error: 'user not found' });
+    }
+
+    if (!accountId) {
+        return res.status(400).json({ message: 'error generating insights', error: "No account not found" })
+    }
+
+    try {
+
+        const insights = await completeInsightsServices.generateInsights(user, accountId);
+
+        return res.status(200).json({message: 'Complete insight', insights: insights});
+
+    } catch (error) {
+        return res.status(500).json({ message: 'Something went wrong', error: error })
+    }
+
+}
+
+
