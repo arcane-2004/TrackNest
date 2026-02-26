@@ -1,12 +1,11 @@
 "use client";
 import React from "react";
-import HoverBorderGradient from "../components/ui/hover-border-gradient";
 import { useNavigate } from "react-router-dom";
-import SplitText from "../components/ui/SplitText";
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import Navbar from "./Navbar";
 import { User, Headset, Question } from "@phosphor-icons/react"
 import LightRays from '../components/ui/LightRays';
+import Logo_2 from '../components/Logo_2'
 
 export default function SparklesPreview() {
     const navigate = useNavigate();
@@ -31,7 +30,7 @@ export default function SparklesPreview() {
                     saturation={1}
                 />
             </div>
-{/* rgba(219,137,4,0.55) */}
+            {/* rgba(219,137,4,0.55) */}
             {/* LEFT glow */}
             <div
                 className="pointer-events-none absolute top-1/4 -left-56 -translate-y-1/2 h-[900px] w-[1000px] bg-[radial-gradient(circle_at_left,rgba(230,121,2,0.55),transparent_60%)] blur-2xl"
@@ -39,7 +38,7 @@ export default function SparklesPreview() {
             <div
                 className="pointer-events-none absolute top-30 -left-40 -translate-y-1/2 h-[400px] w-[900px] bg-[radial-gradient(circle_at_left,rgba(255,132,0,0.15),transparent_80%)] blur-xl"
             />
-{/* rgba(247,154,2,0.15) */}
+            {/* rgba(247,154,2,0.15) */}
             {/* RIGHT glow */}
             <div
                 className="pointer-events-none absolute -top-32 -right-32 h-[600px] w-[600px] bg-[radial-gradient(circle_at_top_right,rgba(255,132,0,0.65),transparent_55%)] blur-xl"
@@ -47,8 +46,16 @@ export default function SparklesPreview() {
 
             {/* Logo */}
             <div className="flex items-center  h-20 ">
+                <p className="mt-20 ">
+                    <Logo_2
+                        // style={{ height: '60px' }}
+                        height={'180'}
+                        color_1={"#FFAB5C"}
+                        color_2={"#D16500"}
+                    />
+                </p>
 
-                <h1 className="relative z-10 mt-10 ml-14 text-center font-bold text-4xl md:text-7xl lg:text-4xl text-white">
+                <h1 className="relative z-10 mt-10 -ml-10 text-center font-bold text-4xl md:text-7xl lg:text-4xl text-white">
                     TrackNest
 
                 </h1>
@@ -74,13 +81,13 @@ export default function SparklesPreview() {
                     </p>
 
                     <div className="mt-10">
-                        <HoverBorderGradient
-                            as="button"
+                        <button
                             onClick={() => navigate("/login")}
-                            className="px-10 py-5 text-white hover:cursor-pointer"
+                            className="px-10 py-4 rounded-lg border border-orange-500 text-orange-400 font-semibold transition-all duration-400 hover:bg-orange-600 hover:text-white hover:border-orange-600 hover:cursor-pointer active:scale-95"
                         >
                             Get Started
-                        </HoverBorderGradient>
+                        </button>
+
                     </div>
                 </div>
 

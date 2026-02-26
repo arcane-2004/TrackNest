@@ -1,8 +1,10 @@
 import React from 'react'
+import { useState } from 'react';
 import { Button } from "@/components/ui/button"
-import { Ellipsis, Pencil, Trash2, } from 'lucide-react';
+import { Ellipsis, Pencil, Trash2, Info } from 'lucide-react';
 import CreateTransaction from "../components/createTransaction";
 import { Icons } from "../assets/CategoryIcons"
+import TransactionDescription from './TransactionDescription';
 import {
     TableCell,
     TableRow,
@@ -16,14 +18,24 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipTrigger,
+    TooltipProvider,
+} from "@/components/ui/tooltip";
 
 
 
 const TransactionCard = ({ handelDelete, t, i, onSuccess }) => {
-    console.log('tra', t)
+
+    const [open, setOpen] = useState(false)
+
     return (
-        <TableRow key={i} className="hover:bg-zinc-800/50 transition-colors">
+
+        <TableRow key={i} className="hover:bg-zinc-800/50 transition-colors"
+
+        >
 
             <TableCell className="font-medium text-white">
                 {t.name || "Untitled"}
@@ -95,46 +107,40 @@ const TransactionCard = ({ handelDelete, t, i, onSuccess }) => {
             >
                 {t.amount < 0 ? `-₹${Math.abs(t.amount)}` : `+₹${t.amount}`}
             </TableCell>
+
             <TableCell>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-
-                        <Button variant="ghost" className="h-8 w-8 p-0 cursor-pointer">
-                            <Ellipsis className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                        // align="end"
-                        className="w-40 bg-zinc-900 border border-zinc-800 text-zinc-200 rounded-xl shadow-lg p-1"
-                    >
-                        <DropdownMenuLabel className="text-xs uppercase tracking-wider text-zinc-500 px-2 py-1">
-                            Actions
-                        </DropdownMenuLabel>
-                        {/* Edit transaction button */}
-                        <CreateTransaction transaction={t} onSuccess={onSuccess}>
-                            <DropdownMenuItem
-                                onSelect={(e) => e.preventDefault()}
-                                className="flex items-center gap-2 px-3 py-2.5 rounded-md hover:bg-zinc-800 hover:text-orange-400 cursor-pointer transition-colors"
+                <TooltipProvider>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setOpen(true)}
+                                className="h-8 w-8 rounded-lg text-zinc-400 hover:text-orange-400 hover:bg-orange-500/10 transition-all"
                             >
+                                <Info className="h-4 w-4" />
+                            </Button>
+                        </TooltipTrigger>
 
-                                <Pencil className="h-4 w-4 text-zinc-400 group-hover:text-orange-400" />
-                                <span>Edit</span>
-                            </DropdownMenuItem>
-                        </CreateTransaction>
-                        <DropdownMenuItem
-                            className="flex items-center gap-2 px-3 py-2.5 rounded-md hover:bg-red-600/10 hover:text-red-400 cursor-pointer transition-colors"
-                            onClick={() => {
-                                handelDelete(t._id);
-                            }}
+                        <TooltipContent
+                            side="top"
+                            className="px-3 py-2 text-sm rounded-md bg-zinc-900 text-zinc-200 border-l-2 border-orange-500 shadow-[0_0_15px_rgba(249,115,22,0.25)]"
+
                         >
-                            <Trash2 className="h-4 w-4 text-zinc-400 group-hover:text-red-400" />
-                            <span>Delete</span>
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
+                            View details
+                        </TooltipContent>
+                    </Tooltip>
+                </TooltipProvider>
 
-                </DropdownMenu>
             </TableCell>
+            <TransactionDescription
+                transaction={t}
+                open={open}
+                setOpen={setOpen}
+                handelDelete={handelDelete}
+                onSuccess={onSuccess}
 
+            ></TransactionDescription>
         </TableRow >
 
 

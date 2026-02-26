@@ -3,15 +3,16 @@ import React from 'react'
 import { useState, useRef, } from 'react'
 import { gsap } from "gsap";
 import { useGSAP } from '@gsap/react'
-import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import LightPillar from '../components/ui/LightPillar';
 import Signup from '../components/Signup'
 import Signin from '../components/Signin'
 import Logo from '../components/Logo';
-import Logo_2 from '../components/Logo_2';
+import { useNavigate } from 'react-router-dom';
 
 
 const UserSigninSignup = () => {
+
+    const navigate = useNavigate();
 
     const [toggle, setToggle] = useState(false)
     const [firstRender, setFirstRender] = useState(true)
@@ -167,7 +168,9 @@ const UserSigninSignup = () => {
                 />
 
                 {/* <img src={logo} alt="" className='fixed h-35 left-1.5 top-1.5 bg-amber-200 bg-clip-text text-transparent' /> */}
-                <div className="fixed  -top-8 -left-8" >
+                <div className="fixed  -top-8 -left-8 hover:cursor-pointer" 
+                onClick={() => {navigate('/')}}
+                >
                     <Logo
                         style={{ height: '60px' }}
                         height={'180'}

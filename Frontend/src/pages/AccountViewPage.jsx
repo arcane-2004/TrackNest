@@ -93,7 +93,7 @@ const AccountViewPage = () => {
 			const response = await axios.delete(`${import.meta.env.VITE_BASE_URL}/account/delete/${id}`, {
 				withCredentials: true
 			});
-		
+
 			toast.success(response.data.message);
 		} catch (error) {
 
@@ -126,64 +126,67 @@ const AccountViewPage = () => {
 	}
 
 	return (
-		<div className='h-full w-full bg-[#0f0f0f] text-white flex'>
+		<div className='h-full w-full bg-[#0f0f0f] text-white flex overflow-hidden'>
 			<Sidebar />
-			<div className="min-h-screen w-full bg-[#0f0f0f] text-white px-10 py-8 font-sans">
+			<div className="w-full bg-[#0f0f0f] text-white px-5 font-sans overflow-y-auto h-screen relative">
 				{/* Header */}
-				<header className="flex justify-between items-center mb-10">
-					<h2 className="font-bold text-3xl tracking-tight bg-gradient-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent drop-shadow-sm">
-						Account
-					</h2>
+				<div className=' sticky top-0 z-10 bg-[#0f0f0f] '>
+					<header className="h-16 flex items-center justify-between pb-1">
+						<h2 className="font-bold text-3xl tracking-tight bg-gradient-to-r from-orange-400 to-amber-500 bg-clip-text text-transparent drop-shadow-sm">
+							Account
+						</h2>
 
-					<div className="flex gap-4">
-						{/* Delete Button */}
-						<ConfirmAccountDelete
-							accountName={account?.name}
-							onConfirm={handleDeleteAccount}
-						>
-							<div
-								className="flex items-center gap-2 px-5 py-2 rounded-full border border-zinc-700 bg-zinc-900 text-white text-sm font-medium hover:bg-red-600 hover:border-red-600 transition-colors duration-200 cursor-pointer"
+						<div className="flex gap-4">
+							{/* Delete Button */}
+							<ConfirmAccountDelete
+								accountName={account?.name}
+								onConfirm={handleDeleteAccount}
 							>
-								<Trash2 className="h-4 w-4" />
-								<span>Delete</span>
-							</div>
+								<div
+									className="flex items-center gap-2 px-5 py-2 rounded-full border border-zinc-700 bg-zinc-900 text-white text-sm font-medium hover:bg-red-600 hover:border-red-600 transition-colors duration-200 cursor-pointer"
+								>
+									<Trash2 className="h-4 w-4" />
+									<span>Delete</span>
+								</div>
 
-						</ConfirmAccountDelete>
+							</ConfirmAccountDelete>
 
-						{/* Add Transaction Button */}
-						<CreateAccount
-							account={account}
-							onUpdateAccount={onUpdateAccount}
-							id={id}>
+							{/* Add Transaction Button */}
+							<CreateAccount
+								account={account}
+								onUpdateAccount={onUpdateAccount}
+								id={id}>
 
-							<div className="relative group px-6 py-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-400 text-sm font-semibold text-white hover:scale-[1.03] transition-transform duration-300 hover:cursor-pointer shadow-md shadow-orange-500/10">
+								<div className="relative group px-6 py-2 rounded-full bg-gradient-to-r from-orange-500 to-amber-400 text-sm font-semibold text-white hover:scale-[1.03] transition-transform duration-300 hover:cursor-pointer shadow-md shadow-orange-500/10">
 
 
-								<span className="relative z-10 flex items-center gap-2">
-									Edit Account
-									<svg
-										fill="none"
-										height="16"
-										viewBox="0 0 24 24"
-										width="16"
-										xmlns="http://www.w3.org/2000/svg"
-										className="group-hover:rotate-90 transition-transform duration-300"
-									>
-										<path
-											d="M10.75 8.75L14.25 12L10.75 15.25"
-											stroke="currentColor"
-											strokeLinecap="round"
-											strokeLinejoin="round"
-											strokeWidth="1.5"
-										/>
-									</svg>
-								</span>
-							</div>
-						</CreateAccount>
-					</div>
-				</header>
+									<span className="relative z-10 flex items-center gap-2">
+										Edit Account
+										<svg
+											fill="none"
+											height="16"
+											viewBox="0 0 24 24"
+											width="16"
+											xmlns="http://www.w3.org/2000/svg"
+											className="group-hover:rotate-90 transition-transform duration-300"
+										>
+											<path
+												d="M10.75 8.75L14.25 12L10.75 15.25"
+												stroke="currentColor"
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												strokeWidth="1.5"
+											/>
+										</svg>
+									</span>
+								</div>
+							</CreateAccount>
+						</div>
 
-				<hr className="border-zinc-800 mb-8" />
+					</header>
+					<hr className="border-zinc-800 mb-8" />
+				</div>
+
 
 				{/* Account Info */}
 				<div className="mb-6 flex justify-between items-center">

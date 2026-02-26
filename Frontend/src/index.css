@@ -1,6 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&family=Roboto+Condensed:ital,wght@0,100..900;1,100..900&display=swap');
 @import "tailwindcss";
 @source "../node_modules/@ilamy/calendar/dist";
+
 @theme inline {
   --shadow-input:
     0px 2px 3px -1px rgba(0, 0, 0, 0.1),
@@ -9,10 +10,46 @@
 }
 
 @theme {
-  --font-figtree : "Figtree", sans-serif;
+  --font-figtree: "Figtree", sans-serif;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
 }
 
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg,
+      #f97316,
+      #c2410c);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg,
+      #fb923c,
+      #ea580c);
+}
+
+/* .custom-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #ea580c transparent;
+}
+
+.custom-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background-color: #ea580c;
+  border-radius: 10px;
+} */
