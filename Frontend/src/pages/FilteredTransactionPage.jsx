@@ -4,7 +4,7 @@ import Sidebar from "../components/Sidebar";
 import { LogOut, ChevronUp, ChevronDown, Loader2 } from "lucide-react";
 import { useHandleLogout } from "../utils/user.hooks";
 import axios from "axios";
-import CreateTransaction from "../components/createTransaction";
+import CreateTransaction from "../components/CreateTransaction";
 import toast from 'react-hot-toast'
 import TransactionCard from "../components/TransactionCard"
 
