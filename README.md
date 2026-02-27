@@ -10,7 +10,7 @@ A full-stack personal finance management web application that helps users track 
 [![MongoDB](https://img.shields.io/badge/MongoDB-6.0-green?logo=mongodb&logoColor=white)](https://www.mongodb.com)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-**[View Live Demo](https://your-deployed-url.com)** | **[GitHub Repository](https://github.com/your-github-url)**
+**[View Live Demo](https://tracknest-frontend.onrender.com)** 
 
 ---
 
