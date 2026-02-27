@@ -7,7 +7,7 @@ import CreateBudget from '../components/CreateBudget';
 import { AccountContext } from '../context/AccountContext';
 import axios from 'axios';
 import { toast } from 'react-hot-toast';
-import BudgetCard from '../components/budgetCard';
+import BudgetCard from '../components/BudgetCard';
 
 
 
