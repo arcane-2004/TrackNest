@@ -2,7 +2,7 @@ import React from 'react'
 import { useState } from 'react';
 import { Button } from "@/components/ui/button"
 import { Ellipsis, Pencil, Trash2, Info } from 'lucide-react';
-import CreateTransaction from "../components/createTransaction";
+import CreateTransaction from "../components/CreateTransaction";
 import { Icons } from "../assets/CategoryIcons"
 import TransactionDescription from './TransactionDescription';
 import {
