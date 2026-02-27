@@ -9,7 +9,7 @@ import {
     DialogClose,
     DialogFooter,
 } from "@/components/ui/dialog";
-import CreateTransaction from "../components/createTransaction";
+import CreateTransaction from "../components/CreateTransaction";
 import { X, Pencil, Trash2 } from "lucide-react";
 
 const TransactionDescription = ({ transaction, open, setOpen, handelDelete, onSuccess }) => {
